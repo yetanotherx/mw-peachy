@@ -98,10 +98,56 @@ class User {
 	
 	public function unblock() {}
 	
-	public function get_editcount( $database = null ) {
+	public function get_editcount( $force = false, $database = null ) {
 		//First check if $database exists, because that returns a more accurate count
-		if( !is_null( $database ) ) {
+		if( !is_null( $database ) && $database instanceOf Database ) {
+			$count = Database::mysql2array($database->select(
+				'archive',
+				'COUNT(*) as count',
+				array( 
+					array(
+						'ar_user_text',
+						'=',
+						$param
+					)
+				)
+			));
+		
+			if( isset( $count[0]['count'] ) ) {
+				$del_count = $count[0]['count'];
+			}
+			else {
+				$del_count = 0;
+			}
+			unset($count);
+			
+			$count = Database::mysql2array($database->select(
+				'revision',
+				'COUNT(*) as count',
+				array( 
+					array(
+						'rev_user_text',
+						'=',
+						$param
+					)
+				)
+			));
+		
+			if( isset( $count[0]['count'] ) ) {
+				$live_count = $count[0]['count'];
+			}
+			else {
+				$live_count = 0;
+			}
+			
+			$this->editcount = $del_count + $live_count;
 		}
+		else {
+			if( $force ) {
+				$this->__construct( $this->wiki, $this->username );
+			}
+		}
+		return $this->editcount;
 	}
 	
 	public function get_contribs( $mostrecentfirst = true, $limit = null ) {

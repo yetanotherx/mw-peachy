@@ -38,7 +38,6 @@ require_once( $IP . 'Page.php' );
 require_once( $IP . 'User.php' );
 require_once( $IP . 'HTTP.php' );
 
-$pgHTTP = new HTTP;
 $pgProxy = array();
 $pgHTTPEcho = false;
 $pgRunPage = null;
@@ -51,6 +50,8 @@ $pgPechoTypes = array(
 	'ERROR',
 	'FAT'
 );
+
+$pgHTTP = new HTTP;
 
 $mwVersion = null;
 
@@ -89,7 +90,7 @@ class Peachy {
 		global $pgHTTP, $mwVersion;
 		
 		$siteinfo = unserialize( $pgHTTP->get( 
-			"http://en.wikipedia.org/w/api.php",
+			$base_url,
 			 array( 'action' => 'query',
 				'meta' => 'siteinfo',
 				'format' => 'php',

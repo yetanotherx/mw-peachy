@@ -58,16 +58,17 @@ class Page {
 				$title = substr($title, 1);
 			}
 			$namespace = explode( ':', $title, 2 );
-			$title = $namespace[1];
-			$namespace = strtolower( trim( $namespace[0] ) );
-			$namespaces = $this->wiki->getNamespaces();
-			if( $namespace == $namespaces[-2] || $namespace == "media" ){
-				// Media or local variant, translate to File:
-				$title = $namespaces[6] . ":" . $title;
-			}
-			elseif( $namespace == $namespaces[-1] || $namespace == "special" ){
-				//Special or local variant, error
-				throw new BadTitle( "Special pages are not currently supported by the API." );
+			if(count($namespace) != 1){
+				$namespace = strtolower( trim( $namespace[0] ) );
+				$namespaces = $this->wiki->getNamespaces();
+				if( $namespace == $namespaces[-2] || $namespace == "media" ){
+					// Media or local variant, translate to File:
+					$title = $namespaces[6] . ":" . $namespace[1];
+				}
+				elseif( $namespace == $namespaces[-1] || $namespace == "special" ){
+					//Special or local variant, error
+					throw new BadTitle( "Special pages are not currently supported by the API." );
+				}
 			}
 		}
 		
@@ -595,7 +596,7 @@ class Page {
 	}
 	
 	public function switchDiscussion() {
-		if($this->namespace_id < 0 || $this->namespace_id == "") {
+		if($this->namespace_id < 0 || $this->namespace_id === "") {
 			// No discussion page exists
 			// Guessing we want to error
 			throw new BadEntryError("switchDiscussion","tried to switch to the discussion page of page which could never have one");

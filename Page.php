@@ -53,7 +53,22 @@ class Page {
 		
 		if( $normalize ) {
 			$title = str_replace( '_', ' ', $title );
-
+			$title = str_replace( '%20', ' ', $title );
+			if( $title[0] == ":" ){
+				$title = substr($title, 1);
+			}
+			$namespace = explode( ':', $title, 2 );
+			$title = $namespace[1];
+			$namespace = strtolower( trim( $namespace[0] ) );
+			$namespaces = $this->wiki->getNamespaces();
+			if( $namespace == $namespaces[-2] || $namespace == "media" ){
+				// Media or local variant, translate to File:
+				$title = $namespaces[6] . ":" . $title;
+			}
+			elseif( $namespace == $namespaces[-1] || $namespace == "special" ){
+				//Special or local variant, error
+				throw new BadTitle( "Special pages are not currently supported by the API." );
+			}
 		}
 		
 		$pageInfoArray = array(
@@ -583,7 +598,7 @@ class Page {
 		if($this->namespace_id < 0 || $this->namespace_id == "") {
 			// No discussion page exists
 			// Guessing we want to error
-			throw new Exception('Error: tried to switch to the discussion page of page which could never have one');
+			throw new BadEntryError("switchDiscussion","tried to switch to the discussion page of page which could never have one");
 			return false;
 		} else {
 			$namespaces = $this->wiki->getNamespaces();

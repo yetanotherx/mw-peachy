@@ -64,13 +64,12 @@ class Peachy {
 		$extensions = Peachy::wikiChecks( $base_url );
 		
 		
-		$hookOut = Hooks::runHook( 'StartLogin', array( &$IP ) );
-		if( !is_null( $hookOut ) ) $config_params = $hookOut;
+		Hooks::runHook( 'StartLogin', array( &$config_params, &$extensions ) );
 		
 		if( !isset( $config_params['username'] ) || 
 			!isset( $config_params['password'] ) ||
 			!isset( $config_params['baseurl'] ) ) {
-			throw new LoginError( "MissingParam", "Either the username, password, or baseurl parameter was not set." );
+			throw new LoginError( array( "MissingParam", "Either the username, password, or baseurl parameter was not set." ) );
 		}
 		
 		$w = new Wiki( $config_params, $extensions['extensions'], $extensions['versions'], false, null );

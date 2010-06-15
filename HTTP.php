@@ -24,6 +24,8 @@ class HTTP {
 	private $use_cookie = null;
 	
 	function __construct() {
+		global $pgUA;
+		
 		if( !function_exists( 'curl_init' ) ) {
 			throw new DependencyError( "cURL", "http://us2.php.net/manual/en/curl.requirements.php" );
 		}
@@ -40,7 +42,7 @@ class HTTP {
 		curl_setopt($this->curl_instance,CURLOPT_RETURNTRANSFER,1);
 		curl_setopt($this->curl_instance,CURLOPT_TIMEOUT,30);
 		curl_setopt($this->curl_instance,CURLOPT_CONNECTTIMEOUT,10);
-		curl_setopt($this->curl_instance,CURLOPT_USERAGENT,'Peachy MediaWiki Bot API Version ' . PEACHYVERSION);
+		curl_setopt($this->curl_instance,CURLOPT_USERAGENT, $pgUA);
 
 		##FIXME: Allow for logging in with a saved cookie, to save login time
 	}

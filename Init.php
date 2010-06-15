@@ -43,6 +43,14 @@ $pgProxy = array();
 $pgHTTPEcho = false;
 $pgRunPage = null;
 $pgVerbose = array(0,1,2,3,4);
+$pgUA = 'Peachy MediaWiki Bot API Version ' . PEACHYVERSION;
+$pgPechoTypes = array(
+	'NORMAL',
+	'NOTICE',
+	'WARN',
+	'ERROR',
+	'FAT'
+);
 
 $mwVersion = null;
 

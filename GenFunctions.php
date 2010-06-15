@@ -71,6 +71,8 @@ function checkExclusion( $text, $username = null, $optout = null ) {
 function outputText( $text, $cat = 0 ) {
 	global $pgVerbose;
 	
+	Hooks::runHook( 'OutputText', array( &$text, &$cat ) );
+	
 	if( in_array( $cat, $pgVerbose ) ) echo $text;
 }
 

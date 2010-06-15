@@ -32,7 +32,7 @@ class Wiki {
 	private $namespaces = null;
 
 	function __construct( $configuration, $extensions = array(), $extversions = array(), $recursed = false, $token = null ) {
-		global $pgHTTP, $pgProxy, $pgHTTPEcho, $pgRunPage, $pgVerbose;
+		global $pgHTTP, $pgProxy, $pgHTTPEcho, $pgRunPage, $pgVerbose, $pgUA;
 		
 		$this->base_url = $configuration['baseurl'];
 		$this->username = $configuration['username'];
@@ -67,6 +67,10 @@ class Wiki {
 			$pgRunPage = $configuration['runpage'];
 		}
 		
+		if( isset( $configuration['useragent'] ) ) {
+			$pgUA = $configuration['useragent'];
+		}
+		
 		if( isset( $configuration['verbose'] ) ) {
 			$pgVerbose = array();
 			
@@ -85,7 +89,7 @@ class Wiki {
 						case 'NOTICE':
 							$pgVerbose[] = 1;
 							break;
-						case 'WARNING':
+						case 'WARN':
 							$pgVerbose[] = 2;
 							break;
 						case 'ERROR':

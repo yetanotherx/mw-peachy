@@ -538,8 +538,14 @@ class Page {
 		
 		if( !$force ) {
 			//Perform nobots checks, login checks, /Run checks
+			$die = true;
+			Hooks::runHook( 'SoftEditBlock', array( &$editarray, &$die ) );
+			if( 1 == 2 && $die ) {
+				die();
+			}
 		}
 		
+		Hooks::runHook( 'StartEdit', array( &$editarray ) );
 		
 		$result = $this->wiki->apiQuery( $editarray, true );
 		
@@ -622,6 +628,8 @@ class Page {
 			$editarray['maxlag'] = $this->wiki->get_maxlag();
 		}
 		
+		Hooks::runHook( 'StartMove', array( &$editarray ) );
+		
 		$result = $this->wiki->apiQuery( $editarray, true );
 		
 		if( isset( $result['error'] ) ) {
@@ -652,12 +660,16 @@ class Page {
 		
 		$tokens = $this->wiki->getTokens();
 		
-		$result = $this->wiki->apiQuery( array(
+		$editarray = array(
 			'action' => 'delete',
 			'title' => $this->title,
 			'token' => $tokens['delete'],
 			'reason' => $reason
-		), true);
+		);
+		
+		Hooks::runHook( 'StartDelete', array( &$editarray ) );
+		
+		$result = $this->wiki->apiQuery( $editarray, true);
 		
 		if( isset( $result['error'] ) ) {
 			throw new DeleteError( $result['error']['code'], $result['error']['info'] );
@@ -700,6 +712,9 @@ class Page {
 				$undelArray['timestamps'] = implode('|',$timestamps);
 			}
 		}
+		
+		Hooks::runHook( 'StartUndelete', array( &$undelArray ) );
+		
 		$result = $this->wiki->apiQuery( $undelArray, true);
 		
 		if( isset( $result['error'] ) ) {
@@ -771,7 +786,9 @@ class Page {
     }
 	
 	public function watch() {
-
+		
+		Hooks::runHook( 'StartWatch' );
+		
 		$result = $this->wiki->apiQuery( array(
 			'action' => 'watch',
 			'title' => $this->title,
@@ -795,7 +812,8 @@ class Page {
 	}
 	
 	public function unwatch() {
-	
+		Hooks::runHook( 'StartUnwatch' );
+		
 		$result = $this->wiki->apiQuery( array(
 			'action' => 'watch',
 			'title' => $this->title,

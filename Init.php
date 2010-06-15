@@ -33,6 +33,7 @@ require_once( $IP . 'Diff/Diff.php' );
 require_once( $IP . 'Wiki.php' );
 require_once( $IP . 'Database.php' ); ##FIXME: Add PostgreSQL support
 require_once( $IP . 'Image.php' );
+require_once( $IP . 'Hooks.php' );
 require_once( $IP . 'Page.php' );
 require_once( $IP . 'User.php' );
 require_once( $IP . 'HTTP.php' );
@@ -61,6 +62,16 @@ class Peachy {
 		}
 		
 		$extensions = Peachy::wikiChecks( $base_url );
+		
+		
+		$hookOut = Hooks::runHook( 'StartLogin', array( &$IP ) );
+		if( !is_null( $hookOut ) ) $config_params = $hookOut;
+		
+		if( !isset( $config_params['username'] ) || 
+			!isset( $config_params['password'] ) ||
+			!isset( $config_params['baseurl'] ) ) {
+			throw new LoginError( "MissingParam", "Either the username, password, or baseurl parameter was not set." );
+		}
 		
 		$w = new Wiki( $config_params, $extensions['extensions'], $extensions['versions'], false, null );
 		return $w;

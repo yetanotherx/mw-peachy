@@ -70,7 +70,7 @@ class Hooks {
 			
 			$hookRet = call_user_func_array( $fncarr, $args );
 			
-			return $hookRet;
+			if( !is_null( $hookRet ) ) return $hookRet;
 			
 		 }
 

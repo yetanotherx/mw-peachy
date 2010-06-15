@@ -32,7 +32,7 @@ class Wiki {
 	private $namespaces = null;
 
 	function __construct( $configuration, $extensions = array(), $extversions = array(), $recursed = false, $token = null ) {
-		global $pgHTTP, $pgProxy, $pgHTTPEcho, $pgRunPage;
+		global $pgHTTP, $pgProxy, $pgHTTPEcho, $pgRunPage, $pgVerbose;
 		
 		$this->base_url = $configuration['baseurl'];
 		$this->username = $configuration['username'];
@@ -65,6 +65,40 @@ class Wiki {
 		
 		if( isset( $configuration['runpage'] ) ) {
 			$pgRunPage = $configuration['runpage'];
+		}
+		
+		if( isset( $configuration['verbose'] ) ) {
+			$pgVerbose = array();
+			
+			$tmp = explode('|',$configuration['verbose']);
+			
+			foreach( $tmp as $setting ) {
+				if( $setting == "ALL" ) {
+					$pgVerbose = array( 0,1,2,3,4 );
+					break;
+				}
+				else {
+					switch( $setting ) {
+						case 'NORMAL':
+							$pgVerbose[] = 0;
+							break;
+						case 'NOTICE':
+							$pgVerbose[] = 1;
+							break;
+						case 'WARNING':
+							$pgVerbose[] = 2;
+							break;
+						case 'ERROR':
+							$pgVerbose[] = 3;
+							break;
+						case 'FAT':
+							$pgVerbose[] = 4;
+							break;
+					}
+				}
+			}
+			
+			unset( $tmp );
 		}
 		
 		$lgarray = array(
@@ -118,7 +152,7 @@ class Wiki {
 					if( $recursed ) throw new LoginError( array( 'Throttled', 'Login attempts have been throttled' ) );
 					
 					$wait = $loginRes['login']['wait'];
-					echo "Login throttled, waiting $wait seconds.\n\n";
+					pecho( "Login throttled, waiting $wait seconds.\n\n", 1 );
 					sleep($wait);
 					
 					$recres = $this->__construct( $configuration, $this->extensions, $this->extversions, true );
@@ -137,7 +171,7 @@ class Wiki {
 					return $recres;
 					break;
 				case 'Success':
-					echo "Successfully logged in to {$this->base_url}\n\n";
+					pecho( "Successfully logged in to {$this->base_url}\n\n", 0 );
 					
 					$userInfoRes = $this->apiQuery(
 						array(

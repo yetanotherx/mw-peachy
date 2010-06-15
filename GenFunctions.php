@@ -58,3 +58,22 @@ function checkExclusion( $text, $username = null, $optout = null ) {
 		return false;
 	}
 }
+
+/*
+
+0 = normal
+1 = notice
+2 = warning
+2 = error
+3 = fatal error
+
+*/
+function outputText( $text, $cat = 0 ) {
+	global $pgVerbose;
+	
+	if( in_array( $cat, $pgVerbose ) ) echo $text;
+}
+
+function pecho( $text, $cat = 0 ) {
+	outputText( $text, $cat );
+}

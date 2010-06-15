@@ -232,7 +232,7 @@ class Database {
 		$vals = implode( ',', $vals );
 		
 		$sql = "INSERT " . implode( ' ', $options ) . " INTO $table ($cols) VALUES ($vals)";
-		echo $sql;
+
 		return (bool)$this->doQuery( $sql );
 	}
 	

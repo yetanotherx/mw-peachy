@@ -42,6 +42,7 @@ $pgHTTP = new HTTP;
 $pgProxy = array();
 $pgHTTPEcho = false;
 $pgRunPage = null;
+$pgVerbose = array(0,1,2,3,4);
 
 $mwVersion = null;
 

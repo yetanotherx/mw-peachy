@@ -82,7 +82,7 @@ class HTTP {
 			return false;
 		}
 		if( in_array( 'peachyecho', $argv ) || $pgHTTPEcho ) {
-			echo "GET: $url\n";
+			pecho("GET: $url\n",0);
 		}
 		
 		return $data;
@@ -123,7 +123,7 @@ class HTTP {
 		}
 		
 		if( in_array( 'peachyecho', $argv ) || $pgHTTPEcho ) {
-			echo "POST: $url\n";
+			pecho("POST: $url\n",0);
 		}
 		
 		return $data;
@@ -160,7 +160,7 @@ class HTTP {
 		}
 		
 		if( in_array( 'peachyecho', $argv ) || $pgHTTPEcho ) {
-			echo "DLOAD: $url\n";
+			pecho( "DLOAD: $url\n", 0 );
 		}
 		
 		fclose($out);

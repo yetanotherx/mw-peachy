@@ -492,7 +492,7 @@ class Page {
 			throw new EditError( "LongSummary", "Summary is over 255 bytes, the maximum allowed" );
 		}
 		
-		echo "Making edit to {$this->title}...\n\n";
+		pecho( "Making edit to {$this->title}...\n\n", 0 );
 		
 		$editarray = array(
 			'title' => $this->title,
@@ -603,7 +603,7 @@ class Page {
 			throw new EditError( "LongReason", "Reason is over 255 bytes, the maximum allowed" );
 		}
 		
-		echo "Moving {$this->title} to $newTitle...\n\n";
+		pecho( "Moving {$this->title} to $newTitle...\n\n", 0 );
 		
 		$editarray = array(
 			'from' => $this->title,
@@ -747,7 +747,7 @@ class Page {
 	
 	public function getTransclusions( $namespace = null, $limit = null ) {
 		
-		echo "Getting transclusions of {$this->title}...\n\n";
+		pecho( "Getting transclusions of {$this->title}...\n\n", 0 );
 
 		$trArray = array(
 			'code' => 'ei',

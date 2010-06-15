@@ -104,7 +104,28 @@ class User {
 		}
 	}
 	
-	public function get_contribs() {}
+	public function get_contribs( $mostrecentfirst = true, $limit = null ) {
+		$ucArray = array(
+			'code' => 'uc',
+			'ucuser' => $this->username,
+			'action' => 'query',
+			'list' => 'usercontribs',
+			'limit' => $limit
+		);
+		
+		if( $mostrecentfirst ){
+			$ucArray['ucdir'] = "older";
+		} else {
+			$ucArray['ucdir'] = "newer";
+		}
+		
+		$result = $this->wiki->listHandler( $ucArray );
+		$finalArray = array();
+		foreach ( $result as $item ){
+			$finalArray[] = $item['title'];
+		}
+		return $finalArray;
+	}
 	
 	public function has_email() {
 		return $this->hasemail;

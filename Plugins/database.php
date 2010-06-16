@@ -37,7 +37,7 @@ class Database {
 	 * @param bool readonly Read-only mode. Default false
 	 * @return void
 	 */
-	public function __construct( $host, $port, $user, $pass, $db, $prefix = '', $readonly = false ) {
+	public function __construct( $host, $port, $user, $pass, $db, $prefix, $readonly ) {
 		$this->mHost = $host;
 		$this->mPort = $port;
 		$this->mUser = $user;
@@ -47,6 +47,14 @@ class Database {
 		$this->mReadonly = $readonly;
 		$this->connectToServer();
 	}
+
+    public static function load( &$newclass = null, $host, $port, $user, $pass, $db, $prefix = '', $readonly = false ) {
+        if( !function_exists( 'mysql_connect' ) && !class_exists( 'mysqli' ) ) {
+            throw new DependancyError( "MySQL", "http://us2.php.net/manual/en/book.mysql.php" );
+        }
+        
+        $newclass = new Database( $host, $port, $user, $pass, $db, $prefix, $readonly );
+    }
 
 	
 	private function connectToServer( $force = false ) {

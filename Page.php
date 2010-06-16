@@ -171,6 +171,7 @@ class Page {
 	
 	/**
 	 * Returns the pageid of the page.
+	 * 
 	 * @return int Pageid
 	 */
 	public function get_id() {
@@ -691,6 +692,7 @@ class Page {
 	
 	/**
 	 * Returns a boolean depending on whether the page can have subpages or not.
+	 * 
 	 * @return bool True if subpages allowed
 	 */		
 	public function allowSubpages() {
@@ -700,6 +702,7 @@ class Page {
 	
 	/**
 	 * Returns a boolean depending on whether the page is a discussion (talk) page or not.
+	 * 
 	 * @return bool True if discussion page, false if not
 	 */	
 	public function isDiscussion() {
@@ -712,6 +715,7 @@ class Page {
 	
 	/**
 	 * Returns the title of the discussion (talk) page associated with a page, if it exists.
+	 * 
 	 * @return string Title of discussion page
 	 */	
 	public function get_discussion() {
@@ -732,6 +736,7 @@ class Page {
 	
 	/**
 	 * Moves a page to a new location.
+	 * 
 	 * @param string $newTitle The new title to which to move the page.
 	 * @param string $reason A descriptive reason for the move.
 	 * @param bool $movetalk Whether or not to move any associated talk (discussion) page.
@@ -797,6 +802,7 @@ class Page {
 	
 	/**
 	 * Deletes the page.
+	 * 
 	 * @param string $reason A reason for the deletion. Defaults to null (blank).
 	 * @return bool True on success
 	 */	
@@ -911,6 +917,7 @@ class Page {
 	
 	/**
 	 * Returns all of titles on which the page is transcluded ("embedded in").
+	 * 
 	 * @param string $namespace A pipe '|' separated list of namespace numbers to check. Default null (all). 
 	 * @param int $limit A hard limit on the number of transclusions to fetch. Default null (all). 
 	 * @return array Titles of pages that transclude this page
@@ -939,6 +946,7 @@ class Page {
 
 	/**
 	 * Adds the page to the logged in user's watchlist
+	 * 
 	 * @return bool True on success
 	 */		
 	public function watch() {
@@ -969,6 +977,7 @@ class Page {
 	
 	/**
 	 * Removes the page to the logged in user's watchlist
+	 * 
 	 * @return bool True on sucecess
 	 */	
 	public function unwatch() {
@@ -999,6 +1008,7 @@ class Page {
 	
 	/**
 	 * Returns the page title
+	 * 
 	 * @param bool $namespace Set to true to return the title with namespace, false to return it without the namespace. Default true. 
 	 * @return string Page title
 	 */
@@ -1011,6 +1021,7 @@ class Page {
 	
 	/**
 	 * Returns whether or not a redirect was followed to get to the real page title
+	 * 
 	 * @return bool
 	 */
 	public function redirectFollowed() {
@@ -1019,6 +1030,7 @@ class Page {
 	
 	/**
 	 * Gets ID or name of the namespace
+	 * 
 	 * @param bool $id Set to true to get namespace ID, set to false to get namespace name. Default true
 	 * @return int|string
 	 */
@@ -1035,6 +1047,7 @@ class Page {
 	
 	/**
 	 * Returns number of hits the page has received
+	 * 
 	 * @return int
 	 */
 	public function get_lastedit( $force = false ) {
@@ -1045,6 +1058,7 @@ class Page {
 	
 	/**
 	 * Returns length of the page
+	 * 
 	 * @return int
 	 */
 	public function get_length( $force = false ) {
@@ -1055,6 +1069,7 @@ class Page {
 	
 	/**
 	 * Returns number of hits the page has received
+	 * 
 	 * @return int
 	 */
 	public function get_hits( $force = false ) {
@@ -1065,6 +1080,7 @@ class Page {
 	
 	/**   
 	 * Regenerates lastedit, length, and hits
+	 * 
 	 * @param array $pageInfoArray2 Array of values to merge with defaults (default: null)
 	 * @return array Information gathered
 	 * @access private

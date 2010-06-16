@@ -94,7 +94,6 @@ class Image {
 	 * @param bool $followRedir If linking page is a redirect, find all pages that link to that redirect as well. Default false.
 	 * @return array
 	 */
-	 
 	##FIXME: Make this work for images on a shared repository
 	public function getUsage( $force = false, $namespace = null, $redirects = "all", $followRedir = false ) {
 		
@@ -129,6 +128,7 @@ class Image {
 	
 	/**
 	 * Returns an array of all files with identical sha1 hashes
+	 * 
 	 * @return array Duplicate files
 	 */
 	public function getDuplicates() {
@@ -237,12 +237,12 @@ class Image {
 	
 	/**
 	 * Downloads an image to the local disk
+	 * 
 	 * @param string $name Filename to store image as. Default false.
 	 * @param int $width Width of image to download. Cannot be used together with $height. Default false.
 	 * @param int $height Height of image to download. Cannot be used together with $width. Default false.
 	 * @return void
 	 */
-
 	public function download( $name = false, $width = false, $height = false ) {
 		global $pgHTTP, $IP;
 		
@@ -297,10 +297,10 @@ class Image {
 	
 	/**
 	 * Returns the normalized image name
+	 * 
 	 * @param bool $namespace Whether or not to include the File: part of the name. Default true.
 	 * @return string
 	 */
-	 
 	public function getName( $namespace = true ) {
 		if( $namespace ) {
 			return $this->name;
@@ -313,36 +313,36 @@ class Image {
 	
 	/**
 	 * Returns the MIME type of the image
+	 * 
 	 * @return string
 	 */
-	 
 	public function getMime() {
 		return $this->mime;
 	}
 	
 	/**
 	 * Whether or not the image exists
+	 * 
 	 * @return bool
 	 */
-	 
 	public function getExists() {
 		return $this->exists;
 	}
 	
 	/**
 	 * Returns the direct URL of the image
+	 * 
 	 * @return string
 	 */
-	 
 	public function getUrl() {
 		return $this->url;
 	}
 	
 	/**
 	 * Whether or not the image is on a shared repository. A true result means that it is stored locally.
+	 * 
 	 * @return bool
 	 */
-	 
 	public function getLocal() {
 		if( $this->commons ) {
 			return false;
@@ -353,9 +353,9 @@ class Image {
 	
 	/**
 	 * Returns the SHA1 hash of the image
+	 * 
 	 * @return string
 	 */
-	 
 	public function getHash() {
 		return $this->hash;
 	}
@@ -364,16 +364,15 @@ class Image {
 	 * Returns the bitdepth of the image
 	 * @return string
 	 */
-	 
 	public function getBitdepth() {
 		return $this->bitdepth;
 	}
 	
 	/**
 	 * Returns the metadata of the image
+	 * 
 	 * @return string
 	 */
-	 
 	public function getMetadata() {
 		return $this->metadata;
 	}

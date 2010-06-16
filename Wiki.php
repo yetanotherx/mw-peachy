@@ -18,10 +18,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 class Wiki {
-
+	
+	/**
+	 * URL to the API for the wiki
+	 * 
+	 * @var string
+	 * @access protected
+	 */
 	protected $base_url;
+	
+	/**
+	 * Username for the user editing the wiki
+	 * 
+	 * @var string
+	 * @access protected
+	 */
 	protected $username;
+	
+	/**
+	 * Edit of editing for the wiki in EPM
+	 * 
+	 * @var int
+	 * @access protected
+	 */
 	protected $edit_rate;
+	
+	/**
+	 * Maximum db lag that the bot will accept. False to disable
+	 * 
+	 * (default value: false)
+	 * 
+	 * @var bool|int
+	 * @access protected
+	 */
 	protected $maxlag = false;
 	protected $apiQueryLimit = 499;
 	protected $isFlagged = false;
@@ -34,6 +63,7 @@ class Wiki {
 	
 	/**
 	 * Contruct function for the wiki. Handles login and related functions
+	 * 
 	 * @access public
 	 * @see Peachy::newWiki()
 	 * @param array $configuration Array with configuration data. At least needs username, password, and base_url.
@@ -238,6 +268,7 @@ class Wiki {
 	
 	/**
 	 * Logs the user out of the wiki
+	 *
 	 * @access public
 	 * @return void
 	 */
@@ -365,6 +396,7 @@ class Wiki {
 	
 	/**
 	 * Returns the base URL for the wiki
+	 * 
 	 * @access public
 	 * @see Wiki::$base_url
 	 * @return string base_url for the wiki
@@ -375,6 +407,7 @@ class Wiki {
 	
 	/**
 	 * Returns the api query limit for the wiki
+	 * 
 	 * @access public
 	 * @see Wiki::$apiQueryLimit
 	 * @return int apiQueryLimit fot the wiki
@@ -385,6 +418,7 @@ class Wiki {
 	
 	/**
 	 * Returns if maxlag is on or what it is set to for the wiki
+	 * 
 	 * @access public
 	 * @see Wiki:$maxlag
 	 * @return bool|int Max lag for the wiki
@@ -395,6 +429,7 @@ class Wiki {
 	
 	/**
 	 * Returns the edit rate in EPM for the wiki
+	 * 
 	 * @access public
 	 * @see Wiki::$edit_rate
 	 * @return int Edit rate in EPM for the wiki
@@ -405,6 +440,7 @@ class Wiki {
 	
 	/**
 	 * Returns the username
+	 * 
 	 * @access public
 	 * @see Wiki::$username
 	 * @return string Username
@@ -415,6 +451,7 @@ class Wiki {
 	
 	/**
 	 * Returns if the Wiki should follow nobots rules
+	 * 
 	 * @access public
 	 * @see Wiki::$nobots
 	 * @return bool True for following nobots
@@ -525,6 +562,7 @@ class Wiki {
 	
 	/**
 	 * Retrieves log entries from the wiki
+	 * 
 	 * @access public
 	 * @link http://www.mediawiki.org/wiki/API:Query_-_Lists#logevents_.2F_le
 	 * @param bool|array $type Type of log to retrieve from the wiki (default: false)

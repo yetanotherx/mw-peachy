@@ -31,7 +31,6 @@ require_once( $IP . 'Exceptions.php' );
 require_once( $IP . 'GenFunctions.php' );
 require_once( $IP . 'Diff/Diff.php' );
 require_once( $IP . 'Wiki.php' );
-require_once( $IP . 'Database.php' ); ##FIXME: Add PostgreSQL support
 require_once( $IP . 'Image.php' );
 require_once( $IP . 'Hooks.php' );
 require_once( $IP . 'Page.php' );

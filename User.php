@@ -167,12 +167,7 @@ class User {
 		}
 		
 		$result = $this->wiki->listHandler( $ucArray );
-		print_r($result);
-		/*$finalArray = array();
-		foreach ( $result as $item ){
-			$finalArray[] = $item['title'];
-		}
-		return $finalArray;*/
+		return $result;
 	}
 	
 	public function has_email() {

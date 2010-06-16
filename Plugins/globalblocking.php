@@ -21,7 +21,7 @@ class GlobalBlocking {
 
     public static function load( $wikiClass ) {
 
-        if( !in_array( 'GlobalBlocking', $wikiClass->getExtensions() ) ) {
+        if( !array_key_exists( 'GlobalBlocking', $wikiClass->getExtensions() ) ) {
             throw new DependancyError( "GlobalBlocking", "http://www.mediawiki.org/wiki/Extension:GlobalBlocking" );
         }
         

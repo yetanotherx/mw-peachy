@@ -781,8 +781,8 @@ class Page {
 	 * @param string $namespace A pipe '|' separated list of namespace numbers to check. Default null (all). 
 	 * @param int $limit A hard limit on the number of transclusions to fetch. Default null (all). 
 	 * @return array
-	*/
-	public function getTransclusions( $namespace = null, $limit = null ) {
+	 */
+	public function get_transclusions( $namespace = null, $limit = null ) {
 		
 		pecho( "Getting transclusions of {$this->title}...\n\n", 0 );
 

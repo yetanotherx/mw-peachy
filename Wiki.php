@@ -29,6 +29,7 @@ class Wiki {
 	protected $tokens = array();
 	protected $userRights = array();
 	private $namespaces = null;
+	private $allowSubpages = null;
 	
 	/**
 	 * Contruct function for the wiki. Handles login and related functions
@@ -651,11 +652,33 @@ class Wiki {
 			
 			foreach($tRes['query']['namespaces'] as $namespace){
 				$this->namespaces[$namespace['id']] = $namespace['*'];
+				$this->allowSubpages[$namespace['id']] = ((isset($namespace['subpages'])) ? 1 : 0);
 			}
 		}
 		return $this->namespaces;
 	}
-	
+	public function getAllowSubpages( $force = false ) {
+		if( is_null( $this->allowSubpages ) || $force ) {
+			$tArray = array(
+				'meta' => 'siteinfo',
+				'action' => 'query',
+				'siprop' => 'namespaces'
+			);
+			$tRes = $this->apiQuery( $tArray );
+			
+			if( isset( $tRes['error'] ) ) {
+				throw new APIError( array( 'error' => $tRes['error']['code'], 'text' => $tRes['error']['info'] ) );
+				return false;
+			}
+			
+			foreach($tRes['query']['namespaces'] as $namespace){
+				$this->namespaces[$namespace['id']] = $namespace['*'];
+				$this->allowSubpages[$namespace['id']] = ((isset($namespace['subpages'])) ? 1 : 0);
+			}
+		}
+		return $this->allowSubpages;
+	}
+					
 	public function getUserRights() {
 		return $this->userRights;
 	}

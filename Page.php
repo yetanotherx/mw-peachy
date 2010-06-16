@@ -592,7 +592,14 @@ class Page {
 	
 	public function undo() {}
 	
-	public function allowSubpages() {}
+	/**
+	 * Returns a boolean depending on whether the page can have subpages or not.
+	 * @return bool
+	 */		
+	public function allowSubpages() {
+		$allows = $this->wiki->getAllowSubpages();
+		return $allows[$this->namespace_id];
+	}
 	
 	/**
 	 * Returns a boolean depending on whether the page is a discussion (talk) page or not.
@@ -864,7 +871,7 @@ class Page {
 	}
 	
 	/**
-	 * Removes the page to the logged in user's watchlist; returns true on success.
+	 * Removes the page from the logged in user's watchlist; returns true on success.
 	 * @return bool
 	 */	
 	public function unwatch() {

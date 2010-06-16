@@ -128,7 +128,11 @@ class Wiki {
 			$lgarray['lgtoken'] = $token;
 		}
 		
+		Hooks::runHook( 'PreLogin', array( &$lgarray ) );
+		
 		$loginRes = $this->apiQuery($lgarray,true);
+		
+		Hooks::runHook( 'PostLogin', array( &$loginRes ) );
 		
 		if( isset( $loginRes['login']['result'] ) ) {
 			switch( $loginRes['login']['result'] ) {
@@ -396,6 +400,8 @@ class Wiki {
 	public function purge( $titles ) {
 		global $pgHTTP;
 		
+		Hooks::runHook( 'StartPurse', array( &$titles ) );
+		
 		if( is_array( $titles ) ) {
 			$titles = implode( '|', $titles );
 		}
@@ -583,6 +589,8 @@ class Wiki {
 	}
 	
 	public function getTokens( $force = false, $rollback = false ) {
+		Hooks::runHook( 'GetTokens', array( &$this->tokens ) );
+		
 		if( $force ) return $this->tokens;
 		
 		if( $rollback ) {

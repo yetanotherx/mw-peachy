@@ -204,9 +204,14 @@ class Image {
 				'ignorewarnings' => intval( $ignorewarnings ),
 				'file' => "@$file"
 			);
+			
+			Hooks::runHook( 'APIUpload', array( &$uploadArray ) );
+			
 			$this->apiQuery( $uploadArray, true );
 		} else {
 			##FIXME: test the non-api upload
+			
+			Hooks::runHook( 'IndexUpload' );
 			
 			$pgHTTP->post(
 				str_replace( 'api.php', 'index.php', $this->base_url ),
@@ -284,6 +289,8 @@ class Image {
 		
 		$localname = str_replace(' ','_',$this->name);
 		if( $name ) $localname = $name;
+		
+		Hooks::runHook( 'DownloadImage', array( &$url, &$name ) );
 		
 		$pgHTTP->download( $url, $IP . 'Images/' . $name );
 	}

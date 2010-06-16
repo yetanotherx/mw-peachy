@@ -120,6 +120,9 @@ class Peachy {
 	static function loadPlugin( $plugin_name ) {
 		global $IP;
 		if( is_file( $IP . 'Plugins/' . $plugin_name . '.php' ) ) {
+		
+			Hooks::runHook( 'LoadPlugin', array( &$plugin_name ) );
+			
 			require_once( $IP . 'Plugins/' . $plugin_name . '.php' );
 		}
 	}

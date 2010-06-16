@@ -674,6 +674,8 @@ class Page {
 	 * @return bool True on match of an appropriate nobots template
 	 */
 	public function nobots( $text = '' ) {
+		if( !$this->wiki->get_nobots() ) return false;
+		
 		if( $text == '' ) {
 			if( $this->content == '' ) {
 				$this->get_text();

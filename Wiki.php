@@ -30,6 +30,7 @@ class Wiki {
 	protected $userRights = array();
 	private $namespaces = null;
 	private $allowSubpages = null;
+	private $nobots = true;
 	
 	/**
 	 * Contruct function for the wiki. Handles login and related functions
@@ -112,6 +113,10 @@ class Wiki {
 			}
 			
 			unset( $tmp );
+		}
+		
+		if( isset($configuration['nobots']) && $configuration['nobots'] == 'false' ) {
+			$this->nobots = false;
 		}
 		
 		$lgarray = array(
@@ -406,6 +411,16 @@ class Wiki {
 	 */
 	public function get_username() {
 		return $this->username;
+	}
+	
+	/**
+	 * Returns if the Wiki should follow nobots rules
+	 * @access public
+	 * @see Wiki::$nobots
+	 * @return bool True for following nobots
+	 */
+	public function get_nobots() {
+		return $this->nobots;
 	}
 	
 	public function purge( $titles ) {

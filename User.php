@@ -157,7 +157,6 @@ class User {
 			'action' => 'query',
 			'list' => 'usercontribs',
 			'limit' => $limit,
-			'lhtitle' => 'title',
 		);
 		
 		if( $mostrecentfirst ){

@@ -29,10 +29,10 @@ class User {
 	private $userpage;
 	private $hasemail = false;
 	
-	function __construct( $wikiClass, $username ) {
+	function __construct( &$wikiClass, $username ) {
 		global $pgHTTP;
 		
-		$this->wiki = $wikiClass;
+		$this->wiki =& $wikiClass;
 		
 		$uiRes = $this->wiki->apiQuery(array(
 				'action' => 'query',

@@ -40,12 +40,19 @@ class Page {
 	private $starttimestamp;
 	
 	
-	
-	
-	
-
-	function __construct( $wikiClass, $title = null, $pageid = null, $followRedir = true, $normalize = true ) {
-		$this->wiki = $wikiClass;
+	/**
+	 * Construction method for the Page class
+	 * 
+	 * @access public
+	 * @param Wiki $wikiClass The Wiki class object
+	 * @param mixed $title Title of the page (default: null)
+	 * @param mixed $pageid ID of the page (default: null)
+	 * @param bool $followRedir Should it follow a redirect when retrieving the page (default: true)
+	 * @param bool $normalize Should the class automatically normalize the title (default: true)
+	 * @return void
+	 */
+	function __construct( &$wikiClass, $title = null, $pageid = null, $followRedir = true, $normalize = true ) {
+		$this->wiki =& $wikiClass;
 		
 		if( is_null( $title ) && is_null( $pageid ) ) {
 			throw new NoTitle();

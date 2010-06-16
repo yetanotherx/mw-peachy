@@ -33,8 +33,8 @@ class Image {
 	private $history = array();
 	
 	
-	function __construct( $wikiClass, $filename = null, $pageid = null, $prop = array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' ) ) {
-		$this->wiki = $wikiClass;
+	function __construct( &$wikiClass, $filename = null, $pageid = null, $prop = array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' ) ) {
+		$this->wiki =& $wikiClass;
 		
 		$imageInfoArray = array(
 			'action' => 'query',

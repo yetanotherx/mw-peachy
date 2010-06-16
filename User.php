@@ -102,7 +102,7 @@ class User {
 		//First check if $database exists, because that returns a more accurate count
 		if( !is_null( $database ) && $database instanceOf Database ) {
 			$count = Database::mysql2array($database->select(
-				'archive',
+				'archive', ##FIXME: Table prefix. This doesn't work for table names such as mw_archive
 				'COUNT(*) as count',
 				array( 
 					array(
@@ -122,7 +122,7 @@ class User {
 			unset($count);
 			
 			$count = Database::mysql2array($database->select(
-				'revision',
+				'revision', ##FIXME: See above
 				'COUNT(*) as count',
 				array( 
 					array(

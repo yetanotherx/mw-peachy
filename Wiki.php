@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class Wiki {
 	
 	/**
-	 * URL to the API for the wiki
+	 * URL to the API for the wiki.
 	 * 
 	 * @var string
 	 * @access protected
@@ -28,7 +28,7 @@ class Wiki {
 	protected $base_url;
 	
 	/**
-	 * Username for the user editing the wiki
+	 * Username for the user editing the wiki.
 	 * 
 	 * @var string
 	 * @access protected
@@ -36,7 +36,7 @@ class Wiki {
 	protected $username;
 	
 	/**
-	 * Edit of editing for the wiki in EPM
+	 * Edit of editing for the wiki in EPM.
 	 * 
 	 * @var int
 	 * @access protected
@@ -44,7 +44,7 @@ class Wiki {
 	protected $edit_rate;
 	
 	/**
-	 * Maximum db lag that the bot will accept. False to disable
+	 * Maximum db lag that the bot will accept. False to disable.
 	 * 
 	 * (default value: false)
 	 * 
@@ -52,17 +52,87 @@ class Wiki {
 	 * @access protected
 	 */
 	protected $maxlag = false;
+	
+	/**
+	 * Limit of results that can be returned by the API at one time.
+	 * 
+	 * (default value: 499)
+	 * 
+	 * @var int
+	 * @access protected
+	 */
 	protected $apiQueryLimit = 499;
+	
+	/**
+	 * Does the user have a bot flag.
+	 * 
+	 * (default value: false)
+	 * 
+	 * @var bool
+	 * @access protected
+	 */
 	protected $isFlagged = false;
+	
+	/**
+	 * Array of extenstions on the Wiki in the form of name => version.
+	 * 
+	 * @var array
+	 * @access private
+	 */
 	private $extensions;
+	
+	/**
+	 * Array of tokens for editing.
+	 * 
+	 * (default value: array())
+	 * 
+	 * @var array
+	 * @access protected
+	 */
 	protected $tokens = array();
+	
+	/**
+	 * Array of rights assigned to the user.
+	 * 
+	 * (default value: array())
+	 * 
+	 * @var array
+	 * @access protected
+	 */
 	protected $userRights = array();
+	
+	/**
+	 * Array of namespaces by ID.
+	 * 
+	 * (default value: null)
+	 * 
+	 * @var array
+	 * @access private
+	 */
 	private $namespaces = null;
+	
+	/**
+	 * array of namespaces that have subpages allowed, by namespace id.
+	 * 
+	 * (default value: null)
+	 * 
+	 * @var array
+	 * @access private
+	 */
 	private $allowSubpages = null;
+	
+	/**
+	 * Should the wiki follow nobots rules?
+	 * 
+	 * (default value: true)
+	 * 
+	 * @var bool
+	 * @access private
+	 */
 	private $nobots = true;
 	
 	/**
-	 * Contruct function for the wiki. Handles login and related functions
+	 * Contruct function for the wiki. Handles login and related functions.
 	 * 
 	 * @access public
 	 * @see Peachy::newWiki()
@@ -267,7 +337,7 @@ class Wiki {
 	}
 	
 	/**
-	 * Logs the user out of the wiki
+	 * Logs the user out of the wiki.
 	 *
 	 * @access public
 	 * @return void
@@ -277,7 +347,7 @@ class Wiki {
 	}
 	
 	/**
-	 * Queries the API
+	 * Queries the API.
 	 * 
 	 * @access public
 	 * @param array $arrayParams Parameters given to query with (default: array())
@@ -395,7 +465,7 @@ class Wiki {
 	}
 	
 	/**
-	 * Returns the base URL for the wiki
+	 * Returns the base URL for the wiki.
 	 * 
 	 * @access public
 	 * @see Wiki::$base_url
@@ -406,7 +476,7 @@ class Wiki {
 	}
 	
 	/**
-	 * Returns the api query limit for the wiki
+	 * Returns the api query limit for the wiki.
 	 * 
 	 * @access public
 	 * @see Wiki::$apiQueryLimit
@@ -417,7 +487,7 @@ class Wiki {
 	}
 	
 	/**
-	 * Returns if maxlag is on or what it is set to for the wiki
+	 * Returns if maxlag is on or what it is set to for the wiki.
 	 * 
 	 * @access public
 	 * @see Wiki:$maxlag
@@ -428,7 +498,7 @@ class Wiki {
 	}
 	
 	/**
-	 * Returns the edit rate in EPM for the wiki
+	 * Returns the edit rate in EPM for the wiki.
 	 * 
 	 * @access public
 	 * @see Wiki::$edit_rate
@@ -439,7 +509,7 @@ class Wiki {
 	}
 	
 	/**
-	 * Returns the username
+	 * Returns the username.
 	 * 
 	 * @access public
 	 * @see Wiki::$username
@@ -450,7 +520,7 @@ class Wiki {
 	}
 	
 	/**
-	 * Returns if the Wiki should follow nobots rules
+	 * Returns if the Wiki should follow nobots rules.
 	 * 
 	 * @access public
 	 * @see Wiki::$nobots
@@ -561,7 +631,7 @@ class Wiki {
 	public function search() {}
 	
 	/**
-	 * Retrieves log entries from the wiki
+	 * Retrieves log entries from the wiki.
 	 * 
 	 * @access public
 	 * @link http://www.mediawiki.org/wiki/API:Query_-_Lists#logevents_.2F_le
@@ -695,6 +765,13 @@ class Wiki {
 		
 	}
 	
+	/**
+	 * Returns extensions.
+	 * 
+	 * @access public
+	 * @see Wiki::$extensions
+	 * @return array Extensions in format name => version
+	 */
 	public function getExtensions() {
 		return $this->extensions;
 	}
@@ -741,7 +818,14 @@ class Wiki {
 		}
 		return $this->allowSubpages;
 	}
-					
+	
+	/**
+	 * Returns user rights.
+	 * 
+	 * @access public
+	 * @see Wiki::$userRights
+	 * @return array Array of user rights
+	 */		
 	public function getUserRights() {
 		return $this->userRights;
 	}

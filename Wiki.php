@@ -33,7 +33,8 @@ class Wiki {
 	/**
 	 * Contruct function for the wiki. Handles login and related functions
 	 * @access public
-	 * @param array $configuration Array with configuration data. At least needs username, password, and base_url. @see Peachy::newWiki()
+	 * @see Peachy::newWiki()
+	 * @param array $configuration Array with configuration data. At least needs username, password, and base_url.
 	 * @param array $extensions Array of names of extensions installed on the wiki and their versions (default: array())
 	 * @param bool $recursed Is the function recursing itself? Used internally, don't use (default: false)
 	 * @param mixed $token Token if the wiki needs a token. Used internally, don't use (default: null)
@@ -225,10 +226,23 @@ class Wiki {
 		
 	}
 	
+	/**
+	 * Logs the user out of the wiki
+	 * @access public
+	 * @return void
+	 */
 	public function logout() {
 		$this->apiQuery( array( 'action' => 'logout' ), true );
 	}
 	
+	/**
+	 * Queries the API
+	 * 
+	 * @access public
+	 * @param array $arrayParams Parameters given to query with (default: array())
+	 * @param bool $post Should it be a POST reqeust? (default: false)
+	 * @return void
+	 */
 	public function apiQuery( $arrayParams = array(), $post = false ) {
 		global $pgHTTP;
 		
@@ -339,18 +353,42 @@ class Wiki {
 		return $endArray;
 	}
 	
+	/**
+	 * Returns the base URL for the wiki
+	 * @access public
+	 * @see Wiki::$base_url
+	 * @return string base_url for the wiki
+	 */
 	public function get_base_url() {
 		return $this->base_url;
 	}
 	
+	/**
+	 * Returns the api query limit for the wiki
+	 * @access public
+	 * @see Wiki::$apiQueryLimit
+	 * @return int apiQueryLimit fot the wiki
+	 */
 	public function get_api_limit() {
 		return $this->apiQueryLimit;
 	}
 	
+	/**
+	 * Returns if maxlag is on or what it is set to for the wiki
+	 * @access public
+	 * @see Wiki:$maxlag
+	 * @return bool|int Max lag for the wiki
+	 */
 	public function get_maxlag() {
 		return $this->maglag;
 	}
 	
+	/**
+	 * Returns the edit rate in EPM for the wiki
+	 * @access public
+	 * @see Wiki::$edit_rate
+	 * @return int Edit rate in EPM for the wiki
+	 */
 	public function get_edit_rate() {
 		return $this->edit_rate;
 	}
@@ -453,6 +491,20 @@ class Wiki {
 	
 	public function search() {}
 	
+	/**
+	 * Retrieves log entries from the wiki
+	 * @access public
+	 * @link http://www.mediawiki.org/wiki/API:Query_-_Lists#logevents_.2F_le
+	 * @param bool|array $type Type of log to retrieve from the wiki (default: false)
+	 * @param bool|string $user Restrict the log to a certain user (default: false)
+	 * @param bool|string $title Restrict the log to a certain page (default: false)
+	 * @param bool|string $start Timestamp for the start of the log (default: false)
+	 * @param bool|string $end Timestamp for the end of the log (default: false)
+	 * @param string $dir Direction for retieving log entries (default: 'older')
+	 * @param bool $tag Restrict the log to entries with a certain tag (default: false)
+	 * @param array $prop Information to retieve from the log (default: array( 'ids', 'title', 'type', 'user', 'timestamp', 'comment', 'details' ))
+	 * @return array Log entries
+	 */
 	public function logs( $type = false, $user = false, $title = false, $start = false, $end = false, $dir = 'older', $tag = false, $prop = array( 'ids', 'title', 'type', 'user', 'timestamp', 'comment', 'details' ) ) {
 		
 		$leArray = array(

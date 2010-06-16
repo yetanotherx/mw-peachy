@@ -463,7 +463,7 @@ class Wiki {
 	public function purge( $titles ) {
 		global $pgHTTP;
 		
-		Hooks::runHook( 'StartPurse', array( &$titles ) );
+		Hooks::runHook( 'StartPurge', array( &$titles ) );
 		
 		if( is_array( $titles ) ) {
 			$titles = implode( '|', $titles );

@@ -718,7 +718,7 @@ class Page {
 		if($this->namespace_id < 0 || $this->namespace_id === "") {
 			// No discussion page exists
 			// Guessing we want to error
-			throw new BadEntryError("get_discussion()","tried to find the discussion page of a page which could never have one");
+			throw new BadEntryError("get_discussion","tried to find the discussion page of a page which could never have one");
 			return false;
 		} else {
 			$namespaces = $this->wiki->getNamespaces();

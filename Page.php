@@ -594,6 +594,10 @@ class Page {
 	
 	public function allowSubpages() {}
 	
+	/**
+	 * Returns a boolean depending on whether the page is a discussion (talk) page or not.
+	 * @return bool
+	 */	
 	public function isDiscussion() {
 		if($this->namespace_id >= 0 && $this->namespace_id%2 == 1){
 			return true;
@@ -602,11 +606,15 @@ class Page {
 		}
 	}
 	
-	public function switchDiscussion() {
+	/**
+	 * Returns the title of the discussion (talk) page associated with a page, if it exists.
+	 * @return string
+	 */	
+	public function get_discussion() {
 		if($this->namespace_id < 0 || $this->namespace_id === "") {
 			// No discussion page exists
 			// Guessing we want to error
-			throw new BadEntryError("switchDiscussion","tried to switch to the discussion page of page which could never have one");
+			throw new BadEntryError("get_discussion()","tried to find the discussion page of a page which could never have one");
 			return false;
 		} else {
 			$namespaces = $this->wiki->getNamespaces();
@@ -618,6 +626,15 @@ class Page {
 		}
 	}
 	
+	/**
+	 * Moves a page to a new location.
+	 * @param string $newTitle The new title to which to move the page.
+	 * @param string $reason A descriptive reason for the move.
+	 * @param bool $movetalk Whether or not to move any associated talk (discussion) page.
+	 * @param bool $movesubpages Whether or not to move any subpages.
+	 * @param bool $noredirect Whether or not to suppress the leaving of a redirect to the new title at the old title.
+	 * @return bool
+	 */	
 	public function move( $newTitle, $reason = '', $movetalk = true, $movesubpages = true, $noredirect = false ) {
 		$tokens = $this->wiki->getTokens();
 		
@@ -674,6 +691,11 @@ class Page {
 	
 	public function protect() {}
 	
+	/**
+	 * Deletes the page.
+	 * @param string $reason A reason for the deletion. Defaults to null (blank).
+	 * @return bool
+	 */	
 	public function delete( $reason = null ) {
 	
 		if( !in_array( 'delete', $this->wiki->getUserRights() ) ) {
@@ -784,7 +806,7 @@ class Page {
 	public function prefixindex() {}
 	
 	/**
-	 * Returns all of titles on which the page is transcluded ("embedded in")
+	 * Returns all of titles on which the page is transcluded ("embedded in").
 	 * @param string $namespace A pipe '|' separated list of namespace numbers to check. Default null (all). 
 	 * @param int $limit A hard limit on the number of transclusions to fetch. Default null (all). 
 	 * @return array
@@ -810,7 +832,11 @@ class Page {
 		$result = $this->wiki->listHandler($trArray);
 		return $result;
     }
-	
+
+	/**
+	 * Adds the page to the logged in user's watchlist; returns true on success.
+	 * @return bool
+	 */		
 	public function watch() {
 		
 		Hooks::runHook( 'StartWatch' );
@@ -837,6 +863,10 @@ class Page {
 		
 	}
 	
+	/**
+	 * Removes the page to the logged in user's watchlist; returns true on success.
+	 * @return bool
+	 */	
 	public function unwatch() {
 		Hooks::runHook( 'StartUnwatch' );
 		

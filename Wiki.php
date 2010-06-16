@@ -398,6 +398,16 @@ class Wiki {
 		return $this->edit_rate;
 	}
 	
+	/**
+	 * Returns the username
+	 * @access public
+	 * @see Wiki::$username
+	 * @return string Username
+	 */
+	public function get_username() {
+		return $this->username;
+	}
+	
 	public function purge( $titles ) {
 		global $pgHTTP;
 		

@@ -131,6 +131,17 @@ class Page {
 
 	}
 	
+	/**
+	 * Returns page history. Can be specified to return ontent aswell
+	 * 
+	 * @access public
+	 * @param int $count Revisions to return (default: 1)
+	 * @param string $dir Direction to return revisions (default: "older")
+	 * @param bool $content Should content of that revision be returned aswell (default: false)
+	 * @param int $revid Revision ID to start from (default: null)
+	 * @param bool $rollback_token Should a rollback token be returned (default: false)
+	 * @return array Revision data
+	 */
 	public function history( $count = 1, $dir = "older", $content = false, $revid = null, $rollback_token = false ) {
 
 		if( !$this->exists ) return array();
@@ -159,6 +170,13 @@ class Page {
 
 	}
 	
+	/**
+	 * Retrieves text from a page, or a cached copy unless $force is true
+	 * 
+	 * @access public
+	 * @param bool $force Grab text from the API, don't use the cached copy (default: false)
+	 * @return string Page content
+	 */
 	public function get_text( $force = false ) {
 		
 		##FIXME: Allow getting sections
@@ -177,16 +195,30 @@ class Page {
 	
 	/**
 	 * Returns the pageid of the page.
-	 * @return int
+	 * @return int Pageid
 	 */
 	public function get_id() {
 		return $this->pageid;
 	}
 	
+	/**
+	 * Returns if the page exists
+	 * 
+	 * @access public
+	 * @return bool Exists
+	 */
 	public function exists() {
 		return $this->exists;
 	}
 	
+	/**
+	 * Returns links on the page.
+	 * 
+	 * @access public
+	 * @link http://www.mediawiki.org/wiki/API:Query_-_Properties#links_.2F_pl
+	 * @param bool $force Force use of API, won't use cached copy (default: false)
+	 * @return bool|array False on error, array of link titles
+	 */
 	public function get_links( $force = false ) {
 
 		if( !$force && count( $this->links ) > 0 ) {
@@ -231,8 +263,17 @@ class Page {
 			
 			
 		}
+		
 	}
 	
+	/**
+	 * Returns templates on the page
+	 * 
+	 * @access public
+	 * @link http://www.mediawiki.org/wiki/API:Query_-_Properties#templates_.2F_tl
+	 * @param bool $force Force use of API, won't use cached copy (default: false)
+	 * @return bool|array False on error, array of template titles
+	 */
 	public function get_templates( $force = false ) {
 
 		if( !$force && count( $this->templates ) > 0 ) {
@@ -279,6 +320,14 @@ class Page {
 		}
 	}
 	
+	/**
+	 * Returns categories of page
+	 * 
+	 * @access public
+	 * @link http://www.mediawiki.org/wiki/API:Query_-_Properties#categories_.2F_cl
+	 * @param bool $force Force use of API, won't use cached copy (default: false)
+	 * @return bool|array False on error, returns array of categories
+	 */
 	public function get_categories( $force = false ) {
 
 		if( !$force && count( $this->categories ) > 0 ) {
@@ -325,6 +374,14 @@ class Page {
 		}
 	}
 	
+	/**
+	 * Returns images used in the page
+	 * 
+	 * @access public
+	 * @link http://www.mediawiki.org/wiki/API:Query_-_Properties#images_.2F_im
+	 * @param bool $force Force use of API, won't use cached copy (default: false)
+	 * @return bool|array False on error, returns array of image titles
+	 */
 	public function get_images( $force = false ) {
 		global $pgHTTP;
 		
@@ -372,6 +429,14 @@ class Page {
 		}
 	}
 	
+	/**
+	 * Returns external links used in the page
+	 * 
+	 * @access public
+	 * @link http://www.mediawiki.org/wiki/API:Query_-_Properties#extlinks_.2F_el
+	 * @param bool $force Force use of API, won't use cached copy (default: false)
+	 * @return bool|array False on error, returns array of URLs
+	 */
 	public function get_extlinks( $force = false ) {
 
 		if( !$force && count( $this->extlinks ) > 0 ) {
@@ -419,6 +484,14 @@ class Page {
 		}
 	}
 	
+	/**
+	 * Returns language links on the page
+	 * 
+	 * @access public
+	 * @link http://www.mediawiki.org/wiki/API:Query_-_Properties#langlinks_.2F_ll
+	 * @param bool $force Force use of API, won't use cached copy (default: false)
+	 * @return bool|array False on error, returns array of links in the form of lang:title
+	 */
 	public function get_langlinks( $force = false ) {
 		if( !$force && count( $this->langlinks ) > 0 ) {
 			return $this->langlinks;
@@ -464,10 +537,18 @@ class Page {
 		}
 	}
 	
+	/**
+	 * Returns the protection level of the page
+	 * 
+	 * @access public
+	 * @link http://www.mediawiki.org/wiki/API:Query_-_Properties#info_.2F_in
+	 * @param bool $force Force use of API, won't use cached copy (default: false)
+	 * @return bool|array False on error, returns array with protection levels
+	 */
 	public function get_protection( $force = false ) {
 
-		if( !$force && count( $this->extlinks ) > 0 ) {
-			return $this->extlinks;
+		if( !$force && count( $this->protection ) > 0 ) {
+			return $this->protection;
 		}
 
 		if( !$this->exists ) return array();
@@ -485,18 +566,33 @@ class Page {
 			throw new APIError( array( 'error' => $tRes['error']['code'], 'text' => $tRes['error']['info'] ) );
 			return false;
 		}
-			
-		return $tRes['query']['pages'][$this->pageid]['protection'];
+		
+		$this->protection = $tRes['query']['pages'][$this->pageid]['protection'];
+		
+		return $this->protection;
 
 	}
 	
+	/**
+	 * Edits the page
+	 * 
+	 * @access public
+	 * @link http://www.mediawiki.org/wiki/API:Edit_-_Create%26Edit_pages
+	 * @param string $text Text of the page that will be saved
+	 * @param string $summary Summary of the edit (default: "")
+	 * @param bool $minor Minor edit (default: false)
+	 * @param bool $bot Mark as bot edit (default: true)
+	 * @param bool $force Override nobots check (default: false)
+	 * @param string $pend Set to 'pre' or 'ap' to prepend or append, respectively (default: null)
+	 * @param bool $create Set to 'never' or 'only' to never create a new page or only create a new page, respectively (default: false) 
+	 */
 	public function edit( 
 		$text, 
 		$summary = "", 
 		$minor = false, 
 		$bot = true, 
 		$force = false,
-		$pend = null, 
+		$pend = false, 
 		$create = false
 	)  {
 	
@@ -561,9 +657,13 @@ class Page {
 		
 		if( !$force ) {
 			//Perform nobots checks, login checks, /Run checks
+			if( $this->nobots( $text ) ) {
+				throw new EditError("Nobots", "The page has a nobots template");
+			}
 			$die = true;
 			Hooks::runHook( 'SoftEditBlock', array( &$editarray, &$die ) );
 			if( 1 == 2 && $die ) {
+				##FIXME: Die() isn't the right thing to do here, throw an error?
 				die();
 			}
 		}
@@ -590,6 +690,18 @@ class Page {
 	
 	}
 	
+	public function nobots( $text = '' ) {
+		if( $text == '' ) {
+			if( $this->content == '' ) {
+				$this->get_text();
+			}
+			
+			$text = $this->content;
+		}
+		
+		return preg_match( '/\{\{(nobots|bots\|allow=none|bots\|deny=all|bots\|optout=all|bots\|deny=.*?'.preg_quote($this->wiki->get_username(),'/').'.*?)\}\}/iS', $text );
+	}
+	
 	public function undo() {}
 	
 	/**
@@ -603,7 +715,7 @@ class Page {
 	
 	/**
 	 * Returns a boolean depending on whether the page is a discussion (talk) page or not.
-	 * @return bool
+	 * @return bool True if discussion page, false if not
 	 */	
 	public function isDiscussion() {
 		if($this->namespace_id >= 0 && $this->namespace_id%2 == 1){
@@ -615,7 +727,7 @@ class Page {
 	
 	/**
 	 * Returns the title of the discussion (talk) page associated with a page, if it exists.
-	 * @return string
+	 * @return string Title of discussion page
 	 */	
 	public function get_discussion() {
 		if($this->namespace_id < 0 || $this->namespace_id === "") {
@@ -640,7 +752,7 @@ class Page {
 	 * @param bool $movetalk Whether or not to move any associated talk (discussion) page.
 	 * @param bool $movesubpages Whether or not to move any subpages.
 	 * @param bool $noredirect Whether or not to suppress the leaving of a redirect to the new title at the old title.
-	 * @return bool
+	 * @return bool True on success
 	 */	
 	public function move( $newTitle, $reason = '', $movetalk = true, $movesubpages = true, $noredirect = false ) {
 		$tokens = $this->wiki->getTokens();
@@ -701,7 +813,7 @@ class Page {
 	/**
 	 * Deletes the page.
 	 * @param string $reason A reason for the deletion. Defaults to null (blank).
-	 * @return bool
+	 * @return bool True on success
 	 */	
 	public function delete( $reason = null ) {
 	
@@ -816,7 +928,7 @@ class Page {
 	 * Returns all of titles on which the page is transcluded ("embedded in").
 	 * @param string $namespace A pipe '|' separated list of namespace numbers to check. Default null (all). 
 	 * @param int $limit A hard limit on the number of transclusions to fetch. Default null (all). 
-	 * @return array
+	 * @return array Titles of pages that transclude this page
 	 */
 	public function get_transclusions( $namespace = null, $limit = null ) {
 		
@@ -841,8 +953,8 @@ class Page {
     }
 
 	/**
-	 * Adds the page to the logged in user's watchlist; returns true on success.
-	 * @return bool
+	 * Adds the page to the logged in user's watchlist
+	 * @return bool True on success
 	 */		
 	public function watch() {
 		
@@ -871,8 +983,8 @@ class Page {
 	}
 	
 	/**
-	 * Removes the page from the logged in user's watchlist; returns true on success.
-	 * @return bool
+	 * Removes the page to the logged in user's watchlist
+	 * @return bool True on sucecess
 	 */	
 	public function unwatch() {
 		Hooks::runHook( 'StartUnwatch' );
@@ -903,7 +1015,7 @@ class Page {
 	/**
 	 * Returns the page title
 	 * @param bool $namespace Set to true to return the title with namespace, false to return it without the namespace. Default true. 
-	 * @return string
+	 * @return string Page title
 	 */
 	public function get_title( $namespace = true ) {
 		if( !$namespace ) {
@@ -970,7 +1082,7 @@ class Page {
 		return $this->hits;
 	}
 	
-	/**
+	/**   
 	 * Regenerates lastedit, length, and hits
 	 * @return void
 	 * @access private

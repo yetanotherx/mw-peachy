@@ -175,7 +175,7 @@ class Wiki {
 					return $recres;
 					break;
 				case 'Success':
-					pecho( "Successfully logged in to {$this->base_url}\n\n", 0 );
+					pecho( "Successfully logged in to {$this->base_url} as {$this->username}\n\n", 0 );
 					
 					$userInfoRes = $this->apiQuery(
 						array(

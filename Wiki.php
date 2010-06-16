@@ -171,7 +171,7 @@ class Wiki {
 					pecho( "Login throttled, waiting $wait seconds.\n\n", 1 );
 					sleep($wait);
 					
-					$recres = $this->__construct( $configuration, $this->extensions, $this->extversions, true );
+					$recres = $this->__construct( $configuration, $this->extensions, true );
 					return $recres;
 					break;
 				case 'Blocked':
@@ -183,7 +183,7 @@ class Wiki {
 					
 					$token = $loginRes['login']['token'];
 
-					$recres = $this->__construct( $configuration, $this->extensions, $this->extversions, true, $token );
+					$recres = $this->__construct( $configuration, $this->extensions, true, $token );
 					return $recres;
 					break;
 				case 'Success':

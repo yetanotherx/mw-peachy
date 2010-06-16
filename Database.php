@@ -23,6 +23,7 @@ class Database {
 	private $mUser;
 	private $mPass;
 	private $mDb;
+	private $mPrefix;
 	private $mysqli = true;
 	
 	/**
@@ -32,15 +33,17 @@ class Database {
 	 * @param string $user Username
 	 * @param string $pass Password
 	 * @param string $db Database
+	 * @param string $prefix Prefix of the tables in the database. Default ''
 	 * @param bool readonly Read-only mode. Default false
 	 * @return void
 	 */
-	public function __construct( $host, $port, $user, $pass, $db, $readonly = false ) {
+	public function __construct( $host, $port, $user, $pass, $db, $prefix = '', $readonly = false ) {
 		$this->mHost = $host;
 		$this->mPort = $port;
 		$this->mUser = $user;
 		$this->mPass = $pass;
 		$this->mDb = $db;
+		$this->mPrefix = $prefix;
 		$this->mReadonly = $readonly;
 		$this->connectToServer();
 	}
@@ -56,6 +59,15 @@ class Database {
 			$this->mConn = new mysqli( $this->mHost.':'.$this->mPort, $this->mUser, $this->mPass, $this->mDB );
 		}
 	
+	}
+	
+	/**
+	 * Returns the table prefix
+	 * @access public
+	 * @return string Table prefix
+	 */
+	public function getPrefix() {
+		return $this->mPrefix;
 	}
 	
 	/**
@@ -152,6 +164,12 @@ class Database {
 		}
 		
 		if( is_array( $table ) ) {
+			if( $this->mPrefix != '' ) {
+				foreach( $table AS $id => $t ) {
+					$table[$id] = $this->mPrefix . $t;
+				}
+			}
+			
 			if( count( $join_on ) == 0 ) {
 				$from = 'FROM ' . implode( ',', $table );
 				$on = null;
@@ -166,7 +184,7 @@ class Database {
 			}
 		}
 		else {
-			$from = 'FROM ' . $table;
+			$from = 'FROM ' . $this->mPrefix . $table;
 			$on = null;
 		}
 		
@@ -231,7 +249,7 @@ class Database {
 		$cols = implode( ',', $cols );
 		$vals = implode( ',', $vals );
 		
-		$sql = "INSERT " . implode( ' ', $options ) . " INTO $table ($cols) VALUES ($vals)";
+		$sql = "INSERT " . implode( ' ', $options ) . " INTO {$this->mPrefix}$table ($cols) VALUES ($vals)";
 
 		return (bool)$this->doQuery( $sql );
 	}
@@ -251,7 +269,7 @@ class Database {
 		}
 		$vals = implode( ', ', $vals );
 		
-		$sql = "UPDATE $table SET " . $vals;
+		$sql = "UPDATE {$this->mPrefix}$table SET " . $vals;
 		if ( $conds != '*' ) {
 			$cnds = array();
 			foreach( $conds as $col => $val ) {
@@ -272,7 +290,7 @@ class Database {
 	 */
 	public function delete( $table, $conds ) {
 		if( $this->mReadonly == true ) throw new DBError( "Write query called while under read-only mode" );
-		$sql = "DELETE FROM $table";
+		$sql = "DELETE FROM {$this->mPrefix}$table";
 		if ( $conds != '*' ) {
 			$cnds = array();
 			foreach( $conds as $col => $val ) {

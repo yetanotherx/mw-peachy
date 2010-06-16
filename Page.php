@@ -65,7 +65,7 @@ class Page {
 				$title = substr($title, 1);
 			}
 			$chunks = explode( ':', $title, 2 );
-			if(count($namespace) != 1){
+			if(count($chunks) != 1){
 				$namespace = strtolower( trim( $chunks[0] ) );
 				$namespaces = $this->wiki->getNamespaces();
 				if( $namespace == $namespaces[-2] || $namespace == "media" ){
@@ -79,11 +79,7 @@ class Page {
 			}
 		}
 		
-		$pageInfoArray = array(
-			'action' => 'query',
-			'prop' => "info",
-			'intoken' => 'edit|delete|protect|move|block|unblock|email|import'
-		);
+		$pageInfoArray = array();
 		
 		if( !is_null( $pageid ) ) {
 			$pageInfoArray['pageids'] = $pageid;
@@ -94,40 +90,20 @@ class Page {
 		
 		if( $followRedir ) $pageInfoArray['redirects'] = '';
 		
-		$pageInfoRes = $this->wiki->apiQuery($pageInfoArray);
+		$info = $this->get_metadata( $pageInfoArray );
 		
-		foreach( $pageInfoRes['query']['pages'] as $key => $info ) {
-			$this->pageid = $key;
-			if( $this->pageid > 0 ) {
-				$this->exists = true;
-			}
-			else {
-				$this->pageid = 0;
-			}
-			
-			if( isset( $info['missing'] ) ) $this->exists = false;
-			if( isset( $info['invalid'] ) ) throw new BadTitle( $title );
-			
-			$this->title = $info['title'];
-			$this->namespace_id = $info['ns'];
-			$this->lastedit = $info['touched'];
-			$this->hits = $info['counter'];
-			$this->length = $info['length'];
-			$this->starttimestamp = $info['starttimestamp'];
-			
-			if( $this->namespace_id != 0 ) {
-				$this->title_wo_namespace = explode( ':', $this->title, 2 );
-				$this->title_wo_namespace = $this->title_wo_namespace[1];
-			}
-			else {
-				$this->title_wo_namespace = $this->title;
-			}
+		if( isset( $info['invalid'] ) ) throw new BadTitle( $title );
+		
+		$this->title = $info['title'];
+		$this->namespace_id = $info['ns'];
+		
+		if( $this->namespace_id != 0 ) {
+			$this->title_wo_namespace = explode( ':', $this->title, 2 );
+			$this->title_wo_namespace = $this->title_wo_namespace[1];
 		}
-		
-		if( isset( $pageInfoRes['query']['redirects'] ) ) $this->redirectFollowed = true;
-		
-		//$this->utitle = strurlencode( $this->title );
-		
+		else {
+			$this->title_wo_namespace = $this->title;
+		}
 
 	}
 	
@@ -690,6 +666,13 @@ class Page {
 	
 	}
 	
+	/**
+	 * Detects the presence of a nobots template or one that denies editing by ours
+	 * 
+	 * @access public
+	 * @param string $text Text of the page to check (default: '')
+	 * @return bool True on match of an appropriate nobots template
+	 */
 	public function nobots( $text = '' ) {
 		if( $text == '' ) {
 			if( $this->content == '' ) {
@@ -706,7 +689,7 @@ class Page {
 	
 	/**
 	 * Returns a boolean depending on whether the page can have subpages or not.
-	 * @return bool
+	 * @return bool True if subpages allowed
 	 */		
 	public function allowSubpages() {
 		$allows = $this->wiki->getAllowSubpages();
@@ -1051,7 +1034,6 @@ class Page {
 	/**
 	 * Returns number of hits the page has received
 	 * @return int
-	 * @fixme Add a $force option
 	 */
 	public function get_lastedit( $force = false ) {
 		if( $force ) $this->get_metadata();
@@ -1062,8 +1044,6 @@ class Page {
 	/**
 	 * Returns length of the page
 	 * @return int
-	 * @fixme Add a $force option
-	 * @fixme Is it bytes or characters?
 	 */
 	public function get_length( $force = false ) {
 		if( $force ) $this->get_metadata();
@@ -1074,7 +1054,6 @@ class Page {
 	/**
 	 * Returns number of hits the page has received
 	 * @return int
-	 * @fixme Add a $force option
 	 */
 	public function get_hits( $force = false ) {
 		if( $force ) $this->get_metadata();
@@ -1084,20 +1063,22 @@ class Page {
 	
 	/**   
 	 * Regenerates lastedit, length, and hits
-	 * @return void
+	 * @param array $pageInfoArray2 Array of values to merge with defaults (default: null)
+	 * @return array Information gathered
 	 * @access private
-	 * @fixme Avoid duplicating functions, merge with constructor
 	 */
-	private function get_metadata() {
+	private function get_metadata( $pageInfoArray2 = null ) {
 		$pageInfoArray = array(
 			'action' => 'query',
 			'prop' => "info",
 			'intoken' => 'edit|delete|protect|move|block|unblock|email|import'
 		);
 		
-		$pageInfoArray['titles'] = $this->title;
-		
-		if( $followRedir ) $pageInfoArray['redirects'] = '';
+		if( $pageInfoArray2 != null ) {
+			$pageInfoArray = array_merge($pageInfoArray, $pageInfoArray2);
+		} else {
+			$pageInfoArray['titles'] = $this->title;
+		}
 		
 		$pageInfoRes = $this->wiki->apiQuery($pageInfoArray);
 		
@@ -1116,6 +1097,8 @@ class Page {
 			$this->hits = $info['counter'];
 			$this->length = $info['length'];
 			$this->starttimestamp = $info['starttimestamp'];
+			
+			return $info;
 		}
 	}
 

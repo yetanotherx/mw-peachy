@@ -114,7 +114,7 @@ class Peachy {
 			}
 		}
 		
-		return $extenstions;
+		return $extensions;
 	}
 	
 	static function loadPlugin( $plugin_name ) {

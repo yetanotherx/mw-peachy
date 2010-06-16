@@ -48,13 +48,13 @@ class Database {
 		$this->connectToServer();
 	}
 
-    public static function load( &$newclass = null, $host, $port, $user, $pass, $db, $prefix = '', $readonly = false ) {
-        if( !function_exists( 'mysql_connect' ) && !class_exists( 'mysqli' ) ) {
-            throw new DependancyError( "MySQL", "http://us2.php.net/manual/en/book.mysql.php" );
-        }
-        
-        $newclass = new Database( $host, $port, $user, $pass, $db, $prefix, $readonly );
-    }
+	public static function load( &$newclass = null, $host, $port, $user, $pass, $db, $prefix = '', $readonly = false ) {
+		if( !function_exists( 'mysql_connect' ) && !class_exists( 'mysqli' ) ) {
+			throw new DependancyError( "MySQL", "http://us2.php.net/manual/en/book.mysql.php" );
+		}
+		
+		$newclass = new Database( $host, $port, $user, $pass, $db, $prefix, $readonly );
+	}
 
 	
 	private function connectToServer( $force = false ) {
@@ -105,8 +105,8 @@ class Database {
 
 		
 		if( mysql_errno( $this->mConn ) == 2006 ) {
-			  $this->connectToServer( true );
-			  $result = mysql_query( $sql, $this->mConn );
+				 $this->connectToServer( true );
+				 $result = mysql_query( $sql, $this->mConn );
 		}
 		
 		

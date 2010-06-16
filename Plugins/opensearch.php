@@ -22,7 +22,7 @@ class OpenSearch {
 	public static function load( $wikiClass, $text, $limit = 100, $namespaces = array( 0 ) ) {
 		global $pgHTTP;
 		
-		if( !in_array( 'OpenSearchXml', $wikiClass->getExtensions() ) ) {
+		if( !array_key_exists( 'OpenSearchXml', $wikiClass->getExtensions() ) ) {
 			throw new DependancyError( "OpenSearchXml", "http://www.mediawiki.org/wiki/Extension:OpenSearchXML" );
 		}
 		

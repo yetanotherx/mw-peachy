@@ -72,7 +72,6 @@ class Peachy {
 		
 		$extensions = Peachy::wikiChecks( $base_url );
 		
-		
 		Hooks::runHook( 'StartLogin', array( &$config_params, &$extensions ) );
 		
 		if( !isset( $config_params['username'] ) || 
@@ -81,7 +80,7 @@ class Peachy {
 			throw new LoginError( array( "MissingParam", "Either the username, password, or baseurl parameter was not set." ) );
 		}
 		
-		$w = new Wiki( $config_params, $extensions['extensions'], $extensions['versions'], false, null );
+		$w = new Wiki( $config_params, $extensions, false, null );
 		return $w;
 	}
 	
@@ -104,20 +103,18 @@ class Peachy {
 		
 		$mwVersion = $version;
 		
-		$retarray = array( 'extensions' => array(), 'versions' => array() );
+		$extensions = array();
 		
 		foreach( $siteinfo['query']['extensions'] as $ext ) {
-			$retarray['extensions'][] = $ext['name'];
-			
 			if( isset( $ext['version'] ) ) {
-				$retarray['versions'][$ext['name']] = $ext['version'];
+				$extensions[$ext['name']] = $ext['version'];
 			}
 			else {
-				$retarray['versions'][$ext['name']] = '';
+				$extensions[$ext['name']] = '';
 			}
 		}
 		
-		return $retarray;
+		return $extenstions;
 	}
 	
 	static function loadPlugin( $plugin_name ) {

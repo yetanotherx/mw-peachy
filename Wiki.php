@@ -26,18 +26,25 @@ class Wiki {
 	protected $apiQueryLimit = 499;
 	protected $isFlagged = false;
 	private $extensions;
-	private $extversions;
 	protected $tokens = array();
 	protected $userRights = array();
 	private $namespaces = null;
-
-	function __construct( $configuration, $extensions = array(), $extversions = array(), $recursed = false, $token = null ) {
+	
+	/**
+	 * Contruct function for the wiki. Handles login and related functions
+	 * @access public
+	 * @param array $configuration Array with configuration data. At least needs username, password, and base_url. @see Peachy::newWiki()
+	 * @param array $extensions Array of names of extensions installed on the wiki and their versions (default: array())
+	 * @param bool $recursed Is the function recursing itself? Used internally, don't use (default: false)
+	 * @param mixed $token Token if the wiki needs a token. Used internally, don't use (default: null)
+	 * @return void
+	 */
+	function __construct( $configuration, $extensions = array(), $recursed = false, $token = null ) {
 		global $pgHTTP, $pgProxy, $pgHTTPEcho, $pgRunPage, $pgVerbose, $pgUA;
 		
 		$this->base_url = $configuration['baseurl'];
 		$this->username = $configuration['username'];
 		$this->extensions = $extensions;
-		$this->extversions = $extversions;
 		
 		if( isset( $configuration['editsperminute'] ) && $configuration['editsperminute'] != 0) {
 			$this->edit_rate = $configuration['editsperminute'];
@@ -566,10 +573,6 @@ class Wiki {
 	
 	public function getExtensions() {
 		return $this->extensions;
-	}
-	
-	public function getExtversions() {
-		return $this->extversions;
 	}
 	
 	public function getNamespaces( $force = false ) {

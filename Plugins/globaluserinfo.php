@@ -21,7 +21,7 @@ class GlobalUserInfo {
 
     public static function load( $wikiClass ) {
     
-        if( !in_array( 'CentralAuth', $wikiClass->getExtensions() ) ) {
+        if( !array_key_exists( 'CentralAuth', $wikiClass->getExtensions() ) ) {
             throw new DependancyError( "CentralAuth" );
         }
         

@@ -57,13 +57,13 @@ class Page {
 			if( $title[0] == ":" ){
 				$title = substr($title, 1);
 			}
-			$namespace = explode( ':', $title, 2 );
+			$chunks = explode( ':', $title, 2 );
 			if(count($namespace) != 1){
-				$namespace = strtolower( trim( $namespace[0] ) );
+				$namespace = strtolower( trim( $chunks[0] ) );
 				$namespaces = $this->wiki->getNamespaces();
 				if( $namespace == $namespaces[-2] || $namespace == "media" ){
 					// Media or local variant, translate to File:
-					$title = $namespaces[6] . ":" . $namespace[1];
+					$title = $namespaces[6] . ":" . $chunks[1];
 				}
 				elseif( $namespace == $namespaces[-1] || $namespace == "special" ){
 					//Special or local variant, error
@@ -776,6 +776,12 @@ class Page {
 	
 	public function prefixindex() {}
 	
+	/**
+	 * Returns all of titles on which the page is transcluded ("embedded in")
+	 * @param string $namespace A pipe '|' separated list of namespace numbers to check. Default null (all). 
+	 * @param int $limit A hard limit on the number of transclusions to fetch. Default null (all). 
+	 * @return array
+	*/
 	public function getTransclusions( $namespace = null, $limit = null ) {
 		
 		pecho( "Getting transclusions of {$this->title}...\n\n", 0 );
@@ -786,7 +792,8 @@ class Page {
 			'action' => 'query',
 			'list' => 'embeddedin',
 			'limit' => $limit,
-			'assert' => 'user'
+			'assert' => 'user',
+			'lhtitle' => 'title'
 		);
 		
 		if(!is_null($namespace)){
@@ -794,11 +801,7 @@ class Page {
 		}
 		
 		$result = $this->wiki->listHandler($trArray);
-		$finalArray = array();
-		foreach ($result as $item){
-			$finalArray[] = $item['title'];
-		}
-		return $finalArray;
+		return $result;
     }
 	
 	public function watch() {

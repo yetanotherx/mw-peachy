@@ -156,7 +156,8 @@ class User {
 			'ucuser' => $this->username,
 			'action' => 'query',
 			'list' => 'usercontribs',
-			'limit' => $limit
+			'limit' => $limit,
+			'lhtitle' => 'title',
 		);
 		
 		if( $mostrecentfirst ){
@@ -166,11 +167,12 @@ class User {
 		}
 		
 		$result = $this->wiki->listHandler( $ucArray );
-		$finalArray = array();
+		print_r($result);
+		/*$finalArray = array();
 		foreach ( $result as $item ){
 			$finalArray[] = $item['title'];
 		}
-		return $finalArray;
+		return $finalArray;*/
 	}
 	
 	public function has_email() {

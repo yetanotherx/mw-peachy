@@ -173,7 +173,7 @@ class Wiki {
 
 					$recres = $this->__construct( $configuration, $this->extensions, $this->extversions, true, $token );
 					return $recres;
-					break; 
+					break;
 				case 'Success':
 					pecho( "Successfully logged in to {$this->base_url}\n\n", 0 );
 					

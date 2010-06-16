@@ -17,14 +17,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-class GlobalUserInfo {
+class Logging {
 
-    public static function load( $wikiClass ) {
-    
-        if( !in_array( 'CentralAuth', $wikiClass->getExtensions() ) ) {
-            throw new DependancyError( "CentralAuth" );
-        }
-        
-    }
+	public static function doLog( $loggingstuff, &$text, &$cat ) {
+		global $pgPechoTypes;
+		
+		$types = $loggingstuff[0];
+		$logFile = $loggingstuff[1];
+		
+		if( in_array( $pgPechoTypes[$cat], $types ) ) {
+			file_put_contents( $logFile, trim($text) . "\n", FILE_APPEND );
+		}
+		
+	}
+
+	public static function load( $types, $logfile ) {
+		global $pgHooks;
+		
+		$pgHooks['OutputText'][] = array( 'Logging::dolog', array($types, $logFile ) );
+		
+	}
 
 }

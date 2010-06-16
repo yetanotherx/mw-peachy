@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 define( 'PEACHY', true );
 define( 'PEACHYVERSION', '0.1alpha' );
-define( 'MINMW', '1.12' );
+define( 'MINMW', '1.15' );
 
 $version = explode( '.', phpversion() );
 

@@ -1174,7 +1174,7 @@ class Page {
 	}
 	
 	/**
-	 * Returns number of hits the page has received
+	 * Returns the timestamp of the last edit
 	 * 
 	 * @return int
 	 */

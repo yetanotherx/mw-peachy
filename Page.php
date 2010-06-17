@@ -825,7 +825,7 @@ class Page {
 	 */		
 	public function allow_subpages() {
 		$allows = $this->wiki->get_allow_subpages();
-		return $allows[$this->namespace_id];
+		return (bool) $allows[$this->namespace_id];
 	}
 	
 	/**

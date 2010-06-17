@@ -839,7 +839,7 @@ class Wiki {
 			
 			foreach($tRes['query']['namespaces'] as $namespace){
 				$this->namespaces[$namespace['id']] = $namespace['*'];
-				$this->allowSubpages[$namespace['id']] = ((isset($namespace['subpages'])) ? 1 : 0);
+				$this->allowSubpages[$namespace['id']] = ((isset($namespace['subpages'])) ? true : false);
 			}
 		}
 		return $this->namespaces;
@@ -847,22 +847,7 @@ class Wiki {
 	
 	public function get_allow_subpages( $force = false ) {
 		if( is_null( $this->allowSubpages ) || $force ) {
-			$tArray = array(
-				'meta' => 'siteinfo',
-				'action' => 'query',
-				'siprop' => 'namespaces'
-			);
-			$tRes = $this->apiQuery( $tArray );
-			
-			if( isset( $tRes['error'] ) ) {
-				throw new APIError( array( 'error' => $tRes['error']['code'], 'text' => $tRes['error']['info'] ) );
-				return false;
-			}
-			
-			foreach($tRes['query']['namespaces'] as $namespace){
-				$this->namespaces[$namespace['id']] = $namespace['*'];
-				$this->allowSubpages[$namespace['id']] = ((isset($namespace['subpages'])) ? true : false);
-			}
+			$this->getNamespaces( true );
 		}
 		return $this->allowSubpages;
 	}

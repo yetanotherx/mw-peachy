@@ -25,7 +25,16 @@ function in_string( $needle, $haystack ) {
 	return strpos( $haystack, $needle ) !== false; 
 }
 
-function checkExclusion( $text, $username = null, $optout = null ) {
+/**
+ * Detects the presence of a nobots template or one that denies editing by ours
+ * 
+ * @access public
+ * @param string $text Text of the page to check (default: '')
+ * @param string $username Username to search for in the template (default: null)
+ * @param string $optout Text to search for in the optout= parameter. (default: null)
+ * @return bool True on match of an appropriate nobots template
+ */
+function checkExclusion( $text = '', $username = null, $optout = null ) {
 	if( in_string( "{{nobots}}", $text ) ) return true;
 	if( in_string( "{{bots}}", $text ) ) return false;
 	

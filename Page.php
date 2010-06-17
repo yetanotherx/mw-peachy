@@ -634,7 +634,7 @@ class Page {
 		
 		if( !$force ) {
 			//Perform nobots checks, login checks, /Run checks
-			if( $this->nobots( $text ) ) {
+			if( checkExclusion( $text, $this->wiki->get_username(), $this->wiki->get_optout() ) ) {
 				throw new EditError("Nobots", "The page has a nobots template");
 			}
 			$stop = true;
@@ -664,27 +664,6 @@ class Page {
 			throw new EditError( "UnknownEditError", print_r($result['edit'],true));
 		}
 	
-	}
-	
-	/**
-	 * Detects the presence of a nobots template or one that denies editing by ours
-	 * 
-	 * @access public
-	 * @param string $text Text of the page to check (default: '')
-	 * @return bool True on match of an appropriate nobots template
-	 */
-	public function nobots( $text = '' ) {
-		if( !$this->wiki->get_nobots() ) return false;
-		
-		if( $text == '' ) {
-			if( $this->content == '' ) {
-				$this->get_text();
-			}
-			
-			$text = $this->content;
-		}
-		
-		return preg_match( '/\{\{(nobots|bots\|allow=none|bots\|deny=all|bots\|optout=all|bots\|deny=.*?'.preg_quote($this->wiki->get_username(),'/').'.*?)\}\}/iS', $text );
 	}
 	
 	public function undo() {}

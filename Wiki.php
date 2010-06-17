@@ -132,6 +132,16 @@ class Wiki {
 	private $nobots = true;
 	
 	/**
+	 * Text to search for in the optout= field of the {{nobots}} template
+	 * 
+	 * (default value: null)
+	 * 
+	 * @var null
+	 * @access private
+	 */
+	private $optout = null;
+	
+	/**
 	 * Contruct function for the wiki. Handles login and related functions.
 	 * 
 	 * @access public
@@ -179,6 +189,10 @@ class Wiki {
 		
 		if( isset( $configuration['useragent'] ) ) {
 			$pgUA = $configuration['useragent'];
+		}
+		
+		if( isset( $configuration['optout'] ) ) {
+			$this->optout = $configuration['optout'];
 		}
 		
 		if( isset( $configuration['verbose'] ) ) {
@@ -528,6 +542,17 @@ class Wiki {
 	 */
 	public function get_nobots() {
 		return $this->nobots;
+	}
+	
+	/**
+	 * Returns the text to search for in the optout= field of the {{nobots}} template
+	 * 
+	 * @access public
+	 * @see Wiki::$optout
+	 * @return null|string String to search for
+	 */
+	public function get_optout() {
+		return $this->optout;
 	}
 	
 	public function purge( $titles ) {

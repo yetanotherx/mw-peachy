@@ -637,11 +637,10 @@ class Page {
 			if( $this->nobots( $text ) ) {
 				throw new EditError("Nobots", "The page has a nobots template");
 			}
-			$die = true;
-			Hooks::runHook( 'SoftEditBlock', array( &$editarray, &$die ) );
-			if( 1 == 2 && $die ) {
-				##FIXME: Die() isn't the right thing to do here, throw an error?
-				die();
+			$stop = true;
+			Hooks::runHook( 'SoftEditBlock', array( &$editarray, &$stop ) );
+			if( 1 == 2 /* debugging stuff, should be replaced with the actual /Run, etc checks. */ && $stop ) {
+				throw new EditError("Shutoff", "The bot has been shut down by its enable page.");
 			}
 		}
 		

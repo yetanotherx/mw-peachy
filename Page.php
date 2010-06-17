@@ -784,7 +784,7 @@ class Page {
 		
 		if( !$force ) {
 			//Perform nobots checks, login checks, /Run checks
-			if( checkExclusion( $text, $this->wiki->get_username(), $this->wiki->get_optout() ) ) {
+			if( checkExclusion( &$this->wiki, $text, $this->wiki->get_username(), $this->wiki->get_optout() ) ) {
 				throw new EditError("Nobots", "The page has a nobots template");
 			}
 			$stop = true;

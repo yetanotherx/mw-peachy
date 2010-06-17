@@ -695,8 +695,8 @@ class Page {
 	 * 
 	 * @return bool True if subpages allowed
 	 */		
-	public function allowSubpages() {
-		$allows = $this->wiki->getAllowSubpages();
+	public function allow_subpages() {
+		$allows = $this->wiki->get_allow_subpages();
 		return $allows[$this->namespace_id];
 	}
 	
@@ -705,7 +705,7 @@ class Page {
 	 * 
 	 * @return bool True if discussion page, false if not
 	 */	
-	public function isDiscussion() {
+	public function is_discussion() {
 		if($this->namespace_id >= 0 && $this->namespace_id%2 == 1){
 			return true;
 		} else {

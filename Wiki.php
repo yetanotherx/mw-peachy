@@ -797,7 +797,8 @@ class Wiki {
 		}
 		return $this->namespaces;
 	}
-	public function getAllowSubpages( $force = false ) {
+	
+	public function get_allow_subpages( $force = false ) {
 		if( is_null( $this->allowSubpages ) || $force ) {
 			$tArray = array(
 				'meta' => 'siteinfo',
@@ -813,10 +814,16 @@ class Wiki {
 			
 			foreach($tRes['query']['namespaces'] as $namespace){
 				$this->namespaces[$namespace['id']] = $namespace['*'];
-				$this->allowSubpages[$namespace['id']] = ((isset($namespace['subpages'])) ? 1 : 0);
+				$this->allowSubpages[$namespace['id']] = ((isset($namespace['subpages'])) ? true : false);
 			}
 		}
 		return $this->allowSubpages;
+	}
+	
+	public function get_nsAllowsSubpages( $namespace = 0 ) {
+		$this->get_allow_subpages();
+		
+		return (bool) $this->allowSubpages[$namespace];
 	}
 	
 	/**
@@ -825,8 +832,8 @@ class Wiki {
 	 * @access public
 	 * @see Wiki::$userRights
 	 * @return array Array of user rights
-	 */		
-	public function getUserRights() {
+	 */					
+	public function get_userrights() {
 		return $this->userRights;
 	}
 

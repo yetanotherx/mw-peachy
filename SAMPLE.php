@@ -8,5 +8,5 @@ Peachy::loadAllPlugins();//Optional, required if using CheckUser, OpenSearch, Si
 
 $sites = SiteMatrix::load( $x ); //Generates sitematrix, logic in Plugins/sitematrix.php
 
-$y = new Page( "Main Page" );
+$y = new Page( $x, "Main Page" );
 echo $y->get_text();

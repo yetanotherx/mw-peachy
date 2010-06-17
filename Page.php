@@ -18,25 +18,175 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 class Page {
-
+	
+	/**
+	 * Wiki class
+	 * 
+	 * @var Wiki
+	 * @access private
+	 */
 	private $wiki;
+	
+	/**
+	 * Title of the page
+	 * 
+	 * @var string
+	 * @access private
+	 */
 	private $title;
+	
+	/**
+	 * The ID of the page
+	 * 
+	 * @var int
+	 * @access private
+	 */
 	private $pageid;
+	
+	/**
+	 * If the page exists or not
+	 * 
+	 * (default value: true)
+	 * 
+	 * @var bool
+	 * @access private
+	 */
 	private $exists = true;
+	
+	/**
+	 * When retriving the page information was a redirect followed
+	 * 
+	 * (default value: false)
+	 * 
+	 * @var bool
+	 * @access private
+	 */
 	private $redirectFollowed = false;
+	
+	/**
+	 * The page title without the namespace bit
+	 * 
+	 * @var string
+	 * @access private
+	 */
 	private $title_wo_namespace;
+	
+	/**
+	 * The ID of the namespace
+	 * 
+	 * @var int
+	 * @access private
+	 */
 	private $namespace_id;
+	
+	/**
+	 * Page text
+	 * 
+	 * @var string
+	 * @access private
+	 */
 	private $content;
+	
+	/**
+	 * Templates used in the page
+	 * 
+	 * (default value: array())
+	 * 
+	 * @var array
+	 * @access private
+	 */
 	private $templates = array();
+	
+	/**
+	 * Protection information for the page
+	 * 
+	 * (default value: array())
+	 * 
+	 * @var array
+	 * @access private
+	 */
 	private $protection = array();
+	
+	/**
+	 * Cateogories that the page is in
+	 * 
+	 * (default value: array())
+	 * 
+	 * @var array
+	 * @access private
+	 */
 	private $categories = array();
+	
+	/**
+	 * Images used in the page
+	 * 
+	 * (default value: array())
+	 * 
+	 * @var array
+	 * @access private
+	 */
 	private $images = array();
+	
+	/**
+	 * Internal links in the page
+	 * 
+	 * (default value: array())
+	 * 
+	 * @var array
+	 * @access private
+	 */
 	private $links = array();
+	
+	/**
+	 * Timestamp of the last edit
+	 * 
+	 * @var string
+	 * @access private
+	 */
 	private $lastedit;
+	
+	/**
+	 * Length of the page in bytes
+	 * 
+	 * @var int
+	 * @access private
+	 */
 	private $length;
+	
+	/**
+	 * Amount of hits (views) the page has
+	 * 
+	 * @var int
+	 * @access private
+	 */
 	private $hits;
+	
+	/**
+	 * Language links on the page
+	 * 
+	 * (default value: array())
+	 * 
+	 * @var array
+	 * @access private
+	 */
 	private $langlinks = array();
+	
+	/**
+	 * External links on the page
+	 * 
+	 * (default value: array())
+	 * 
+	 * @var array
+	 * @access private
+	 */
 	private $extlinks = array();
+	
+	/**
+	 * starttimestamp(?)
+	 * 
+	 * @var mixed
+	 * @access private
+	 */
 	private $starttimestamp;
 	
 	
@@ -1066,8 +1216,7 @@ class Page {
 	private function get_metadata( $pageInfoArray2 = null ) {
 		$pageInfoArray = array(
 			'action' => 'query',
-			'prop' => "info",
-			'intoken' => 'edit|delete|protect|move|block|unblock|email|import'
+			'prop' => "info"
 		);
 		
 		if( $pageInfoArray2 != null ) {

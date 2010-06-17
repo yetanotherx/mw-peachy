@@ -142,6 +142,14 @@ class Wiki {
 	private $optout = null;
 	
 	/**
+	 * Configuration (sans password)
+	 * 
+	 * @var array
+	 * @access private
+	 */
+	private $configuration;
+	
+	/**
 	 * Contruct function for the wiki. Handles login and related functions.
 	 * 
 	 * @access public
@@ -343,6 +351,9 @@ class Wiki {
 							}
 						}
 					}
+					
+					$this->configuration = $configuration;
+					unset($this->configuration['password']);
 					
 
 			}
@@ -553,6 +564,17 @@ class Wiki {
 	 */
 	public function get_optout() {
 		return $this->optout;
+	}
+	
+	/**
+	 * Returns the configuration of the wiki
+	 * 
+	 * @access public
+	 * @see Wiki::$configuration
+	 * @return array Configuration array
+	 */
+	public function get_configuration() {
+		return $this->configuration;
 	}
 	
 	public function purge( $titles ) {

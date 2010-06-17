@@ -414,15 +414,20 @@ class Wiki {
 		
 		$code = $tArray['code'];
 		unset( $tArray['code'] );
-		$limit = $tArray['limit'];
-		unset( $tArray['limit'] );
+		
+		if( isset($tArray['limit']) ) {
+			$limit = $tArray['limit'];
+			unset( $tArray['limit'] );
+		} else {
+			$limit = null;
+		}
 		
 		$tArray['action'] = 'query';
 		$tArray[$code . 'limit'] = ($this->apiQueryLimit + 1);
 		
 		$retrieved = 0;
 		
-		if(!is_null($limit)){
+		if( isset($limit) && !is_null($limit) ){
 			if(!is_numeric($limit)){
 				throw new BadEntryError("listHandler","limit should be a number or null");
 			} else {
@@ -435,7 +440,7 @@ class Wiki {
 				}
 			}
 		} 
-		if(!is_null($tArray[$code . 'namespace'])){
+		if( isset($tArray[$code . 'namespace']) && !is_null($tArray[$code . 'namespace']) ){
 			if(strlen($tArray[$code . 'namespace']) === 0){
 				$tArray[$code . 'namespace'] = null;
 			} elseif( is_array( $tArray[$code . 'namespace'] ) ) {
@@ -724,7 +729,57 @@ class Wiki {
 	
 	public function listblocks() {}
 	
-	public function categorymembers() {}
+	/**
+	 * Retrives the titles of member pages of the given category
+	 * 
+	 * @access public
+	 * @param mixed $category Category to retieve
+	 * @param bool $subcat Should subcategories be checked (default: false)
+	 * @param mixed $namespace Restrict results to the given namespace (default: null)
+	 * @return array Array of titles
+	 */
+	public function categorymembers( $category, $subcat = false, $namespace = null) {
+		$cmArray = array(
+			'list' => 'categorymembers',
+			'code' => 'cm',
+			'cmtitle' => $category,
+			'cmprop' => 'title',
+		);
+		
+		$strip_categories = false;
+		
+		if( $namespace ) {
+			if( is_array( $namspace ) ) {
+				if( $subcat && !in_array( 14, $namespace ) ) {
+					$namespace[] = 14;
+					$strip_categories = true;
+				}
+				
+				$namespace = implode( '|', $namespace );
+			}
+			else if( $subcat && $namespace !== '14' ) {
+				$namespace .= '|14';
+				$strip_categories = true;
+			}
+			
+			$cmArray['cmnamespace'] = $namespace;
+		}
+		
+		$top_category = $this->listHandler( $cmArray );
+		$final_titles = array();
+		
+		foreach( array_values($top_category) AS $category ) {
+			if( $category['ns'] == 14 && $subcat ) {
+				$final_titles = array_merge( $final_titles, $this->categorymembers( $category['title'], $subcat, $namespace ));
+				
+				if( $strip_categories ) continue;
+			}
+			
+			$final_titles[] = $category['title'];
+		}
+		
+		return $final_titles;
+	}
 	
 	public function deletedrevs() {
 	}

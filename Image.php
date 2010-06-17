@@ -362,6 +362,7 @@ class Image {
 	
 	/**
 	 * Returns the bitdepth of the image
+	 * 
 	 * @return string
 	 */
 	public function getBitdepth() {
@@ -377,5 +378,12 @@ class Image {
 		return $this->metadata;
 	}
 	
-
+	/**
+	 * Returns a page class for the image
+	 * 
+	 * @return Page
+	 */
+	public function &getPageclass() {
+		return new Page( $this->wiki, $this->title );
+	}
 }

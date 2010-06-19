@@ -47,7 +47,7 @@ $pgPechoTypes = array(
 	'NOTICE',
 	'WARN',
 	'ERROR',
-	'FAT'
+	'FATAL'
 );
 
 $pgHTTP = new HTTP;

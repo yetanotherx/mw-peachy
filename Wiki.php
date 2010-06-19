@@ -227,7 +227,7 @@ class Wiki {
 						case 'ERROR':
 							$pgVerbose[] = 3;
 							break;
-						case 'FAT':
+						case 'FATAL':
 							$pgVerbose[] = 4;
 							break;
 					}

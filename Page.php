@@ -354,43 +354,19 @@ class Page {
 
 		if( !$this->exists ) return array();
 		
-		$endArray = array();
+		$tArray = array(
+			'prop' => 'links',
+			'titles' => $this->title,
+			'code' => 'pl',
+			'lhtitle' => 'links'
+		);
 		
-		$continue = null;
-		
-		while( 1 ) {
-			$tArray = array(
-				'action' => 'query',
-				'prop' => 'links',
-				'pllimit' => $this->wiki->get_api_limit(),
-				'titles' => $this->title,
-			);
-			
-			if( !is_null( $continue ) ) $tArray['plcontinue'] = $continue;
-			
-				
-			$tRes = $this->wiki->apiQuery( $tArray );
-				
-			if( isset( $tRes['error'] ) ) {
-				throw new APIError( array( 'error' => $tRes['error']['code'], 'text' => $tRes['error']['info'] ) );
-				return false;
-			}
-			
-			foreach( $tRes['query']['pages'][$this->pageid]['links'] as $x ) {
-				$endArray[] = $x['title'];
-			}
-			
-			if( empty( $tRes['query-continue']['links']['plcontinue'] ) ) {
-				$this->links = $endArray;
-				return $endArray;
-			}
-			else {
-				$continue = $tRes['query-continue']['links']['plcontinue'];
-			}
-			
-			
+		$this->links = array();
+		$result = $this->wiki->listHandler($tArray);
+		foreach($result[0] as $link){
+			$this->links[] = $link['title'];
 		}
-		
+		return $this->links;
 	}
 	
 	/**
@@ -409,42 +385,19 @@ class Page {
 
 		if( !$this->exists ) return array();
 		
-		$endArray = array();
+		$tArray = array(
+			'prop' => 'templates',
+			'titles' => $this->title,
+			'code' => 'tl',
+			'lhtitle' => 'templates'
+		);
 		
-		$continue = null;
-		
-		while( 1 ) {
-			$tArray = array(
-				'action' => 'query',
-				'prop' => 'templates',
-				'tllimit' => $this->wiki->get_api_limit(),
-				'titles' => $this->title,
-			);
-			
-			if( !is_null( $continue ) ) $tArray['tlcontinue'] = $continue;
-			
-				
-			$tRes = $this->wiki->apiQuery( $tArray );
-			 
-			if( isset( $tRes['error'] ) ) {
-				throw new APIError( array( 'error' => $tRes['error']['code'], 'text' => $tRes['error']['info'] ) );
-				return false;
-			}
-			
-			foreach( $tRes['query']['pages'][$this->pageid]['templates'] as $x ) {
-				$endArray[] = $x['title'];
-			}
-			
-			if( empty( $tRes['query-continue']['templates']['tlcontinue'] ) ) {
-				$this->templates = $endArray;
-				return $endArray;
-			}
-			else {
-				$continue = $tRes['query-continue']['templates']['tlcontinue'];
-			}
-			
-			
+		$this->templates = array();
+		$result = $this->wiki->listHandler($tArray);
+		foreach($result[0] as $template){
+			$this->templates[] = $template['title'];
 		}
+		return $this->templates;
 	}
 	
 	/**
@@ -463,42 +416,20 @@ class Page {
 
 		if( !$this->exists ) return array();
 		
-		$endArray = array();
+		$tArray = array(
+			'prop' => 'categories',
+			'titles' => $this->title,
+			'code' => 'cl',
+			'lhtitle' => 'categories'
+		);
 		
-		$continue = null;
-		
-		while( 1 ) {
-			$tArray = array(
-				'action' => 'query',
-				'prop' => 'categories',
-				'cllimit' => $this->wiki->get_api_limit(),
-				'titles' => $this->title,
-			);
-			
-			if( !is_null( $continue ) ) $tArray['clcontinue'] = $continue;
-			
-				
-			$tRes = $this->wiki->apiQuery( $tArray );
-			
-			if( isset( $tRes['error'] ) ) {
-				throw new APIError( array( 'error' => $tRes['error']['code'], 'text' => $tRes['error']['info'] ) );
-				return false;
-			}
-			
-			foreach( $tRes['query']['pages'][$this->pageid]['categories'] as $x ) {
-				$endArray[] = $x['title'];
-			}
-			
-			if( empty( $tRes['query-continue']['categories']['clcontinue'] ) ) {
-				$this->categories = $endArray;
-				return $endArray;
-			}
-			else {
-				$continue = $tRes['query-continue']['categories']['clcontinue'];
-			}
-			
-			
+		$this->categories = array();
+		$result = $this->wiki->listHandler($tArray);
+		foreach($result[0] as $category){
+			$this->categories[] = $category['title'];
 		}
+		return $this->categories;
+			
 	}
 	
 	/**
@@ -518,42 +449,21 @@ class Page {
 
 		if( !$this->exists ) return array();
 		
-		$endArray = array();
+		$tArray = array(
+			'prop' => 'images',
+			'titles' => $this->title,
+			'code' => 'im',
+			'lhtitle' => 'images'
+		);
 		
-		$continue = null;
-		
-		while( 1 ) {
-			$tArray = array(
-				'action' => 'query',
-				'prop' => 'images',
-				'imlimit' => $this->wiki->get_api_limit(),
-				'titles' => $this->title,
-			);
-			
-			if( !is_null( $continue ) ) $tArray['imcontinue'] = $continue;
-			
-				
-			$tRes = $this->wiki->apiQuery( $tArray );
-			  
-			if( isset( $tRes['error'] ) ) {
-				throw new APIError( array( 'error' => $tRes['error']['code'], 'text' => $tRes['error']['info'] ) );
-				return false;
-			}
-			
-			foreach( $tRes['query']['pages'][$this->pageid]['images'] as $x ) {
-				$endArray[] = $x['title'];
-			}
-			
-			if( empty( $tRes['query-continue']['images']['imcontinue'] ) ) {
-				$this->images = $endArray;
-				return $endArray;
-			}
-			else {
-				$continue = $tRes['query-continue']['images']['imcontinue'];
-			}
-			
-			
+		$this->images = array();
+		$result = $this->wiki->listHandler($tArray);
+		foreach($result[0] as $image){
+			$this->images[] = $image['title'];
 		}
+		return $this->images;
+			
+	
 	}
 	
 	/**
@@ -572,43 +482,19 @@ class Page {
 
 		if( !$this->exists ) return array();
 		
-		$endArray = array();
+		$tArray = array(
+			'prop' => 'extlinks',
+			'titles' => $this->title,
+			'code' => 'el',
+			'lhtitle' => 'extlinks'
+		);
 		
-		$continue = null;
-		
-		while( 1 ) {
-			$tArray = array(
-				'action' => 'query',
-				'prop' => 'extlinks',
-				'ellimit' => $this->wiki->get_api_limit(),
-				'titles' => $this->title,
-			);
-			
-			if( !is_null( $continue ) ) $tArray['elcontinue'] = $continue;
-			
-				
-			$tRes = $this->wiki->apiQuery( $tArray );
-			
-
-			if( isset( $tRes['error'] ) ) {
-				throw new APIError( array( 'error' => $tRes['error']['code'], 'text' => $tRes['error']['info'] ) );
-				return false;
-			}
-			
-			foreach( $tRes['query']['pages'][$this->pageid]['extlinks'] as $x ) {
-				$endArray[] = $x['*'];
-			}
-			
-			if( empty( $tRes['query-continue']['extlinks']['elcontinue'] ) ) {
-				$this->extlinks = $endArray;
-				return $endArray;
-			}
-			else {
-				$continue = $tRes['query-continue']['extlinks']['elcontinue'];
-			}
-			
-			
+		$this->extlinks = array();
+		$result = $this->wiki->listHandler($tArray);
+		foreach($result[0] as $extlink){
+			$this->extlinks[] = $extlink['*'];
 		}
+		return $this->extlinks;
 	}
 	
 	/**
@@ -626,42 +512,19 @@ class Page {
 
 		if( !$this->exists ) return array();
 		
-		$endArray = array();
+		$tArray = array(
+			'prop' => 'langlinks',
+			'titles' => $this->title,
+			'code' => 'll',
+			'lhtitle' => 'langlinks'
+		);
 		
-		$continue = null;
-		
-		while( 1 ) {
-			$tArray = array(
-				'action' => 'query',
-				'prop' => 'langlinks',
-				'lllimit' => $this->wiki->get_api_limit(),
-				'titles' => $this->title,
-			);
-			
-			if( !is_null( $continue ) ) $tArray['llcontinue'] = $continue;
-			
-				
-			$tRes = $this->wiki->apiQuery( $tArray );
-			
-			if( isset( $tRes['error'] ) ) {
-				throw new APIError( array( 'error' => $tRes['error']['code'], 'text' => $tRes['error']['info'] ) );
-				return false;
-			}
-			
-			foreach( $tRes['query']['pages'][$this->pageid]['langlinks'] as $x ) {
-				$endArray[] = $x['lang'] . ':' . $x['*'];
-			}
-			
-			if( empty( $tRes['query-continue']['langlinks']['llcontinue'] ) ) {
-				$this->extlinks = $endArray;
-				return $endArray;
-			}
-			else {
-				$continue = $tRes['query-continue']['langlinks']['llcontinue'];
-			}
-			
-			
+		$this->langlinks = array();
+		$result = $this->wiki->listHandler($tArray);
+		foreach($result[0] as $langlink){
+			$this->langlinks[] = $langlink['lang'] . ":" . $langlink['*'];
 		}
+		return $this->langlinks;
 	}
 	
 	/**

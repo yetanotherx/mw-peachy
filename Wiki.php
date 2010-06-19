@@ -719,13 +719,144 @@ class Wiki {
 		return $this->listHandler( $leArray );
 	}
 	
-	public function allimages() {}
+	/**
+	 * Enumerate all images sequentially
+	 * 
+	 * @access public
+	 * @link http://www.mediawiki.org/wiki/API:Query_-_Lists#allimages_.2F_le
+	 * @param string $prefix Search for all image titles that begin with this value. (default: null)
+	 * @param string $sha1 SHA1 hash of image (default: null)
+	 * @param string $base36 SHA1 hash of image in base 36 (default: null)
+	 * @param string $from The image title to start enumerating from. (default: null)
+	 * @param string $minsize Limit to images with at least this many bytes (default: null)
+	 * @param string $maxsize Limit to images with at most this many bytes (default: null)
+	 * @param string $dir Direction in which to list (default: 'ascending')
+	 * @param array $prop Information to retieve (default: array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' ))
+	 * @return array List of images
+	 */
+	public function allimages( $prefix = null, $sha1 = null, $base36 = null, $from = null, $minsize = null, $maxsize = null, $dir = 'ascending', $prop = array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' ) ) {
+		$leArray = array(
+			'list' => 'allimages',
+			'code' => 'ai',
+			'aidir' => $dir,
+			'aiprop' => implode( '|', $prop ),
+		);
+		
+		if( !is_null( $from ) ) $leArray['aifrom'] = $from;
+		if( !is_null( $prefix ) ) $leArray['aiprefix'] = $prefix;
+		if( !is_null( $minsize ) ) $leArray['aiminsize'] = $minsize;
+		if( !is_null( $maxsize ) ) $leArray['aimaxsize'] = $maxsize;
+		if( !is_null( $sha1 ) ) $leArray['aisha1'] = $sha1;
+		if( !is_null( $base36 ) ) $leArray['aisha1base36'] = $base36;
+		$leArray['limit'] = $this->apiQueryLimit;
+		
+		return $this->listHandler( $leArray );
 	
-	public function allpages() {}
+	}
 	
-	public function alllinks() {}
+	/**
+	 * Enumerate all pages sequentially
+	 * 
+	 * @access public
+	 * @link http://www.mediawiki.org/wiki/API:Query_-_Lists#allpages_.2F_le
+	 * @param array $namespace The namespace to enumerate. (default: array( 0 ))
+	 * @param string $prefix Search for all page titles that begin with this value. (default: null)
+	 * @param string $from The page title to start enumerating from. (default: null)
+	 * @param string $redirects Which pages to list: all, redirects, or nonredirects (default: all)
+	 * @param string $minsize Limit to pages with at least this many bytes (default: null)
+	 * @param string $maxsize Limit to pages with at most this many bytes (default: null)
+	 * @param array $protectiontypes Limit to protected pages. Examples: array( 'edit' ), array( 'move' ), array( 'edit', 'move' ). (default: array())
+	 * @param array $protectionlevels Limit to protected pages. Examples: array( 'autoconfirmed' ), array( 'sysop' ), array( 'autoconfirmed', 'sysop' ). (default: array())
+	 * @param string $dir Direction in which to list (default: 'ascending')
+	 * @param string $interwiki Filter based on whether a page has langlinks (either withlanglinks, withoutlanglinks, or all (default))
+	 * @return array List of pages
+	 */
+	public function allpages( $namespace = array( 0 ), $prefix = null, $from = null, $redirects = 'all', $minsize = null, $maxsize = null, $protectiontypes = array(), $protectionlevels = array(), $dir = 'ascending', $interwiki = 'all' ) {
+		$leArray = array(
+			'list' => 'allpages',
+			'code' => 'ap',
+			'apdir' => $dir,
+			'apnamespace' => implode( '|', $namespace ),
+			'apfilterredir' => $redirects,
+			'apfilterlanglinks' => $interwiki,
+		);
+		
+		if( count( $protectiontypes ) && count( $protectionlevels ) ) {
+			throw new BadEntryError( "AllPages", '$protectionlevels and $protectiontypes cannot be used in conjunction' );
+		}
+		elseif( count( $protectiontypes ) ) {
+			$leArray['apprtype'] = implode( '|', $protectiontypes );
+		}
+		elseif( count( $protectionlevels ) ) {
+			$leArray['apprlevel'] = implode( '|', $protectionlevels );
+		}
+		
+		if( !is_null( $from ) ) $leArray['apfrom'] = $from;//
+		if( !is_null( $prefix ) ) $leArray['apprefix'] = $prefix; //
+		if( !is_null( $minsize ) ) $leArray['apminsize'] = $minsize; //
+		if( !is_null( $maxsize ) ) $leArray['apmaxsize'] = $maxsize; // 
+		$leArray['limit'] = $this->apiQueryLimit;
+		
+		return $this->listHandler( $leArray );
+	}
 	
-	public function allusers() {}
+	/**
+	 * Enumerate all internal links that point to a given namespace
+	 * 
+	 * @access public
+	 * @link http://www.mediawiki.org/wiki/API:Query_-_Lists#alllinks_.2F_le
+	 * @param array $namespace The namespace to enumerate. (default: array( 0 ))
+	 * @param string $prefix Search for all page titles that begin with this value. (default: null)
+	 * @param string $from The page title to start enumerating from. (default: null)
+	 * @param string $continue When more results are available, use this to continue. (default: null)
+	 * @param bool $unique Set to true in order to only show unique links (default: true)
+	 * @param array $prop What pieces of information to include: ids and/or title. (default: array( 'ids', 'title' ))
+	 * @return array List of links
+	 */
+	public function alllinks( $namespace = array( 0 ), $prefix = null, $from = null, $continue = null, $unique = true, $prop = array( 'ids', 'title' ) ) {
+		$leArray = array(
+			'list' => 'alllinks',
+			'code' => 'al',
+			'alnamespace' => implode( '|', $namespaces ),
+			'alprop' => implode( '|', $prop ),
+		);
+		
+		if( !is_null( $from ) ) $leArray['alfrom'] = $from;
+		if( !is_null( $prefix ) ) $leArray['alprefix'] = $prefix;
+		if( !is_null( $continue ) ) $leArray['alcontinue'] = $continue;
+		if( $unique ) $leArray['alunique'] = 'yes';
+		$leArray['limit'] = $this->apiQueryLimit;
+		
+		return $this->listHandler( $leArray );
+	}
+	
+	/**
+	 * Enumerate all registered users
+	 * 
+	 * @access public
+	 * @link http://www.mediawiki.org/wiki/API:Query_-_Lists#alllinks_.2F_le
+	 * @param string $prefix Search for all usernames that begin with this value. (default: null)
+	 * @param array $groups Limit users to a given group name (default: array())
+	 * @param string $from The username to start enumerating from. (default: null)
+	 * @param bool $editsonly Set to true in order to only show users with edits (default: false)
+	 * @param array $prop What pieces of information to include (default: array( 'blockinfo', 'groups', 'editcount', 'registration' ))
+	 * @return array List of users
+	 */
+	public function allusers( $prefix = null, $groups = array(), $from = null, $editsonly = false, $prop = array( 'blockinfo', 'groups', 'editcount', 'registration' ) ) {
+		$leArray = array(
+			'list' => 'allusers',
+			'code' => 'au',
+			'auprop' => implode( '|', $prop ),
+		);
+		
+		if( !is_null( $from ) ) $leArray['aufrom'] = $from;
+		if( !is_null( $prefix ) ) $leArray['auprefix'] = $prefix;
+		if( !count( $groups ) ) $leArray['augroup'] = implode( '|', $groups );
+		if( $editsonly ) $leArray['auwitheditsonly'] = 'yes';
+		$leArray['limit'] = $this->apiQueryLimit;
+		
+		return $this->listHandler( $leArray );
+	}
 	
 	public function backlinks() {}
 	

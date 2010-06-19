@@ -64,7 +64,7 @@ class Database {
 			$this->mysqli = false;
 		}
 		else {
-			$this->mConn = new mysqli( $this->mHost.':'.$this->mPort, $this->mUser, $this->mPass, $this->mDB );
+			$this->mConn = new mysqli( $this->mHost.':'.$this->mPort, $this->mUser, $this->mPass, $this->mDb );
 		}
 	
 	}
@@ -79,15 +79,15 @@ class Database {
 	}
 	
 	/**
-	 * Destruct function, front-end for mysql_close.
+	 * Destruct function. Closes the connection to the database.
 	 * @return void
-	 */
-	
-	 
+	 */	 
 	public function __destruct() {
-		
-		mysql_close( $this->mConn );
-	
+		if (!$this->mysqli) {
+			mysql_close( $this->mConn );
+		} else {
+			$this->mConn->close();
+		}
 	}
 	
 	/**
@@ -97,33 +97,51 @@ class Database {
 	 * @return object|bool MySQL object, false if there's no result
 	 */
 	public function doQuery( $sql ) {
+		$sql = trim($sql);		
 		
-		 $sql = trim($sql);
-		
-
-		$result = mysql_query( $sql, $this->mConn );
-
-		
-		if( mysql_errno( $this->mConn ) == 2006 ) {
-				 $this->connectToServer( true );
-				 $result = mysql_query( $sql, $this->mConn );
+		if (!$this->mysqli) {
+			$result = mysql_query( $sql, $this->mConn );
+		} else {
+			$result = $this->mConn->query( $sql );
 		}
-		
+			
+		if ( $this->errorNo() == 2006 ) {
+			$this->connectToServer();
+			if (!$this->mysqli) {
+				$result = mysql_query( $sql, $this->mConn );
+			} else {
+				$result = $this->mConn->query( $sql );
+			}
+		}
 		
 		if( !$result ) return false;
 		return $result;
 	}
 	
-	
-	
 	/**
-	 * Front-end for mysql_error
-	 
+	 * Returns a string description of the last MySQL error
 	 * @return string|bool MySQL error string, null if no error
 	 */
-
-	public function errorStr( $sql ) {
-		$result = mysql_error( $this->mConn );
+	public function errorStr( ) {
+		if (!$this->mysqli) {
+			$result = mysql_error( $this->mConn );
+		} else {
+			$result = $this->mConn->error;
+		}
+		if( !$result ) return false;
+		return $result;
+	}
+	
+	/**
+	 * Returns the error code of the last MySQL call
+	 * @return int|bool MySQL error code, null if no error
+	 */
+	public function errorNo( ) {
+		if (!$this->mysqli) {
+			$result = mysql_errno( $this->mConn );
+		} else {
+			$result = $this->mConn->errno;
+		}
 		if( !$result ) return false;
 		return $result;
 	}
@@ -134,7 +152,11 @@ class Database {
 	 * @return string Escaped data
 	 */
 	public function mysqlEscape( $data ) {
-		return mysql_real_escape_string( $data, $this->mConn );
+		if (!$this->mysqli) {
+			return mysql_real_escape_string( $data, $this->mConn );
+		} else {
+			return $this->mConn->real_escape_string( $data );
+		}
 	}
 	
 	/**
@@ -146,8 +168,14 @@ class Database {
 	public static function mysql2array( $data ) {
 
 		$return = array();
-		while( $row = mysql_fetch_assoc( $data ) ) {
-			$return[] = $row;
+		if (!$this->mysqli) {
+			while( $row = mysql_fetch_assoc( $data ) ) {
+				$return[] = $row;
+			}
+		} else {
+			while( $row = $data->fetch_assoc( ) ) {
+				$return[] = $row;
+			}
 		}
 
 		return $return;
@@ -260,6 +288,20 @@ class Database {
 		$sql = "INSERT " . implode( ' ', $options ) . " INTO {$this->mPrefix}$table ($cols) VALUES ($vals)";
 
 		return (bool)$this->doQuery( $sql );
+	}
+	
+	/**
+	 * Front-end for mysql_insert_id
+	 * @return int The value of the AUTO_INCREMENT field that was updated by the previous query.
+	 */
+	public function insert_id () {
+		if( $this->mReadonly == true ) throw new DBError( "Write function called while under read-only mode" );
+		
+		if (!$this->mysqli) {
+			return mysql_insert_id( $this->mConn );
+		} else {
+			return $this->mConn->insert_id;
+		}
 	}
 	
 	/**

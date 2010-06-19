@@ -48,7 +48,7 @@ class IRC {
 	
 	/**
 	 * Plugin initalization function
-	 * @param object $newclass Location to store IRC class in memory
+	 * @param object &$newclass Location to store IRC class in memory
 	 * @param string $User Username to send to IRC
 	 * @param string $Nick Nick to use
 	 * @param string $Pass Password to send

@@ -655,7 +655,7 @@ class Page {
 		
 		if( !$force ) {
 			//Perform nobots checks, login checks, /Run checks
-			if( checkExclusion( &$this->wiki, $text, $this->wiki->get_username(), $this->wiki->get_optout() ) ) {
+			if( checkExclusion( $this->wiki, $text, $this->wiki->get_username(), $this->wiki->get_optout() ) ) {
 				throw new EditError("Nobots", "The page has a nobots template");
 			}
 			$stop = true;
@@ -670,7 +670,13 @@ class Page {
 		$result = $this->wiki->apiQuery( $editarray, true );
 		
 		if( isset( $result['error'] ) ) {
-			throw new EditError( $result['error']['code'], $result['error']['info'] );
+			if( $result['error']['code'] == 'maxlag' ) {
+				pecho("Edit failed, database lag is too high.", 2);
+				return false;
+			}
+			else {
+				throw new EditError( $result['error']['code'], $result['error']['info'] );
+			}
 		}
 		elseif( isset( $result['edit'] ) ) {
 			if( $result['edit']['result'] == "Success" ) {

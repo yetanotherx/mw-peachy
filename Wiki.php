@@ -755,7 +755,6 @@ class Wiki {
 		if( !is_null( $maxsize ) ) $leArray['aimaxsize'] = $maxsize;
 		if( !is_null( $sha1 ) ) $leArray['aisha1'] = $sha1;
 		if( !is_null( $base36 ) ) $leArray['aisha1base36'] = $base36;
-		$leArray['limit'] = $this->apiQueryLimit;
 		
 		return $this->listHandler( $leArray );
 	
@@ -783,7 +782,7 @@ class Wiki {
 			'list' => 'allpages',
 			'code' => 'ap',
 			'apdir' => $dir,
-			'apnamespace' => implode( '|', $namespace ),
+			'apnamespace' => $namespace,
 			'apfilterredir' => $redirects,
 			'apfilterlanglinks' => $interwiki,
 		);
@@ -802,7 +801,6 @@ class Wiki {
 		if( !is_null( $prefix ) ) $leArray['apprefix'] = $prefix; //
 		if( !is_null( $minsize ) ) $leArray['apminsize'] = $minsize; //
 		if( !is_null( $maxsize ) ) $leArray['apmaxsize'] = $maxsize; // 
-		$leArray['limit'] = $this->apiQueryLimit;
 		
 		return $this->listHandler( $leArray );
 	}
@@ -824,7 +822,7 @@ class Wiki {
 		$leArray = array(
 			'list' => 'alllinks',
 			'code' => 'al',
-			'alnamespace' => implode( '|', $namespaces ),
+			'alnamespace' => $namespaces,
 			'alprop' => implode( '|', $prop ),
 		);
 		
@@ -860,7 +858,6 @@ class Wiki {
 		if( !is_null( $prefix ) ) $leArray['auprefix'] = $prefix;
 		if( !count( $groups ) ) $leArray['augroup'] = implode( '|', $groups );
 		if( $editsonly ) $leArray['auwitheditsonly'] = 'yes';
-		$leArray['limit'] = $this->apiQueryLimit;
 		
 		return $this->listHandler( $leArray );
 	}

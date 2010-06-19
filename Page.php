@@ -1063,23 +1063,10 @@ class Page {
 	public function get_transclusions( $namespace = null, $limit = null ) {
 		
 		pecho( "Getting transclusions of {$this->title}...\n\n", 0 );
-
-		$trArray = array(
-			'code' => 'ei',
-			'eititle' => $this->title,
-			'action' => 'query',
-			'list' => 'embeddedin',
-			'limit' => $limit,
-			'assert' => 'user',
-			'lhtitle' => 'title'
-		);
 		
-		if(!is_null($namespace)){
-			$trArray['einamespace'] = $namespace;
-		}
-		
-		$result = $this->wiki->listHandler($trArray);
+		$result = $this->wiki->embeddedin($this->title, $namespace, $limit);
 		return $result;
+		
     }
 
 	/**

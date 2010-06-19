@@ -436,8 +436,8 @@ class Wiki {
 				if($limit < 0 || (floor($limit) != $limit)){
 					throw new BadEntryError("listHandler","limit should an integer greater than 0");
 				}
-				## FIXME: Whats $eilimit??
-				if($limit < $eilimit){
+
+				if($limit < $tArray[$code . 'limit']){
 					$tArray[$code . 'limit'] = $limit;
 				}
 			}
@@ -918,24 +918,24 @@ class Wiki {
 	}
 	
 	/**
-	 * Returns array of pages that embedd (transclude) the page given
+	 * Returns array of pages that embed (transclude) the page given
 	 * 
 	 * @access public
 	 * @param mixed $title
 	 * @param mixed $namespace. (default: null)
 	 * @return void
 	 */
-	public function embeddedin( $title, $namespace = null ) {
+	public function embeddedin( $title, $namespace = null, $limit = null ) {
 		$eiArray = array(
 			'list' => 'embeddedin',
 			'code' => 'ei',
 			'eititle' => $title,
-			'lhtitle' => 'title'
+			'lhtitle' => 'title',
+			'action' => 'query',
+			'limit' => $limit
 		);
 		
-		if( $namespace !== null ) {
-			if( is_array( $namespace ) ) $namespace = implode( '|', $namespace );
-			
+		if(!is_null($namespace)){
 			$eiArray['einamespace'] = $namespace;
 		}
 		

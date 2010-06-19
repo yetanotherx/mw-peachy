@@ -385,7 +385,7 @@ class Wiki {
 		$arrayParams['format'] = 'php';
 		$assert = false;
 		
-		if( $post && $this->isFlagged && in_array( 'assert', array_values( $post ) ) && $post['assert'] == 'user' ) {
+		if( $post && $this->isFlagged && in_array( 'assert', array_values( $arrayParams ) ) && $post['assert'] == 'user' ) {
 			$post['assert'] = 'bot';
 			$assert = true;
 		}
@@ -436,6 +436,7 @@ class Wiki {
 				if($limit < 0 || (floor($limit) != $limit)){
 					throw new BadEntryError("listHandler","limit should an integer greater than 0");
 				}
+				## FIXME: Whats $eilimit??
 				if($limit < $eilimit){
 					$tArray[$code . 'limit'] = $limit;
 				}
@@ -525,7 +526,7 @@ class Wiki {
 	 * @return bool|int Max lag for the wiki
 	 */
 	public function get_maxlag() {
-		return $this->maglag;
+		return $this->maxlag;
 	}
 	
 	/**
@@ -749,7 +750,7 @@ class Wiki {
 		
 		$strip_categories = false;
 		
-		if( $namespace ) {
+		if( $namespace !== null ) {
 			if( is_array( $namspace ) ) {
 				if( $subcat && !in_array( 14, $namespace ) ) {
 					$namespace[] = 14;
@@ -785,7 +786,30 @@ class Wiki {
 	public function deletedrevs() {
 	}
 	
-	public function embeddedin() {}
+	/**
+	 * Returns array of pages that embedd (transclude) the page given
+	 * 
+	 * @access public
+	 * @param mixed $title
+	 * @param mixed $namespace. (default: null)
+	 * @return void
+	 */
+	public function embeddedin( $title, $namespace = null ) {
+		$eiArray = array(
+			'list' => 'embeddedin',
+			'code' => 'ei',
+			'eititle' => $title,
+			'lhtitle' => 'title'
+		);
+		
+		if( $namespace !== null ) {
+			if( is_array( $namespace ) ) $namespace = implode( '|', $namespace );
+			
+			$eiArray['einamespace'] = $namespace;
+		}
+		
+		return $this->listHandler( $eiArray );
+	}
 	
 	public function logevents() {}
 	

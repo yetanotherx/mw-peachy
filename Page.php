@@ -734,8 +734,16 @@ class Page {
 			throw new EditError( "PermissionDenied", "User is not allowed to edit {$this->title}" );
 		}
 		
-		if( mb_strlen( $summary, '8bit' ) > 255 ) {
-			throw new EditError( "LongSummary", "Summary is over 255 bytes, the maximum allowed" );
+		if( function_exists( 'mb_strlen' ) ) {
+			if( mb_strlen( $summary, '8bit' ) > 255 ) {
+				throw new EditError( "LongSummary", "Summary is over 255 bytes, the maximum allowed" );
+			}
+		}
+		else {
+			// If we don't have mb_strlen we compromise and use strlen
+			if( strlen( $summary) > 255 ) {
+				throw new EditError( "LongSummary", "Summary is over 255 bytes, the maximum allowed" );
+			}
 		}
 		
 		pecho( "Making edit to {$this->title}...\n\n", 0 );
@@ -803,6 +811,8 @@ class Page {
 		}
 		elseif( isset( $result['edit'] ) ) {
 			if( $result['edit']['result'] == "Success" ) {
+				if( array_key_exists( 'nochange', $result['edit'] ) ) return $this->lastedit;
+				
 				$this->__construct( $this->wiki, $this->pageid );
 				return $result['edit']['newrevid'];
 			}
@@ -1231,17 +1241,20 @@ class Page {
 			$this->pageid = $key;
 			if( $this->pageid > 0 ) {
 				$this->exists = true;
+				$this->lastedit = $info['touched'];
+				$this->hits = $info['counter'];
+				$this->length = $info['length'];
+				$this->starttimestamp = ( isset($info['starttimestamp']) ) ? $info['starttimestamp'] : '' ;
 			}
 			else {
 				$this->pageid = 0;
+				$this->lastedit = '';
+				$this->hits = '';
+				$this->length = '';
+				$this->starttimestamp = '';
 			}
 			
 			if( isset( $info['missing'] ) ) $this->exists = false;
-
-			$this->lastedit = $info['touched'];
-			$this->hits = $info['counter'];
-			$this->length = $info['length'];
-			$this->starttimestamp = $info['starttimestamp'];
 			
 			return $info;
 		}

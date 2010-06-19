@@ -410,43 +410,6 @@ class Wiki {
 		}
 	}
 	
-	/**
-	 * Queries the API, automatically continuing the query if possible.
-	 * 
-	 * @access public
-	 * @param array $arrayParams Parameters given to query with (default: array())
-	 * @param int $sleep How long to sleep between requests (default: 0)
-	 * @return array Returns an array with the API result
-	 */
-	public function apiQueryContinue( $arrayParams = array(), $sleep = 0 ) {
-		global $pgHTTP;
-		
-		$continue = array();
-		
-       		while ( true ) {
-			$x = $this->apiQuery( array_merge($arrayParams,$continue) );
-			$a = key( $x['query'] );
-			
-            		if ( ! isset( $return ) ) {
-                		$return = $x;
-            		} else {
-                		$return['query'][$a] = array_merge( $return['query'][$a], $x['query'][$a] );
-                	}
-            		
-            		if ( isset( $x['query-continue'] ) ) {
-                		$b = key( $x['query-continue'][$a] );
-                		$continue[$b] = $x['query-continue'][$a][$b];
-                		unset($return['query-continue']);
-            		} else {
-                		break;
-                	}
-                	
-            		if ( $sleep != 0 ) {
-                		sleep( $sleep );
-                	}
-        	}
-        	return $return;
-	}
 	
 	public function listHandler( $tArray = array() ) {
 		

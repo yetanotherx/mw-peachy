@@ -414,7 +414,8 @@ class Wiki {
 	 * Simplifies the running of API queries, especially with continues and other parameters.
 	 * 
 	 * @access public
-	 * @param array $tArray Parameters given to query with (default: array()). In addition to those recognised by the API, ['code'] should be used to described the section of the API used (required), ['limit'] to impose a hard limit on the number of results returned (optional) and ['lhtitle'] to simplify the result to a simpler, more specific array of just e.g. titles.
+	 * @link http://compwhizii.net/peachy/wiki/Manual/Wiki::listHandler
+	 * @param array $tArray Parameters given to query with (default: array()). In addition to those recognised by the API, ['code'] is the first two characters of all the parameters in a list=XXX API call. For example: with allpages, the parameters start with 'ap'. With recentchanges, the parameters start with 'rc' (required), ['limit'] to impose a hard limit on the number of results returned (optional) and ['lhtitle'] to simplify a multidimendional result into a unidimensional result. lhtitle is the key of the sub-array to return. (optional)
 	 * @return array Returns an array with the API result
 	 */
 	public function listHandler( $tArray = array() ) {

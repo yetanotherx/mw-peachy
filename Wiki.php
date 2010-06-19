@@ -869,7 +869,7 @@ class Wiki {
 	public function listblocks() {}
 	
 	/**
-	 * Retrives the titles of member pages of the given category
+	 * Retrieves the titles of member pages of the given category
 	 * 
 	 * @access public
 	 * @param mixed $category Category to retieve
@@ -937,7 +937,6 @@ class Wiki {
 			'code' => 'ei',
 			'eititle' => $title,
 			'lhtitle' => 'title',
-			'action' => 'query',
 			'limit' => $limit
 		);
 		
@@ -960,7 +959,26 @@ class Wiki {
 	
 	public function users() {}
 	
-	public function random() {}
+	/**
+	 * Returns the titles of some random pages.
+	 * 
+	 * @access public
+	 * @param string $namespaces A pipe '|' separated list of namespaces to select from (default: "0" i.e. mainspace).
+	 * @param int $limit The number of titles to return (default: 1).
+	 * @param bool $onlyredirects Only include redirects (true) or only include non-redirects (default; false).
+	 * @return array A series of random titles.
+	 */
+	public function random($namespaces = "0", $limit = 1, $onlyredirects = false) {
+		$rnArray = array(
+			'code' => 'rn',
+			'list' => 'random',
+			'rnnamespace' => $namespaces,
+			'limit' => $limit,
+			'rnredirect' => (is_null($onlyredirects) || !$onlyredirects) ? null : "true",
+			'lhtitle' => 'title'
+		);
+		return $this->listHandler($rnArray);
+	}
 	
 	public function protectedtitles() {}
 	
@@ -1040,6 +1058,13 @@ class Wiki {
 		return $this->extensions;
 	}
 	
+	/**
+	 * Returns an array of the namespaces used on the current wiki.
+	 * 
+	 * @access public
+	 * @param bool $force Whether or not to force an update of any cached values first.
+	 * @return array The namespaces in use in the format index => local name. 
+	 */
 	public function getNamespaces( $force = false ) {
 		if( is_null( $this->namespaces ) || $force ) {
 			$tArray = array(
@@ -1061,7 +1086,14 @@ class Wiki {
 		}
 		return $this->namespaces;
 	}
-	
+
+	/**
+	 * Returns an array of subpage-allowing namespaces.
+	 * 
+	 * @access public
+	 * @param bool $force Whether or not to force an update of any cached values first.
+	 * @return array An array of namespaces that allow subpages.
+	 */	
 	public function get_allow_subpages( $force = false ) {
 		if( is_null( $this->allowSubpages ) || $force ) {
 			$this->getNamespaces( true );
@@ -1069,7 +1101,14 @@ class Wiki {
 		return $this->allowSubpages;
 	}
 	
-	public function get_nsAllowsSubpages( $namespace = 0 ) {
+	/**
+	 * Returns a boolean equal to whether or not the namespace with index given allows subpages.
+	 * 
+	 * @access public
+	 * @param int $namespace The namespace that might allow subpages.
+	 * @return bool Whether or not that namespace allows subpages.
+	 */
+	public function get_ns_allows_subpages( $namespace = 0 ) {
 		$this->get_allow_subpages();
 		
 		return (bool) $this->allowSubpages[$namespace];

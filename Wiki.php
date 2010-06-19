@@ -685,6 +685,7 @@ class Wiki {
 		
 		$rcArray['limit'] = $this->apiQueryLimit;
 		
+		Hooks::runHook( 'PreQueryRecentchanges', array( &$rcArray ) );
 		return $this->listHandler( $rcArray );
 		
 	}
@@ -723,6 +724,7 @@ class Wiki {
 		if( $tag ) $leArray['letag'] = $tag;
 		$leArray['limit'] = $this->apiQueryLimit;
 		
+		Hooks::runHook( 'PreQueryLog', array( &$leArray ) );
 		return $this->listHandler( $leArray );
 	}
 	
@@ -756,6 +758,7 @@ class Wiki {
 		if( !is_null( $sha1 ) ) $leArray['aisha1'] = $sha1;
 		if( !is_null( $base36 ) ) $leArray['aisha1base36'] = $base36;
 		
+		Hooks::runHook( 'PreQueryAllimages', array( &$leArray ) );
 		return $this->listHandler( $leArray );
 	
 	}
@@ -802,6 +805,7 @@ class Wiki {
 		if( !is_null( $minsize ) ) $leArray['apminsize'] = $minsize; //
 		if( !is_null( $maxsize ) ) $leArray['apmaxsize'] = $maxsize; // 
 		
+		Hooks::runHook( 'PreQueryAllpages', array( &$leArray ) );
 		return $this->listHandler( $leArray );
 	}
 	
@@ -832,6 +836,7 @@ class Wiki {
 		if( $unique ) $leArray['alunique'] = 'yes';
 		$leArray['limit'] = $this->apiQueryLimit;
 		
+		Hooks::runHook( 'PreQueryAlllinks', array( &$leArray ) );
 		return $this->listHandler( $leArray );
 	}
 	
@@ -859,6 +864,7 @@ class Wiki {
 		if( !count( $groups ) ) $leArray['augroup'] = implode( '|', $groups );
 		if( $editsonly ) $leArray['auwitheditsonly'] = 'yes';
 		
+		Hooks::runHook( 'PreQueryAllusers', array( &$leArray ) );
 		return $this->listHandler( $leArray );
 	}
 	
@@ -902,6 +908,7 @@ class Wiki {
 			$cmArray['cmnamespace'] = $namespace;
 		}
 		
+		Hooks::runHook( 'PreQueryCategorymembers', array( &$cmArray ) );
 		$top_category = $this->listHandler( $cmArray );
 		$final_titles = array();
 		
@@ -942,6 +949,7 @@ class Wiki {
 			$eiArray['einamespace'] = $namespace;
 		}
 		
+		Hooks::runHook( 'PreQueryEmbeddedin', array( &$eiArray ) );
 		return $this->listHandler( $eiArray );
 	}
 	
@@ -985,6 +993,8 @@ class Wiki {
 		if(!is_null($namespace)){
 			$tArray['eunamespace'] = $namespace;
 		}
+		
+		Hooks::runHook( 'PreQueryExturlusage', array( &$tArray ) );
 		$result = $this->listHandler($tArray);
 		return $result;
 	}
@@ -1009,6 +1019,8 @@ class Wiki {
 			'rnredirect' => (is_null($onlyredirects) || !$onlyredirects) ? null : "true",
 			'lhtitle' => 'title'
 		);
+		
+		Hooks::runHook( 'PreQueryRandom', array( &$rnArray ) );
 		return $this->listHandler($rnArray);
 	}
 	
@@ -1032,8 +1044,51 @@ class Wiki {
 	
 	public function setUserAgent() {}
 	
-	public function diff( $rev1, $rev2 ) {
-	
+	/**
+	 * Returns a unified or HTML diff between two revisions
+	 * 
+	 * @access public
+	 * @param int $rev1 The revision id of the old revision
+	 * @param int $rev2 The revision id of the new revision
+	 * @param string $method Format of diff. Either 'unified', or 'inline' (HTML diff)
+	 * @return string Returned diff
+	 */
+	public function diff( $rev1, $rev2, $method = 'unified' ) {
+		$r1array = array(
+			'action' => 'query',
+			'prop' => 'revisions',
+			'revids' => $rev1,
+			'rvprop' => 'content'
+		);
+		$r2array = array(
+			'action' => 'query',
+			'prop' => 'revisions',
+			'revids' => $rev2,
+			'rvprop' => 'content'
+		);
+		
+		$r1 = $this->apiQuery( $r1array );
+		$r2 = $this->apiQuery( $r2array );
+		
+		
+		if( isset( $r1['query']['badrevids'] ) || isset( $r2['query']['badrevids'] ) ) {
+			
+		}
+		elseif( !isset( $r1['query']['pages'] ) || !isset( $r2['query']['pages'] ) ) {
+			
+		}
+		else {
+			foreach( $r1['query']['pages'] as $r1pages ) {
+				$r1text = $r1pages['revisions'][0]['*'];
+			}
+			foreach( $r2['query']['pages'] as $r2pages ) {
+				$r2text = $r2pages['revisions'][0]['*'];
+			}
+			
+			return getTextDiff($method, $r1text, $r2text);
+		}
+		
+		
 	}
 	
 	public function get_tokens( $force = false, $rollback = false ) {

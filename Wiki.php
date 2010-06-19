@@ -953,7 +953,41 @@ class Wiki {
 	
 	public function watchlistraw() {}
 	
-	public function exturlusage() {}
+	/** 
+	 * Returns details of usage of an external URL on the wiki.
+	 *
+	 * @access public
+	 * @param string $url The url to search for links to, without a protocol. * can be used as a wildcard.
+	 * @param string $protocol The protocol to accompany the URL. Only certain values are allowed, depending on how $wgUrlProtocols is set on the wiki; by default the allowed values are 'http://', 'https://', 'ftp://', 'irc://', 'gopher://', 'telnet://', 'nntp://', 'worldwind://', 'mailto:' and 'news:'. Default 'http://'.
+	 * @param string $prop Properties to return; it should be a pipe '|' separated list of values; the options are 'ids', 'title' and 'url'. Default null (all).
+	 * @param string $namespace A pipe '|' separated list of namespace numbers to check. Default null (all).
+	 * @param int $limit A hard limit on the number of transclusions to fetch. Default null (all).
+	 */
+	public function exturlusage($url, $protocol = "http", $prop = null, $namespace = null, $limit = null ) {
+		if( isset($prop) && !is_null($prop) ){
+			if(strlen($prop) == 0){
+				$prop = null;
+			} else {
+				if(!preg_match('/^(ids|title|url)(\|(ids|title|url)){0,2}/',$prop)){
+					throw new BadEntryError("exturlusage",'$prop should be a pipe \'|\' separated list of values; the options are \'ids\', \'title\' and \'url\'.');
+				}
+			}
+		}
+		
+		$tArray = array(
+			'list' => 'exturlusage',
+			'code' => 'eu',
+			'euquery' => $url,
+			'euprotocol' => $protocol,
+			'limit' => $limit,
+			'euprop' => $prop
+		);	
+		if(!is_null($namespace)){
+			$tArray['eunamespace'] = $namespace;
+		}
+		$result = $this->listHandler($tArray);
+		return $result;
+	}
 	
 	public function users() {}
 	
@@ -1002,7 +1036,7 @@ class Wiki {
 	
 	}
 	
-	public function getTokens( $force = false, $rollback = false ) {
+	public function get_tokens( $force = false, $rollback = false ) {
 		Hooks::runHook( 'GetTokens', array( &$this->tokens ) );
 		
 		if( $force ) return $this->tokens;
@@ -1052,7 +1086,7 @@ class Wiki {
 	 * @see Wiki::$extensions
 	 * @return array Extensions in format name => version
 	 */
-	public function getExtensions() {
+	public function get_extensions() {
 		return $this->extensions;
 	}
 	
@@ -1063,7 +1097,7 @@ class Wiki {
 	 * @param bool $force Whether or not to force an update of any cached values first.
 	 * @return array The namespaces in use in the format index => local name. 
 	 */
-	public function getNamespaces( $force = false ) {
+	public function get_namespaces( $force = false ) {
 		if( is_null( $this->namespaces ) || $force ) {
 			$tArray = array(
 				'meta' => 'siteinfo',
@@ -1094,7 +1128,7 @@ class Wiki {
 	 */	
 	public function get_allow_subpages( $force = false ) {
 		if( is_null( $this->allowSubpages ) || $force ) {
-			$this->getNamespaces( true );
+			$this->get_namespaces( true );
 		}
 		return $this->allowSubpages;
 	}

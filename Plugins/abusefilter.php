@@ -25,7 +25,7 @@ class AbuseFilter {
     public static function load( $wikiclass, &$newclass = null ) {
         global $pgHTTP;
         
-        if( !array_key_exists( 'AbuseFilter', $wikiClass->getExtensions() ) ) {
+        if( !array_key_exists( 'AbuseFilter', $wikiClass->get_extensions() ) ) {
             throw new DependancyError( "AbuseFilter", "http://www.mediawiki.org/wiki/Extension:AbuseFilter" );
         }
         

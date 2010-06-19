@@ -191,7 +191,7 @@ class Image {
 	public function upload( $file, $text = '', $comment = '', $watch = false, $ignorewarnings = true ) {
 		global $mwVersion;
 		
-		$tokens = $this->getTokens();
+		$tokens = $this->wiki->get_tokens();
 		
 		if( version_compare( $mwVersion, '1.16' ) >= 0 ) {
 			$uploadArray = array(

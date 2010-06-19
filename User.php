@@ -180,7 +180,7 @@ class User {
 	public function createaccount() {}
 	
 	public function deletedcontribs( $content = false, $start = null, $end = null, $dir = 'older', $prop = array( 'revid', 'user', 'parsedcomment', 'minor', 'len', 'content', 'token' ) ) {
-		if( !in_array( 'deletedhistory', $this->wiki->getUserRights() ) ) {
+		if( !in_array( 'deletedhistory', $this->wiki->get_userrights() ) ) {
 			throw new PermissionsError( "User is not allowed to view deleted revisions" );
 			return false;
 		}

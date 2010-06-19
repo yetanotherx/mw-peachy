@@ -217,7 +217,7 @@ class Page {
 			$chunks = explode( ':', $title, 2 );
 			if(count($chunks) != 1){
 				$namespace = strtolower( trim( $chunks[0] ) );
-				$namespaces = $this->wiki->getNamespaces();
+				$namespaces = $this->wiki->get_namespaces();
 				if( $namespace == $namespaces[-2] || $namespace == "media" ){
 					// Media or local variant, translate to File:
 					$title = $namespaces[6] . ":" . $chunks[1];
@@ -588,7 +588,7 @@ class Page {
 	
 		global $pgRunPage;
 		
-		$tokens = $this->wiki->getTokens();
+		$tokens = $this->wiki->get_tokens();
 		
 		if( $tokens['edit'] == '+\\' ) {
 			throw new EditError( "LoggedOut", "User has logged out" );
@@ -726,7 +726,7 @@ class Page {
 			throw new BadEntryError("get_discussion","tried to find the discussion page of a page which could never have one");
 			return false;
 		} else {
-			$namespaces = $this->wiki->getNamespaces();
+			$namespaces = $this->wiki->get_namespaces();
 			if($this->is_discussion()){
 				return $namespaces[($this->namespace_id - 1)] . ":" . $this->title_wo_namespace;
 			} else {
@@ -746,7 +746,7 @@ class Page {
 	 * @return bool True on success
 	 */	
 	public function move( $newTitle, $reason = '', $movetalk = true, $movesubpages = true, $noredirect = false ) {
-		$tokens = $this->wiki->getTokens();
+		$tokens = $this->wiki->get_tokens();
 		
 		if( $tokens['move'] == '+\\' ) {
 			throw new EditError( "LoggedOut", "User has logged out" );
@@ -809,12 +809,12 @@ class Page {
 	 */	
 	public function delete( $reason = null ) {
 	
-		if( !in_array( 'delete', $this->wiki->getUserRights() ) ) {
+		if( !in_array( 'delete', $this->wiki->get_userrights() ) ) {
 			throw new PermissionsError( "User is not allowed to delete pages" );
 			return false;
 		}
 		
-		$tokens = $this->wiki->getTokens();
+		$tokens = $this->wiki->get_tokens();
 		
 		$editarray = array(
 			'action' => 'delete',
@@ -848,12 +848,12 @@ class Page {
 	public function unprotect() {}
 	
 	public function undelete( $reason = null, $timestamps = null ) {
-		if( !in_array( 'undelete', $this->wiki->getUserRights() ) ) {
+		if( !in_array( 'undelete', $this->wiki->get_userrights() ) ) {
 			throw new PermissionsError( "User is not allowed to undelete pages" );
 			return false;
 		}
 		
-		$tokens = $this->wiki->getTokens();
+		$tokens = $this->wiki->get_tokens();
 		
 		$undelArray = array(
 			'action' => 'undelete',
@@ -891,7 +891,7 @@ class Page {
 	}
 	
 	public function deletedrevs( $content = false, $user = null, $excludeuser = null, $start = null, $end = null, $dir = 'older', $prop = array( 'revid', 'user', 'parsedcomment', 'minor', 'len', 'content', 'token' ) ) {
-		if( !in_array( 'deletedhistory', $this->wiki->getUserRights() ) ) {
+		if( !in_array( 'deletedhistory', $this->wiki->get_userrights() ) ) {
 			throw new PermissionsError( "User is not allowed to view deleted revisions" );
 			return false;
 		}
@@ -1027,7 +1027,7 @@ class Page {
 			return $this->namespace_id;
 		}
 		else {
-			$namespaces = $this->wiki->getNamespaces();
+			$namespaces = $this->wiki->get_namespaces();
 			
 			return $namespaces[$this->namespace_id];
 		}

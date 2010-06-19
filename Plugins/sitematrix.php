@@ -22,7 +22,7 @@ class SiteMatrix {
 	public static function load( $wikiClass ) {
 		global $pgHTTP;
 		
-		if( !array_key_exists( 'SiteMatrix', $wikiClass->getExtensions() ) ) {
+		if( !array_key_exists( 'SiteMatrix', $wikiClass->get_extensions() ) ) {
 			throw new DependancyError( "SiteMatrix" );
 		}
 		

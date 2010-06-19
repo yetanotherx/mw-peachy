@@ -83,7 +83,7 @@ class HTTP {
 			throw new CURLError( curl_errno( $this->curl_instance ), curl_error( $this->curl_instance ) );
 			return false;
 		}
-		if( in_array( 'peachyecho', $argv ) || $pgHTTPEcho ) {
+		if( (!is_null( $argv ) && in_array( 'peachyecho', $argv )) || $pgHTTPEcho ) {
 			pecho("GET: $url\n",0);
 		}
 		
@@ -124,7 +124,7 @@ class HTTP {
 			return false;
 		}
 		
-		if( in_array( 'peachyecho', $argv ) || $pgHTTPEcho ) {
+		if( (!is_null( $argv ) && in_array( 'peachyecho', $argv )) || $pgHTTPEcho ) {
 			pecho("POST: $url\n",0);
 		}
 		
@@ -161,7 +161,7 @@ class HTTP {
 			return false;
 		}
 		
-		if( in_array( 'peachyecho', $argv ) || $pgHTTPEcho ) {
+		if( (!is_null( $argv ) && in_array( 'peachyecho', $argv )) || $pgHTTPEcho ) {
 			pecho( "DLOAD: $url\n", 0 );
 		}
 		

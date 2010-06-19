@@ -864,7 +864,7 @@ class Page {
 			return false;
 		} else {
 			$namespaces = $this->wiki->getNamespaces();
-			if($this->isDiscussion()){
+			if($this->is_discussion()){
 				return $namespaces[($this->namespace_id - 1)] . ":" . $this->title_wo_namespace;
 			} else {
 				return $namespaces[($this->namespace_id + 1)] . ":" . $this->title_wo_namespace;

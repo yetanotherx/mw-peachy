@@ -410,7 +410,13 @@ class Wiki {
 		}
 	}
 	
-	
+	/**
+	 * Simplifies the running of API queries, especially with continues and other parameters.
+	 * 
+	 * @access public
+	 * @param array $tArray Parameters given to query with (default: array()). In addition to those recognised by the API, ['code'] should be used to described the section of the API used (required), ['limit'] to impose a hard limit on the number of results returned (optional) and ['lhtitle'] to simplify the result to a simpler, more specific array of just e.g. titles.
+	 * @return array Returns an array with the API result
+	 */
 	public function listHandler( $tArray = array() ) {
 		
 		$code = $tArray['code'];

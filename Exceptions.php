@@ -38,12 +38,12 @@ class CURLError extends Exception {
 	private $errno;
 	private $error;
 	
-	public function __construct( $error ) {
-		$this->errno = $error['errno'];
-		$this->error = $error['error'];
+	public function __construct( $errno, $error ) {
+		$this->errno = $errno;
+		$this->error = $error;
 		
 		parent::__construct( 
-			"cURL Error (" . $error['errno'] . "): " . $error['error']
+			"cURL Error (" . $this->errno . "): " . $this->error
 		);
 	}
 	

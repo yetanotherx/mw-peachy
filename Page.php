@@ -701,7 +701,7 @@ class Page {
 				throw new EditError("Nobots", "The page has a nobots template");
 			}
 			
-			if( !preg_match( '/enable|yes|run|go|true/i', $runtext ) && !is_null( $pgRunPage ) ) {
+			if( !is_null( $pgRunPage ) && !preg_match( '/enable|yes|run|go|true/i', $runtext )  ) {
 				throw new EditError("Enablepage", "Script was disabled by Run page");
 			}
 			

@@ -76,7 +76,7 @@ class Peachy {
 			);
 		}
 		
-		$extensions = Peachy::wikiChecks( $base_url );
+		$extensions = Peachy::wikiChecks( $config_params['baseurl'] );
 		
 		Hooks::runHook( 'StartLogin', array( &$config_params, &$extensions ) );
 		

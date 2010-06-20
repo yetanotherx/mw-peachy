@@ -893,8 +893,6 @@ class Wiki {
 		return $this->listHandler( $leArray );
 	}
 	
-	public function backlinks() {}
-	
 	public function listblocks() {}
 	
 	/**
@@ -980,7 +978,16 @@ class Wiki {
 	
 	public function logevents() {}
 	
-	public function tags() {}
+	public function tags( $prop = array( 'name', 'displayname', 'description', 'hitcount' ) ) {
+		$eiArray = array(
+			'list' => 'tags',
+			'code' => 'tg',
+			'tgprop' => implode( '|', $prop )
+		);
+		
+		Hooks::runHook( 'PreQueryTags', array( &$eiArray ) );
+		return $this->listHandler( $eiArray );
+	}
 	
 	public function watchlist() {}
 	
@@ -1064,10 +1071,6 @@ class Wiki {
 	public function import() {}
 	
 	public function export() {}
-	
-	public function isLoggedIn() {}
-	
-	public function setUserAgent() {}
 	
 	/**
 	 * Returns a unified or HTML diff between two revisions

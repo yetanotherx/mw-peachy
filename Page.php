@@ -1164,5 +1164,19 @@ class Page {
 			return $info;
 		}
 	}
+	
+	public function get_backlinks( $namespaces = array( 0 ), $redirects = 'all', $followredir = true ) {
+		$leArray = array(
+			'list' => 'backlinks',
+			'code' => 'bl',
+			'blnamespace' => $namespaces,
+			'blfilterredir' => $redirects
+		);
+		
+		if( $followredir ) $leArray['blredirect'] = 'yes';
+		
+		Hooks::runHook( 'PreQueryBacklinks', array( &$leArray ) );
+		return $this->listHandler( $leArray );
+	}
 
 }

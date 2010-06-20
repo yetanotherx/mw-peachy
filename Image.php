@@ -384,6 +384,7 @@ class Image {
 	 * @return Page
 	 */
 	public function &getPageclass() {
-		return new Page( $this->wiki, $this->name );
+		$image_page = new Page( $this->wiki, $this->name );
+		return $image_page;
 	}
 }

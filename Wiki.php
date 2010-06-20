@@ -638,7 +638,7 @@ class Wiki {
 	
 	public function rollback() {}
 	
-	public function recentchanges( $namespace = 0, $tag = false, $start = false, $end = false, $user = false, $excludeuser = false, $dir = 'older', $minor = null, $bot = null, $anon = null, $redirect = null, $patrolled = null, $prop = array( 'user', 'comment', 'flags', 'timestamp', 'title', 'ids', 'sizes', 'tags' ) ) {
+	public function recentchanges( $namespace = 0, $tag = false, $start = false, $end = false, $user = false, $excludeuser = false, $dir = 'older', $minor = null, $bot = null, $anon = null, $redirect = null, $patrolled = null, $prop = array( 'user', 'comment', 'flags', 'timestamp', 'title', 'ids', 'sizes', 'tags' ), $limit = null ) {
 
 		if( is_array( $namespace ) ) {
 			$namespace = implode( '|', $namespace );
@@ -650,7 +650,7 @@ class Wiki {
 			'rcnamespace' => $namespace,
 			'rcdir' => $dir,
 			'rcprop' => implode( '|', $prop ),
-			
+			'limit' => $limit
 		);
 		
 		if( $tag ) $rcArray['rctag'] = $tag;
@@ -730,15 +730,17 @@ class Wiki {
 	 * @param string $dir Direction for retieving log entries (default: 'older')
 	 * @param bool $tag Restrict the log to entries with a certain tag (default: false)
 	 * @param array $prop Information to retieve from the log (default: array( 'ids', 'title', 'type', 'user', 'timestamp', 'comment', 'details' ))
+	 * @param int limit How many results to retrieve (default: null i.e. all).
 	 * @return array Log entries
 	 */
-	public function logs( $type = false, $user = false, $title = false, $start = false, $end = false, $dir = 'older', $tag = false, $prop = array( 'ids', 'title', 'type', 'user', 'timestamp', 'comment', 'details' ) ) {
+	public function logs( $type = false, $user = false, $title = false, $start = false, $end = false, $dir = 'older', $tag = false, $prop = array( 'ids', 'title', 'type', 'user', 'timestamp', 'comment', 'details' ), $limit = null ) {
 		
 		$leArray = array(
 			'list' => 'logevents',
 			'code' => 'le',
 			'ledir' => $dir,
 			'leprop' => implode( '|', $prop ),
+			'limit' => $limit
 		);
 		
 		if( is_array( $type ) ) $leArray['letype'] = implode( '|', $type );
@@ -766,14 +768,16 @@ class Wiki {
 	 * @param string $maxsize Limit to images with at most this many bytes (default: null)
 	 * @param string $dir Direction in which to list (default: 'ascending')
 	 * @param array $prop Information to retieve (default: array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' ))
+	 * @param int limit How many results to retrieve (default: null i.e. all).
 	 * @return array List of images
 	 */
-	public function allimages( $prefix = null, $sha1 = null, $base36 = null, $from = null, $minsize = null, $maxsize = null, $dir = 'ascending', $prop = array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' ) ) {
+	public function allimages( $prefix = null, $sha1 = null, $base36 = null, $from = null, $minsize = null, $maxsize = null, $dir = 'ascending', $prop = array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' ), $limit = null ) {
 		$leArray = array(
 			'list' => 'allimages',
 			'code' => 'ai',
 			'aidir' => $dir,
 			'aiprop' => implode( '|', $prop ),
+			'limit' => $limit
 		);
 		
 		if( !is_null( $from ) ) $leArray['aifrom'] = $from;
@@ -803,9 +807,10 @@ class Wiki {
 	 * @param array $protectionlevels Limit to protected pages. Examples: array( 'autoconfirmed' ), array( 'sysop' ), array( 'autoconfirmed', 'sysop' ). (default: array())
 	 * @param string $dir Direction in which to list (default: 'ascending')
 	 * @param string $interwiki Filter based on whether a page has langlinks (either withlanglinks, withoutlanglinks, or all (default))
+	 * @param int limit How many results to retrieve (default: null i.e. all)
 	 * @return array List of pages
 	 */
-	public function allpages( $namespace = array( 0 ), $prefix = null, $from = null, $redirects = 'all', $minsize = null, $maxsize = null, $protectiontypes = array(), $protectionlevels = array(), $dir = 'ascending', $interwiki = 'all' ) {
+	public function allpages( $namespace = array( 0 ), $prefix = null, $from = null, $redirects = 'all', $minsize = null, $maxsize = null, $protectiontypes = array(), $protectionlevels = array(), $dir = 'ascending', $interwiki = 'all', $limit = null ) {
 		$leArray = array(
 			'list' => 'allpages',
 			'code' => 'ap',
@@ -813,6 +818,7 @@ class Wiki {
 			'apnamespace' => $namespace,
 			'apfilterredir' => $redirects,
 			'apfilterlanglinks' => $interwiki,
+			'limit' => $limit
 		);
 		
 		if( count( $protectiontypes ) && count( $protectionlevels ) ) {
@@ -845,14 +851,16 @@ class Wiki {
 	 * @param string $continue When more results are available, use this to continue. (default: null)
 	 * @param bool $unique Set to true in order to only show unique links (default: true)
 	 * @param array $prop What pieces of information to include: ids and/or title. (default: array( 'ids', 'title' ))
+	 * @param int limit How many results to retrieve (default: null i.e. all).
 	 * @return array List of links
 	 */
-	public function alllinks( $namespace = array( 0 ), $prefix = null, $from = null, $continue = null, $unique = true, $prop = array( 'ids', 'title' ) ) {
+	public function alllinks( $namespace = array( 0 ), $prefix = null, $from = null, $continue = null, $unique = true, $prop = array( 'ids', 'title' ), $limit = null ) {
 		$leArray = array(
 			'list' => 'alllinks',
 			'code' => 'al',
 			'alnamespace' => $namespaces,
 			'alprop' => implode( '|', $prop ),
+			'limit' => $limit
 		);
 		
 		if( !is_null( $from ) ) $leArray['alfrom'] = $from;
@@ -875,13 +883,15 @@ class Wiki {
 	 * @param string $from The username to start enumerating from. (default: null)
 	 * @param bool $editsonly Set to true in order to only show users with edits (default: false)
 	 * @param array $prop What pieces of information to include (default: array( 'blockinfo', 'groups', 'editcount', 'registration' ))
+	 * @param int limit How many results to retrieve (default: null i.e. all).
 	 * @return array List of users
 	 */
-	public function allusers( $prefix = null, $groups = array(), $from = null, $editsonly = false, $prop = array( 'blockinfo', 'groups', 'editcount', 'registration' ) ) {
+	public function allusers( $prefix = null, $groups = array(), $from = null, $editsonly = false, $prop = array( 'blockinfo', 'groups', 'editcount', 'registration' ), $limit = null ) {
 		$leArray = array(
 			'list' => 'allusers',
 			'code' => 'au',
 			'auprop' => implode( '|', $prop ),
+			'limit' => $limit
 		);
 		
 		if( !is_null( $from ) ) $leArray['aufrom'] = $from;
@@ -899,23 +909,25 @@ class Wiki {
 	 * Retrieves the titles of member pages of the given category
 	 * 
 	 * @access public
-	 * @param mixed $category Category to retieve
+	 * @param string $category Category to retieve
 	 * @param bool $subcat Should subcategories be checked (default: false)
-	 * @param mixed $namespace Restrict results to the given namespace (default: null)
+	 * @param string|array $namespace Restrict results to the given namespace (default: null i.e. all)
+	 * @param int limit How many results to retrieve (default: null i.e. all)
 	 * @return array Array of titles
 	 */
-	public function categorymembers( $category, $subcat = false, $namespace = null) {
+	public function categorymembers( $category, $subcat = false, $namespace = null, $limit = null) {
 		$cmArray = array(
 			'list' => 'categorymembers',
 			'code' => 'cm',
 			'cmtitle' => $category,
 			'cmprop' => 'title',
+			'limit' => $limit
 		);
 		
 		$strip_categories = false;
 		
 		if( $namespace !== null ) {
-			if( is_array( $namspace ) ) {
+			if( is_array( $namespace ) ) {
 				if( $subcat && !in_array( 14, $namespace ) ) {
 					$namespace[] = 14;
 					$strip_categories = true;
@@ -935,7 +947,7 @@ class Wiki {
 		$top_category = $this->listHandler( $cmArray );
 		$final_titles = array();
 		
-		foreach( array_values($top_category) AS $category ) {
+		foreach( array_values($top_category) as $category ) {
 			if( $category['ns'] == 14 && $subcat ) {
 				$final_titles = array_merge( $final_titles, $this->categorymembers( $category['title'], $subcat, $namespace ));
 				
@@ -955,8 +967,9 @@ class Wiki {
 	 * Returns array of pages that embed (transclude) the page given
 	 * 
 	 * @access public
-	 * @param mixed $title
-	 * @param mixed $namespace. (default: null)
+	 * @param string $title The title of the page being embedded.
+	 * @param array $namespace Which namespaces to search (default: null)
+	 * @param int limit How many results to retrieve (default: null i.e. all).
 	 * @return void
 	 */
 	public function embeddedin( $title, $namespace = null, $limit = null ) {
@@ -978,15 +991,24 @@ class Wiki {
 	
 	public function logevents() {}
 	
-	public function tags( $prop = array( 'name', 'displayname', 'description', 'hitcount' ) ) {
-		$eiArray = array(
+	/**
+	 * List change tags enabled on the wiki.
+	 *
+	 * @access public
+	 * @param array $prop Which properties to retrieve (default: array( 'name', 'displayname', 'description', 'hitcount' ) i.e. all).
+	 * @param int limit How many results to retrieve (default: null i.e. all).
+	 * @return array The tags retrieved.
+	 */
+	public function tags( $prop = array( 'name', 'displayname', 'description', 'hitcount' ), $limit = null ) {
+		$tgArray = array(
 			'list' => 'tags',
 			'code' => 'tg',
-			'tgprop' => implode( '|', $prop )
+			'tgprop' => implode( '|', $prop ),
+			'limit' => $limit
 		);
 		
-		Hooks::runHook( 'PreQueryTags', array( &$eiArray ) );
-		return $this->listHandler( $eiArray );
+		Hooks::runHook( 'PreQueryTags', array( &$tgArray ) );
+		return $this->listHandler( $tgArray );
 	}
 	
 	public function watchlist() {}
@@ -999,17 +1021,22 @@ class Wiki {
 	 * @access public
 	 * @param string $url The url to search for links to, without a protocol. * can be used as a wildcard.
 	 * @param string $protocol The protocol to accompany the URL. Only certain values are allowed, depending on how $wgUrlProtocols is set on the wiki; by default the allowed values are 'http://', 'https://', 'ftp://', 'irc://', 'gopher://', 'telnet://', 'nntp://', 'worldwind://', 'mailto:' and 'news:'. Default 'http://'.
-	 * @param string $prop Properties to return; it should be a pipe '|' separated list of values; the options are 'ids', 'title' and 'url'. Default null (all).
+	 * @param array $prop Properties to return in array form; the options are 'ids', 'title' and 'url'. Default null (all).
 	 * @param string $namespace A pipe '|' separated list of namespace numbers to check. Default null (all).
 	 * @param int $limit A hard limit on the number of transclusions to fetch. Default null (all).
+	 * @return array Details about the usage of that external link on the wiki.
 	 */
-	public function exturlusage($url, $protocol = "http", $prop = null, $namespace = null, $limit = null ) {
-		if( isset($prop) && !is_null($prop) ){
-			if(strlen($prop) == 0){
+	public function exturlusage( $url, $protocol = "http", $prop = null, $namespace = null, $limit = null ) {
+		if( isset( $prop ) && !is_null( $prop ) ){
+			if( strlen( $prop ) == 0 ){
 				$prop = null;
 			} else {
-				if(!preg_match('/^(ids|title|url)(\|(ids|title|url)){0,2}/',$prop)){
-					throw new BadEntryError("exturlusage",'$prop should be a pipe \'|\' separated list of values; the options are \'ids\', \'title\' and \'url\'.');
+				if( is_array( $prop ) ) {
+					$prop = array_unique( $prop );
+					$prop = implode( '|' , $prop );
+				}
+				if( !preg_match('/^(ids|title|url)(\|(ids|title|url)){0,2}/',$prop) ){
+					throw new BadEntryError("exturlusage",'$prop should be an array containing permutations of the options \'ids\', \'title\' and \'url\'.');
 				}
 			}
 		}

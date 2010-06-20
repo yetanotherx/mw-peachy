@@ -142,6 +142,16 @@ class Wiki {
 	private $optout = null;
 	
 	/**
+	 * Whether or not to not edit if the user has new messages
+	 * 
+	 * (default value: false)
+	 * 
+	 * @var bool
+	 * @access private
+	 */
+	private $stoponnewmessages = false;
+	
+	/**
 	 * Configuration (sans password)
 	 * 
 	 * @var array
@@ -201,6 +211,10 @@ class Wiki {
 		
 		if( isset( $configuration['optout'] ) ) {
 			$this->optout = $configuration['optout'];
+		}
+		
+		if( isset( $configuration['stoponnewmessages'] ) ) {
+			$this->stoponnewmessages = 'true';
 		}
 		
 		if( isset( $configuration['verbose'] ) ) {
@@ -567,6 +581,17 @@ class Wiki {
 	 */
 	public function get_nobots() {
 		return $this->nobots;
+	}
+	
+	/**
+	 * Returns if the script should not edit if the user has new messages
+	 * 
+	 * @access public
+	 * @see Wiki::$stoponnewmessages
+	 * @return bool True for stopping on new messages
+	 */
+	public function get_stoponnewmessages() {
+		return $this->stoponnewmessages;
 	}
 	
 	/**

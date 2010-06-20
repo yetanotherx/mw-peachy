@@ -654,14 +654,63 @@ class Page {
 		}
 		
 		if( !$force ) {
+			$preeditinfo = $this->wiki->apiQuery(
+				'action' => 'query',
+				'meta' => 'userinfo',
+				'uiprop' => 'hasmsg|blockinfo',
+				'prop' => 'revisions',
+				'titles' => $this->title,
+				'rvprop' => 'content'
+			);
+			
+			if( !is_null($pgRunPage) ) {
+				$preeditinfo['titles'] .=  "|" . $pgRunPage;
+			}
+		
+			if( isset( $preeditinfo['query']['pages'] ) ) {
+				//$oldtext = $preeditinfo['query']['pages'][$this->pageid]['revisions'][0]['*'];
+				foreach( $preeditinfo['query']['pages'] as $pageid => $page ) {
+					if( $pageid == $this->pageid ) {
+						$oldtext = $page['revisions'][0]['*'];
+					}
+					elseif( $pageid == "-1" ) {
+						if( $page['title'] == $pgRunPage ) {
+							pecho("Edit failed, enable page does not exist.", 2);
+							return false;
+						}
+						else {
+							$oldtext = '';
+						}
+					}
+					else {
+						$runtext = $page['revisions'][0]['*'];
+					}
+				}
+				$messages = (bool) (isset( $preeditinfo['query']['userinfo']['messages']));
+				$blocked = (bool) (isset( $preeditinfo['query']['userinfo']['blockedby']));
+			}
+			else {
+				$oldtext = '';
+				$runtext = '';
+				$messages = false;
+				$blocked = false;
+			}
+			
 			//Perform nobots checks, login checks, /Run checks
-			if( checkExclusion( $this->wiki, $text, $this->wiki->get_username(), $this->wiki->get_optout() ) ) {
+			if( checkExclusion( $this->wiki, $oldtext, $this->wiki->get_username(), $this->wiki->get_optout() ) && $this->wiki->get_nobots() ) {
 				throw new EditError("Nobots", "The page has a nobots template");
 			}
-			$stop = true;
-			Hooks::runHook( 'SoftEditBlock', array( &$editarray, &$stop ) );
-			if( 1 == 2 /* debugging stuff, should be replaced with the actual /Run, etc checks. */ && $stop ) {
-				throw new EditError("Shutoff", "The bot has been shut down by its enable page.");
+			
+			if( !preg_match( '/enable|yes|run|go|true/i', $runtext ) && !is_null( $pgRunPage ) ) {
+				throw new EditError("Enablepage", "Script was disabled by Run page");
+			}
+			
+			if( $messages && $this->wiki->get_stoponnewmessages() ) {
+				throw new EditError("NewMessages", "User has new messages");
+			}
+			
+			if( $blocked ) {
+				throw new EditError("Blocked", "User has been blocked");
 			}
 		}
 		

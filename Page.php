@@ -609,7 +609,7 @@ class Page {
 			}
 		}
 		
-		pecho( "Making edit to {$this->title}...\n\n", 0 );
+		pecho( "Making edit to {$this->title}...\n\n", PECHO_NORMAL );
 		
 		$editarray = array(
 			'title' => $this->title,
@@ -675,7 +675,7 @@ class Page {
 					}
 					elseif( $pageid == "-1" ) {
 						if( $page['title'] == $pgRunPage ) {
-							pecho("Edit failed, enable page does not exist.", 2);
+							pecho("Edit failed, enable page does not exist.", PECHO_WARN);
 							return false;
 						}
 						else {
@@ -720,7 +720,7 @@ class Page {
 		
 		if( isset( $result['error'] ) ) {
 			if( $result['error']['code'] == 'maxlag' ) {
-				pecho("Edit failed, database lag is too high.", 2);
+				pecho("Edit failed, database lag is too high.", PECHO_WARN);
 				return false;
 			}
 			else {
@@ -814,7 +814,7 @@ class Page {
 			throw new EditError( "LongReason", "Reason is over 255 bytes, the maximum allowed" );
 		}
 		
-		pecho( "Moving {$this->title} to $newTitle...\n\n", 0 );
+		pecho( "Moving {$this->title} to $newTitle...\n\n", PECHO_NORMAL );
 		
 		$editarray = array(
 			'from' => $this->title,
@@ -980,7 +980,7 @@ class Page {
 	 */
 	public function get_transclusions( $namespace = null, $limit = null ) {
 		
-		pecho( "Getting transclusions of {$this->title}...\n\n", 0 );
+		pecho( "Getting transclusions of {$this->title}...\n\n", PECHO_NORMAL );
 		
 		$result = $this->wiki->embeddedin($this->title, $namespace, $limit);
 		return $result;

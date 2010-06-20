@@ -230,19 +230,19 @@ class Wiki {
 				else {
 					switch( $setting ) {
 						case 'NORMAL':
-							$pgVerbose[] = 0;
+							$pgVerbose[] = PECHO_NORMAL;
 							break;
 						case 'NOTICE':
-							$pgVerbose[] = 1;
+							$pgVerbose[] = PECHO_NOTICE;
 							break;
 						case 'WARN':
-							$pgVerbose[] = 2;
+							$pgVerbose[] = PECHO_WARN;
 							break;
 						case 'ERROR':
-							$pgVerbose[] = 3;
+							$pgVerbose[] = PECHO_ERROR;
 							break;
 						case 'FATAL':
-							$pgVerbose[] = 4;
+							$pgVerbose[] = PECHO_FATAL;
 							break;
 					}
 				}
@@ -310,7 +310,7 @@ class Wiki {
 					if( $recursed ) throw new LoginError( array( 'Throttled', 'Login attempts have been throttled' ) );
 					
 					$wait = $loginRes['login']['wait'];
-					pecho( "Login throttled, waiting $wait seconds.\n\n", 1 );
+					pecho( "Login throttled, waiting $wait seconds.\n\n", PECHO_NOTICE );
 					sleep($wait);
 					
 					$recres = $this->__construct( $configuration, $this->extensions, true );
@@ -329,7 +329,7 @@ class Wiki {
 					return $recres;
 					break;
 				case 'Success':
-					pecho( "Successfully logged in to {$this->base_url} as {$this->username}\n\n", 0 );
+					pecho( "Successfully logged in to {$this->base_url} as {$this->username}\n\n", PECHO_NORMAL );
 					
 					$userInfoRes = $this->apiQuery(
 						array(

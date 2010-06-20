@@ -84,7 +84,7 @@ class HTTP {
 			return false;
 		}
 		if( (!is_null( $argv ) && in_array( 'peachyecho', $argv )) || $pgHTTPEcho ) {
-			pecho("GET: $url\n",0);
+			pecho( "GET: $url\n", PECHO_NORMAL );
 		}
 		
 		return $data;
@@ -125,7 +125,7 @@ class HTTP {
 		}
 		
 		if( (!is_null( $argv ) && in_array( 'peachyecho', $argv )) || $pgHTTPEcho ) {
-			pecho("POST: $url\n",0);
+			pecho( "POST: $url\n", PECHO_NORMAL );
 		}
 		
 		return $data;
@@ -162,7 +162,7 @@ class HTTP {
 		}
 		
 		if( (!is_null( $argv ) && in_array( 'peachyecho', $argv )) || $pgHTTPEcho ) {
-			pecho( "DLOAD: $url\n", 0 );
+			pecho( "DLOAD: $url\n", PECHO_NORMAL );
 		}
 		
 		fclose($out);

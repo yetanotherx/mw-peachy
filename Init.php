@@ -21,6 +21,12 @@ define( 'PEACHY', true );
 define( 'PEACHYVERSION', '0.1alpha' );
 define( 'MINMW', '1.15' );
 
+define( 'PECHO_NORMAL', 0 );
+define( 'PECHO_NOTICE', 1 );
+define( 'PECHO_WARN', 2 );
+define( 'PECHO_ERORR', 3 );
+define( 'PECHO_FATAL', 4 );
+
 $version = explode( '.', phpversion() );
 
 if( $version[0] < '5' ) die( "PHP 5 or higher is require_onced to use Peachy.\n" );

@@ -104,7 +104,7 @@ class Peachy {
 		$version = preg_replace( '/[^0-9\.]/','',str_replace('MediaWiki ', '', $siteinfo['query']['general']['generator'] ));
 		
 		if( !version_compare( $version, MINMW ) ) {
-			throw new DependencyError( "MediaWiki 1.12", "http://mediawiki.org" );
+			throw new DependencyError( "MediaWiki " . MINMW, "http://mediawiki.org" );
 		}
 		
 		$mwVersion = $version;

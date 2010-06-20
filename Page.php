@@ -654,14 +654,14 @@ class Page {
 		}
 		
 		if( !$force ) {
-			$preeditinfo = $this->wiki->apiQuery(
+			$preeditinfo = $this->wiki->apiQuery( array(
 				'action' => 'query',
 				'meta' => 'userinfo',
 				'uiprop' => 'hasmsg|blockinfo',
 				'prop' => 'revisions',
 				'titles' => $this->title,
 				'rvprop' => 'content'
-			);
+			) );
 			
 			if( !is_null($pgRunPage) ) {
 				$preeditinfo['titles'] .=  "|" . $pgRunPage;

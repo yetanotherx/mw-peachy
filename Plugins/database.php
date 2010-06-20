@@ -31,6 +31,12 @@ class Database {
 	private $mReadonly;
 	
 	/**
+	 * Whether or not to use PostgreSQL
+	 * @var bool
+	 */
+	private $mPG = false;
+	
+	/**
 	 * Various parameters
 	 */
 	private $mHost;
@@ -53,6 +59,17 @@ class Database {
 	 * @return void
 	 */
 	public function __construct( $host, $port, $user, $pass, $db, $prefix, $readonly ) {
+		if( $this->mPG ) {
+			if( !function_exists( 'pg_connect' ) ) {
+				throw new DependancyError( "PostgreSQL", "http://us2.php.net/manual/en/book.pgsql.php" );
+			}
+		}
+		else {
+			if( !function_exists( 'mysql_connect' ) && !class_exists( 'mysqli' ) ) {
+				throw new DependancyError( "MySQL", "http://us2.php.net/manual/en/book.mysql.php" );
+			}
+		}
+		
 		$this->mHost = $host;
 		$this->mPort = $port;
 		$this->mUser = $user;
@@ -64,22 +81,29 @@ class Database {
 	}
 
 	public static function load( &$newclass = null, $host, $port, $user, $pass, $db, $prefix = '', $readonly = false ) {
-		if( !function_exists( 'mysql_connect' ) && !class_exists( 'mysqli' ) ) {
-			throw new DependancyError( "MySQL", "http://us2.php.net/manual/en/book.mysql.php" );
-		}
+		
 		
 		$newclass = new Database( $host, $port, $user, $pass, $db, $prefix, $readonly );
+	}
+	
+	public function setPostgre() {
+		$this->mPG = true;
 	}
 
 	
 	private function connectToServer( $force = false ) {
-		if( !class_exists( 'mysqli' ) ) {
-			$this->mConn = mysql_connect( $this->mHost.':'.$this->mPort, $this->mUser, $this->mPass, $force );
-			mysql_select_db( $this->mDb, $this->mConn );
-			$this->mysqli = false;
+		if( $this->mPG ) {
+			$this->mConn = pg_connect("host={$this->mHost} port={$this->mPost} dbname={$this->mDb} user={$this->mUser} password={$this->mPass}");
 		}
 		else {
-			$this->mConn = new mysqli( $this->mHost.':'.$this->mPort, $this->mUser, $this->mPass, $this->mDb );
+			if( !class_exists( 'mysqli' ) ) {
+				$this->mConn = mysql_connect( $this->mHost.':'.$this->mPort, $this->mUser, $this->mPass, $force );
+				mysql_select_db( $this->mDb, $this->mConn );
+				$this->mysqli = false;
+			}
+			else {
+				$this->mConn = new mysqli( $this->mHost.':'.$this->mPort, $this->mUser, $this->mPass, $this->mDb );
+			}
 		}
 	
 	}
@@ -98,10 +122,15 @@ class Database {
 	 * @return void
 	 */	 
 	public function __destruct() {
-		if (!$this->mysqli) {
-			mysql_close( $this->mConn );
-		} else {
-			$this->mConn->close();
+		if( $this->mPG ) {
+			pg_close( $this->mConn );
+		}
+		else {
+			if (!$this->mysqli) {
+				mysql_close( $this->mConn );
+			} else {
+				$this->mConn->close();
+			}
 		}
 	}
 	
@@ -114,18 +143,23 @@ class Database {
 	public function doQuery( $sql ) {
 		$sql = trim($sql);		
 		
-		if (!$this->mysqli) {
-			$result = mysql_query( $sql, $this->mConn );
-		} else {
-			$result = $this->mConn->query( $sql );
+		if( $this->mPG ) {
+			$result = pg_query( $this->mConn, $sql );
 		}
-			
-		if ( $this->errorNo() == 2006 ) {
-			$this->connectToServer();
+		else {
 			if (!$this->mysqli) {
 				$result = mysql_query( $sql, $this->mConn );
 			} else {
 				$result = $this->mConn->query( $sql );
+			}
+			
+			if ( $this->errorNo() == 2006 ) {
+				$this->connectToServer();
+				if (!$this->mysqli) {
+					$result = mysql_query( $sql, $this->mConn );
+				} else {
+					$result = $this->mConn->query( $sql );
+				}
 			}
 		}
 		
@@ -138,6 +172,7 @@ class Database {
 	 * @return string|bool MySQL error string, null if no error
 	 */
 	public function errorStr( ) {
+		if( $this->mPG ) throw new DBError( "MySQLOnly", "Database::errorStr is only available for MySQL" );
 		if (!$this->mysqli) {
 			$result = mysql_error( $this->mConn );
 		} else {
@@ -152,6 +187,7 @@ class Database {
 	 * @return int|bool MySQL error code, null if no error
 	 */
 	public function errorNo( ) {
+		if( $this->mPG ) throw new DBError( "MySQLOnly", "Database::errorNo is only available for MySQL" );
 		if (!$this->mysqli) {
 			$result = mysql_errno( $this->mConn );
 		} else {
@@ -167,11 +203,24 @@ class Database {
 	 * @return string Escaped data
 	 */
 	public function mysqlEscape( $data ) {
+		if( $this->mPG ) {
+			return $this->pgsqlEscape( $data );
+		}
+		
 		if (!$this->mysqli) {
 			return mysql_real_escape_string( $data, $this->mConn );
 		} else {
 			return $this->mConn->real_escape_string( $data );
 		}
+	}
+	
+	/**
+	 * Front-end for pg_escape_string
+	 * @param string $data Data to escape
+	 * @return string Escaped data
+	 */
+	public function pgsqlEscape( $data ) {
+		return pg_escape_string( $this->mConn, $data );
 	}
 	
 	/**
@@ -183,17 +232,29 @@ class Database {
 	public static function mysql2array( $data ) {
 
 		$return = array();
-		if (!$this->mysqli) {
-			while( $row = mysql_fetch_assoc( $data ) ) {
+		
+		if( $this->mPG ) {
+			while( $row = pg_fetch_array( $this->mConn, $data ) ) {
 				$return[] = $row;
 			}
-		} else {
-			while( $row = $data->fetch_assoc( ) ) {
-				$return[] = $row;
+		}
+		else {
+			if (!$this->mysqli) {
+				while( $row = mysql_fetch_assoc( $data ) ) {
+					$return[] = $row;
+				}
+			} else {
+				while( $row = $data->fetch_assoc( ) ) {
+					$return[] = $row;
+				}
 			}
 		}
 
 		return $return;
+	}
+	
+	public static function pgsql2array( $data ) {
+		return self::mysql2array( $data );
 	}
 	
 	/**

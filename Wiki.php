@@ -446,7 +446,11 @@ class Wiki {
 		
 		$tArray['action'] = 'query';
 		$tArray[$code . 'limit'] = ($this->apiQueryLimit + 1);
-		
+		if($code == 'sr'){
+			$tArray['srlimit'] = intval($tArray['srlimit']) / 10;
+		} elseif($code == 'rn'){
+			$tArray['rnlimit'] = 10 * (1 + intval($this->apiQueryLimit == 4999));
+		}
 		$retrieved = 0;
 		
 		if( isset($limit) && !is_null($limit) ){
@@ -476,10 +480,14 @@ class Wiki {
 		$endArray = array();
 		
 		$continue = null;
+		$offset = null;
+		$start = null;
 		
 		while( 1 ) { 
 			
 			if( !is_null( $continue ) ) $tArray[$code . 'continue'] = $continue;
+			if( !is_null( $offset ) ) $tArray[$code . 'offset'] = $offset;
+			if( !is_null( $start ) ) $tArray[$code . 'start'] = $start;
 			
 			$tRes = $this->apiQuery( $tArray );
 				
@@ -498,14 +506,22 @@ class Wiki {
 			if(!is_null($limit)){
 				$retrieved = $retrieved + $tArray[$code . 'limit'];
 				if($retrieved > $limit){
-					$endArray = array_slice($endArray,0,$limit);
+					if(count($endArray) >= $limit){
+						$endArray = array_slice($endArray,0,$limit);
+					}
 					break;
 				}
 			}
 			
 			if( isset( $tRes['query-continue'] ) ) {
 				foreach( $tRes['query-continue'] as $z ) {
-					$continue = $z[$code . 'continue'];
+					if( isset( $z[$code . 'continue'] ) ){
+						$continue = $z[$code . 'continue'];
+					} elseif ( isset( $z[$code . 'offset'] ) ){
+						$offset = $z[$code . 'offset'];
+					} elseif ( isset( $z[$code . 'start'] ) ){
+						$start = $z[$code . 'start'];
+					}
 				}
 			}
 			else {
@@ -715,7 +731,33 @@ class Wiki {
 		
 	}
 	
-	public function search() {}
+	/**
+	 * Performs a search and retrieves the results
+	 *
+	 * @access public
+	 * @param string $search What to search for
+	 * @param bool $fulltext Whether to search the full text of pages (default, true) or just titles (false; may not be enabled on all wikis).
+	 * @param array $namespaces The namespaces to search in (default: array( 0 )).
+	 * @param array $prop What properties to retrieve (default: array('size', 'wordcount', 'timestamp', 'snippet') ).
+	 * @param bool $includeredirects Whether to include redirects or not (default: true).
+	 * @param int $limit A hard limit on the number of results to retrieve (default: null i.e. all).
+	 */
+	public function search($search, $fulltext = true, $namespaces = array(0), $prop = array('size', 'wordcount', 'timestamp', 'snippet'), $includeredirects = true, $limit = null) {
+	
+		$srArray = array(
+			'code' => 'sr',
+			'list' => 'search',
+			'limit' => $limit,
+			'srsearch' => $search,
+			'srnamespace' => $namespaces,
+			'srwhat' => ($fulltext) ? "text" : "title",
+			'srinfo' => '', ##FIXME: find a meaningful way of assing back 'totalhits' and 'suggestion' as required.
+			'srprop' => implode( '|', $prop ),
+			'srredirects' => $includeredirects
+		);
+		
+		return $this->listHandler($srArray);
+	}
 	
 	/**
 	 * Retrieves log entries from the wiki.

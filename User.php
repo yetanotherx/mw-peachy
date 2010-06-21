@@ -277,17 +277,12 @@ class User {
 			return false;
 		}
 		
-		if( !in_array( 'emailuser', $this->wiki->get_userrights() ) ) {
-			throw new PermissionsError( "User is not allowed to email other users" );
-			return false;
-		}
-		
 		$tokens = $this->wiki->get_tokens();
-		
+
 		$editarray = array(
 			'action' => 'emailuser',
-			'target' => $this->title,
-			'token' => $tokens['email'],
+			'target' => $this->username,
+			'token' => $tokens['edit'],
 			'subject' => $subject,
 			'text' => $text
 		);

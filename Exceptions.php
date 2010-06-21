@@ -177,6 +177,22 @@ class UndeleteError extends Exception {
 	}
 }
 
+class ProtectError extends Exception {
+	public function __construct( $error, $text ) {
+		parent::__construct( 
+			"Protect Error: " . $error . " ($text)"
+		);
+	}
+}
+
+class EmailError extends Exception {
+	public function __construct( $error, $text ) {
+		parent::__construct( 
+			"Email Error: " . $error . " ($text)"
+		);
+	}
+}
+
 class ImageError extends Exception {
 	public function __construct( $error ) {
 		parent::__construct( 

@@ -272,7 +272,49 @@ class User {
 		return $this->hasemail;
 	}
 	
-	public function email() {}
+	public function email( $text = null, $subject = "Wikipedia Email", $ccme = false ) {
+		if( !$this->has_email() ) {
+			pecho( "Cannot email {$this->username}, user has email disabled", PECHO_WARNING );
+			return false;
+		}
+		
+		if( !in_array( 'emailuser', $this->wiki->get_userrights() ) ) {
+			throw new PermissionsError( "User is not allowed to email other users" );
+			return false;
+		}
+		
+		$tokens = $this->wiki->get_tokens();
+		
+		$editarray = array(
+			'action' => 'emailuser',
+			'target' => $this->title,
+			'token' => $tokens['email'],
+			'subject' => $subject,
+			'text' => $text
+		);
+		
+		if( $ccme ) $editarray['ccme'] = 'yes';
+		
+		Hooks::runHook( 'StartEmail', array( &$editarray ) );
+		
+		$result = $this->wiki->apiQuery( $editarray, true);
+		
+		if( isset( $result['error'] ) ) {
+			throw new EmailError( $result['error']['code'], $result['error']['info'] );
+		}
+		elseif( isset( $result['emailuser'] ) ) {
+			if( $result['emailuser']['result'] == "Success" ) {
+				$this->__construct( $this->wiki, $this->title );
+				return true;
+			}
+			else {
+				throw new EmailError( "UnknownEmailError", print_r($result['email'],true));
+			}
+		}
+		else {
+			throw new DeleteError( "UnknownEmailError", print_r($result['email'],true));
+		}
+	}
 	
 	public function userrights() {}
 	

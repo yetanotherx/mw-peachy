@@ -76,14 +76,6 @@ class User {
 	private $ip = false;
 	
 	/**
-	 * Page class of userpage
-	 * 
-	 * @var Page
-	 * @access private
-	 */
-	private $userpage;
-	
-	/**
 	 * Whether or not user has email enabled
 	 * 
 	 * @var bool
@@ -352,6 +344,16 @@ class User {
 		if( !is_null( $end ) ) $drArray['drend'] = $end;
 		
 		return $this->wiki->listHandler( $drArray );
+	}
+	
+	/**
+	 * Returns a page class for the userpage
+	 * 
+	 * @return Page
+	 */
+	public function &getPageclass() {
+		$user_page = new Page( $this->wiki, "User:" . $this->username );
+		return $user_page;
 	}
 
 }

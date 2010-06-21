@@ -92,7 +92,7 @@ class Email {
 			throw new DependancyError( "Mail", "http://us4.php.net/manual/en/book.mail.php" );
 		}
 		
-		$newClass = __construct( $fromEmail, $fromName, $subject, $message );
+		$newClass = new Email( $fromEmail, $fromName, $subject, $message );
 	}
 	
 	/**

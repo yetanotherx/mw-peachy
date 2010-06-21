@@ -368,9 +368,13 @@ class Page {
 		
 		$this->links = array();
 		$result = $this->wiki->listHandler($tArray);
-		foreach($result[0] as $link){
-			$this->links[] = $link['title'];
+		
+		if( count( $result ) > 0 ) {
+			foreach($result[0] as $link){
+				$this->links[] = $link['title'];
+			}
 		}
+		
 		return $this->links;
 	}
 	
@@ -399,9 +403,13 @@ class Page {
 		
 		$this->templates = array();
 		$result = $this->wiki->listHandler($tArray);
-		foreach($result[0] as $template){
-			$this->templates[] = $template['title'];
+		
+		if( count( $result ) > 0 ) {
+			foreach($result[0] as $template){
+				$this->templates[] = $template['title'];
+			}
 		}
+		
 		return $this->templates;
 	}
 	
@@ -430,9 +438,13 @@ class Page {
 		
 		$this->categories = array();
 		$result = $this->wiki->listHandler($tArray);
-		foreach($result[0] as $category){
-			$this->categories[] = $category['title'];
+		
+		if( count( $result ) > 0 ) {
+			foreach($result[0] as $category){
+				$this->categories[] = $category['title'];
+			}
 		}
+		
 		return $this->categories;
 			
 	}
@@ -463,9 +475,13 @@ class Page {
 		
 		$this->images = array();
 		$result = $this->wiki->listHandler($tArray);
-		foreach($result[0] as $image){
-			$this->images[] = $image['title'];
+		
+		if( count( $result ) > 0 ) {
+			foreach($result[0] as $image){
+				$this->images[] = $image['title'];
+			}
 		}
+		
 		return $this->images;
 			
 	
@@ -496,9 +512,13 @@ class Page {
 		
 		$this->extlinks = array();
 		$result = $this->wiki->listHandler($tArray);
-		foreach($result[0] as $extlink){
-			$this->extlinks[] = $extlink['*'];
+		
+		if( count( $result ) > 0 ) {
+			foreach($result[0] as $extlink){
+				$this->extlinks[] = $extlink['*'];
+			}
 		}
+		
 		return $this->extlinks;
 	}
 	
@@ -526,9 +546,13 @@ class Page {
 		
 		$this->langlinks = array();
 		$result = $this->wiki->listHandler($tArray);
-		foreach($result[0] as $langlink){
-			$this->langlinks[] = $langlink['lang'] . ":" . $langlink['*'];
+		
+		if( count( $result ) > 0 ) {
+			foreach($result[0] as $langlink){
+				$this->langlinks[] = $langlink['lang'] . ":" . $langlink['*'];
+			}
 		}
+		
 		return $this->langlinks;
 	}
 	
@@ -706,7 +730,7 @@ class Page {
 				throw new EditError("Nobots", "The page has a nobots template");
 			}
 			
-			if( !is_null( $pgRunPage ) && !preg_match( '/enable|yes|run|go|true/i', $runtext )  ) {
+			if( !is_null( $pgRunPage ) && !preg_match( '/enable|yes|run|go|true/i', $runtext ) ) {
 				throw new EditError("Enablepage", "Script was disabled by Run page");
 			}
 			

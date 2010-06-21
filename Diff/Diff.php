@@ -23,7 +23,7 @@ require_once( $IP . 'Diff/textdiff/Diff/Renderer.php' );
 function getTextDiff($method, $diff1, $diff2) {
 	switch ($method) {
 		case 'unified':
-			require_once '/home/soxred93/textdiff/textdiff/Diff/Renderer/unified.php';
+			require_once $IP . 'Diff/textdiff/Diff/Renderer/unified.php';
 			$diff = new Text_Diff('auto', array(explode("\n",$diff1), explode("\n",$diff2)));
 
 			$renderer = new Text_Diff_Renderer_unified();
@@ -31,7 +31,7 @@ function getTextDiff($method, $diff1, $diff2) {
 			$diff = $renderer->render($diff);
 			break;
 		case 'inline':
-			require_once '/home/soxred93/textdiff/textdiff/Diff/Renderer/inline.php';
+			require_once $IP . 'Diff/textdiff/Diff/Renderer/inline.php';
 			$diff = new Text_Diff('auto', array(explode("\n",$diff1), explode("\n",$diff2)));
 
 			$renderer = new Text_Diff_Renderer_inline();

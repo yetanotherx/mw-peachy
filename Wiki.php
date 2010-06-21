@@ -1175,10 +1175,10 @@ class Wiki {
 		
 		
 		if( isset( $r1['query']['badrevids'] ) || isset( $r2['query']['badrevids'] ) ) {
-			
+			throw new BadEntryError( "BadRevids", "A bad revision ID was passed" );
 		}
 		elseif( !isset( $r1['query']['pages'] ) || !isset( $r2['query']['pages'] ) ) {
-			
+			throw new APIError( "UnknownAPIError", print_r( $r1, true ), print_r( $r2, true ) );
 		}
 		else {
 			foreach( $r1['query']['pages'] as $r1pages ) {

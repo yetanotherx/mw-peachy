@@ -35,18 +35,12 @@ class OpenSearch {
 				'namespace' => implode( '|', $namespaces )
 			)
 		);
-		
-		$OS = explode(',', $OSres);
-		
-		##FIXME:::: Only shift if page does not exist. 
+		 
 		##FIXME: Shift this whole mess to json_decode
-		array_shift( $OS );
 		
-		foreach( $OS as $key => $val ) {
-			$OS[$key] = str_replace( array('[',']','"'),'', $val );
-		}
+		return json_decode( $OSres, true );
 		
-		return $OS;
+		
 		
 	}
 

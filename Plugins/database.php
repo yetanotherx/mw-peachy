@@ -55,7 +55,7 @@ class Database {
 	 * @param string $pass Password
 	 * @param string $db Database
 	 * @param string $prefix Prefix of the tables in the database. Default ''
-	 * @param bool readonly Read-only mode. Default false
+	 * @param bool $readonly Read-only mode. Default false
 	 * @return void
 	 */
 	public function __construct( $host, $port, $user, $pass, $db, $prefix, $readonly ) {
@@ -79,18 +79,39 @@ class Database {
 		$this->mReadonly = $readonly;
 	}
 
+	/**
+	 * Load function, initializes Database class
+	 * @param Database &newclass Where to store the class once it's initialized
+	 * @param string $host Server to connect to
+	 * @param string $port Port
+	 * @param string $user Username
+	 * @param string $pass Password
+	 * @param string $db Database
+	 * @param string $prefix Prefix of the tables in the database. Default ''
+	 * @param bool $readonly Read-only mode. Default false
+	 * @return void
+	 */
 	public static function load( &$newclass = null, $host, $port, $user, $pass, $db, $prefix = '', $readonly = false ) {
 		
 		
 		$newclass = new Database( $host, $port, $user, $pass, $db, $prefix, $readonly );
 	}
 	
+	/**
+	 * Tells Database class to use PostgreSQL functions instead of MySQL functions
+	 *
+	 * @return void
+	 */
 	public function setPostgre() {
 		$this->mPG = true;
 	}
 
-	
-	private function connectToServer( $force = false ) {
+	/**
+	 * Connect to the my/pgsql server
+	 *
+	 * @return void
+	 */
+	private function connectToServer() {
 		if( $this->mPG ) {
 			$this->mConn = pg_connect("host={$this->mHost} port={$this->mPost} dbname={$this->mDb} user={$this->mUser} password={$this->mPass}");
 		}

@@ -79,6 +79,14 @@ class Email {
 		$this->mMessage = $message;
 	}
 	
+	/**
+     * Load function, initializes the Email class
+     * @param string $fromEmail Email address of sender
+     * @param string $fromName Name of sender.
+     * @param string $subject Subject of email
+     * @param string $message Message to send
+     * @param Email &$newclass Where to store the new class
+     */
 	public static function load( $fromEmail, $fromName, $subject, $message, &$newClass ) {
 		if( !function_exists( 'mail' ) ) {
 			throw new DependancyError( "Mail", "http://us4.php.net/manual/en/book.mail.php" );

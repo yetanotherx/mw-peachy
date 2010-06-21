@@ -93,6 +93,7 @@ class Database {
 	 */
 	public static function load( &$newclass = null, $host, $port, $user, $pass, $db, $prefix = '', $readonly = false ) {
 		
+		Hooks::runHook( 'LoadDatabase', array( &$host, &$port, &$user, &$pass, &$db, &$prefix, &$readonly ) );
 		
 		$newclass = new Database( $host, $port, $user, $pass, $db, $prefix, $readonly );
 	}

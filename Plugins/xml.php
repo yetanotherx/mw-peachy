@@ -43,7 +43,11 @@ class XML {
 			$xmlout = $pgHTTP->get( $data );
 		}
 		
+		Hooks::runHook( 'PreSimpleXMLLoad', array( &$xmlout ) );
+		
 		$xml = simplexml_load_string( $xmlout );
+		
+		Hooks::runHook( 'PostSimpleXMLLoad', array( &$xml ) );
 		
 		if( !$xml ) {
 			foreach( libxml_get_errors() as $error ) {

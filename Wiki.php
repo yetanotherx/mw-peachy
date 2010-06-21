@@ -505,11 +505,19 @@ class Wiki {
 			if( isset( $tRes['error'] ) ) {
 				throw new APIError( array( 'error' => $tRes['error']['code'], 'text' => $tRes['error']['info'] ) );
 				return false;
-			}
+			}print_r($tRes);
 			
 			foreach( $tRes['query'] as $x ) {
 				foreach( $x as $y ) {
-					if( isset( $tArray['lhtitle'] ) ) $y = $y[$tArray['lhtitle']];
+					if( isset( $tArray['lhtitle'] ) ) {
+						if( isset( $y[$tArray['lhtitle']] ) ) {
+							$y = $y[$tArray['lhtitle']];
+						}
+						else {
+							continue;
+						}
+					}
+					
 					$endArray[] = $y;
 				}
 			}

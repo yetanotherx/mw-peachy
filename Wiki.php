@@ -505,7 +505,7 @@ class Wiki {
 			if( isset( $tRes['error'] ) ) {
 				throw new APIError( array( 'error' => $tRes['error']['code'], 'text' => $tRes['error']['info'] ) );
 				return false;
-			}print_r($tRes);
+			}
 			
 			foreach( $tRes['query'] as $x ) {
 				foreach( $x as $y ) {

@@ -1079,29 +1079,16 @@ class Wiki {
 	 * @param int $limit A hard limit on the number of transclusions to fetch. Default null (all).
 	 * @return array Details about the usage of that external link on the wiki.
 	 */
-	public function exturlusage( $url, $protocol = "http", $prop = null, $namespace = null, $limit = null ) {
-		if( isset( $prop ) && !is_null( $prop ) ){
-			if( strlen( $prop ) == 0 ){
-				$prop = null;
-			} else {
-				if( is_array( $prop ) ) {
-					$prop = array_unique( $prop );
-					$prop = implode( '|' , $prop );
-				}
-				if( !preg_match('/^(ids|title|url)(\|(ids|title|url)){0,2}/',$prop) ){
-					throw new BadEntryError("exturlusage",'$prop should be an array containing permutations of the options \'ids\', \'title\' and \'url\'.');
-				}
-			}
-		}
-		
+	public function exturlusage( $url, $protocol = 'http', $prop = array( 'title' ), $namespace = null, $limit = null ) {
 		$tArray = array(
 			'list' => 'exturlusage',
 			'code' => 'eu',
 			'euquery' => $url,
 			'euprotocol' => $protocol,
 			'limit' => $limit,
-			'euprop' => $prop
-		);	
+			'euprop' => implode( '|', $prop )
+		);
+		
 		if(!is_null($namespace)){
 			$tArray['eunamespace'] = $namespace;
 		}
@@ -1122,7 +1109,7 @@ class Wiki {
 	 * @param bool $onlyredirects Only include redirects (true) or only include non-redirects (default; false).
 	 * @return array A series of random titles.
 	 */
-	public function random($namespaces = "0", $limit = 1, $onlyredirects = false) {
+	public function random($namespaces = 0, $limit = 1, $onlyredirects = false) {
 		$rnArray = array(
 			'code' => 'rn',
 			'list' => 'random',

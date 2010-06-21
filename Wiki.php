@@ -770,7 +770,7 @@ class Wiki {
 			'srsearch' => $search,
 			'srnamespace' => $namespaces,
 			'srwhat' => ($fulltext) ? "text" : "title",
-			'srinfo' => '', ##FIXME: find a meaningful way of assing back 'totalhits' and 'suggestion' as required.
+			'srinfo' => '', ##FIXME: find a meaningful way of passing back 'totalhits' and 'suggestion' as required.
 			'srprop' => implode( '|', $prop ),
 			'srredirects' => $includeredirects
 		);

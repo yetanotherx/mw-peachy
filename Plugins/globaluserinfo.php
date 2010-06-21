@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class GlobalUserInfo {
 
-    public static function load( $wikiClass ) {
+    public static function load( &$wikiClass ) {
     
         if( !array_key_exists( 'CentralAuth', $wikiClass->get_extensions() ) ) {
             throw new DependancyError( "CentralAuth" );

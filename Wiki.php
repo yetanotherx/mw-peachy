@@ -224,7 +224,13 @@ class Wiki {
 			
 			foreach( $tmp as $setting ) {
 				if( $setting == "ALL" ) {
-					$pgVerbose = array( 0,1,2,3,4 );
+					$pgVerbose = array(
+						PECHO_NORMAL,
+						PECHO_NOTICE,
+						PECHO_WARN,
+						PECHO_ERROR,
+						PECHO_FATAL
+					);
 					break;
 				}
 				else {
@@ -272,7 +278,7 @@ class Wiki {
 		
 		Hooks::runHook( 'PreLogin', array( &$lgarray ) );
 		
-		$loginRes = $this->apiQuery($lgarray,true);
+		$loginRes = $this->apiQuery( $lgarray, true );
 		
 		Hooks::runHook( 'PostLogin', array( &$loginRes ) );
 		

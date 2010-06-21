@@ -79,6 +79,14 @@ class Email {
 		$this->mMessage = $message;
 	}
 	
+	public static function load( $fromEmail, $fromName, $subject, $message, &$newClass ) {
+		if( !function_exists( 'mail' ) ) {
+			throw new DependancyError( "Mail", "http://us4.php.net/manual/en/book.mail.php" );
+		}
+		
+		$newClass = __construct( $fromEmail, $fromName, $subject, $message );
+	}
+	
 	/**
      * Adds another email to the To: field.
      * @param string $toEmail Email address of recipient

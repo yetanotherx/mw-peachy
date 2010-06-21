@@ -22,7 +22,7 @@ class AbuseFilter {
     function __construct() {
     }
 
-    public static function load( $wikiclass, &$newclass = null ) {
+    public static function load( &$wikiclass, &$newclass = null ) {
         global $pgHTTP;
         
         if( !array_key_exists( 'AbuseFilter', $wikiClass->get_extensions() ) ) {

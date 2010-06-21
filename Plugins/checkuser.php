@@ -24,7 +24,7 @@ class CheckUser {
     function __construct() {
     }
 
-    public static function load( &$newclass = null ) {
+    public static function load( &$wikiclass = null, &$newclass = null ) {
         $extensions = $wikiClass->get_extensions();
         if( !array_key_exists( 'CheckUser', $extensions ) ) {
             throw new DependancyError( "CheckUser", "http://www.mediawiki.org/wiki/Extension:CheckUser" );
@@ -35,6 +35,6 @@ class CheckUser {
         
         ##FIXME: Check for version # too
         
-        $newclass = new CheckUser();
+        $newclass = new CheckUser( $wikiclass );
     }
 }

@@ -898,7 +898,7 @@ class Page {
 	 * @param bool $watch Whether or not to watch the page
 	 * @return bool True on success
 	 */	
-	public function protect( $levels = array( 'edit' => 'sysop', 'move' => 'sysop' ), $reason = null, $cascade = false, $watch = false ) {
+	public function protect( $levels = array( 'edit' => 'sysop', 'move' => 'sysop' ), $reason = null, $expiry = 'indefinite', $cascade = false, $watch = false ) {
 	
 		if( !in_array( 'protect', $this->wiki->get_userrights() ) ) {
 			throw new PermissionsError( "User is not allowed to protect pages" );
@@ -912,7 +912,8 @@ class Page {
 			'title' => $this->title,
 			'token' => $tokens['protect'],
 			'reason' => $reason,
-			'protections' => array()
+			'protections' => array(),
+			'expiry' => $expiry
 		);
 		
 		foreach( $levels as $type => $level ) {

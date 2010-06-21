@@ -18,11 +18,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 class HTTP {
-
-	private $curl_instance;
-	private $cookie_hash;
-	private $use_cookie = null;
 	
+	/**
+	 * Curl object
+	 * 
+	 * @var cURL
+	 * @access private
+	 */
+	private $curl_instance;
+	
+	/**
+	 * Hash to use for cookies
+	 * 
+	 * @var string
+	 * @access private
+	 */
+	private $cookie_hash;
+	
+	/**
+	 * Construction method for the HTTP class
+	 * 
+	 * @access public
+	 * @return void
+	 */	
 	function __construct() {
 		global $pgUA;
 		
@@ -47,6 +65,14 @@ class HTTP {
 		##FIXME: Allow for logging in with a saved cookie, to save login time
 	}
 	
+	/**
+	 * Get an url with HTTP GET
+	 * 
+	 * @access public
+	 * @param string $url URL to get
+	 * @param array $data Array of data to pass. Gets transformed into the URL inside the function. Default null.
+	 * @return bool|string Result
+	 */
 	function get( $url, $data = null ) {
 		global $argv, $pgProxy, $pgHTTPEcho;
 		
@@ -91,6 +117,25 @@ class HTTP {
 		
 	}
 	
+	/**
+	 * Returns the HTTP code of the last request
+	 * 
+	 * @access public
+	 * @return int HTTP code
+	 */
+	function get_HTTP_code() {
+		$ci = curl_getinfo( $this->curl_instance );
+		return $ci['http_code'];
+	}
+	
+	/**
+	 * Sends data via HTTP POST
+	 * 
+	 * @access public
+	 * @param string $url URL to send
+	 * @param array $data Array of data to pass.
+	 * @return bool|string Result
+	 */
 	function post( $url, $data ) {
 		global $argv, $pgProxy, $pgHTTPEcho;
 		
@@ -131,6 +176,14 @@ class HTTP {
 		return $data;
 	}
 	
+	/**
+	 * Downloads an URL to the local disk
+	 * 
+	 * @access public
+	 * @param string $url URL to get
+	 * @param array $local Local filename to download to
+	 * @return bool
+	 */
 	function download( $url, $local ) {
 		global $argv, $pgProxy, $pgHTTPEcho;
 		
@@ -172,6 +225,12 @@ class HTTP {
 		
 	}
 	
+	/**
+	 * Destructor, deleted cookies and closes cURL class
+	 * 
+	 * @access public
+	 * @return void
+	 */
 	function __destruct () {
 		curl_close($this->curl_instance);
 		@unlink('/tmp/peachy.cookies.'.$this->cookie_hash.'.dat');

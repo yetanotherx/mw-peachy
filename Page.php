@@ -911,7 +911,7 @@ class Page {
 		);
 		
 		foreach( $levels as $type => $level ) {
-			$editarray['protections'] = "$type=$level";
+			$editarray['protections'][] = "$type=$level";
 		}
 		
 		$editarray['protections'] = implode( "|", $editarray['protections'] );

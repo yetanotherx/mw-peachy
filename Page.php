@@ -761,6 +761,11 @@ class Page {
 				if( array_key_exists( 'nochange', $result['edit'] ) ) return $this->lastedit;
 				
 				$this->__construct( $this->wiki, null, $this->pageid );
+				
+				if( !is_null( $this->wiki->get_edit_rate() ) && $this->wiki->get_edit_rate() != 0 ) {
+					sleep( intval( 60 / $this->wiki->get_edit_rate() ) - 1 );
+				}
+				
 				return $result['edit']['newrevid'];
 			}
 			else {

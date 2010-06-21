@@ -19,16 +19,86 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class User {
 
+	/**
+	 * Wiki class
+	 * 
+	 * @var Wiki
+	 * @access private
+	 */
 	private $wiki; 
+	
+	/**
+	 * Username
+	 * 
+	 * @var string
+	 * @access private
+	 */
 	private $username;
+	
+	/**
+	 * Whether or not user exists
+	 * 
+	 * @var bool
+	 * @access private
+	 */
 	private $exists = true;
+	
+	/**
+	 * Whether or not user is blocked
+	 * 
+	 * @var bool
+	 * @access private
+	 */
 	private $blocked = false;
+	
+	/**
+	 * Rough estimate as to number of edits
+	 * 
+	 * @var int
+	 * @access private
+	 */
 	private $editcount;
+	
+	/**
+	 * List of groups user is a member of
+	 * 
+	 * @var array
+	 * @access private
+	 */
 	private $groups;
+	
+	/**
+	 * Whether or not user is an IP
+	 * 
+	 * @var bool
+	 * @access private
+	 */
 	private $ip = false;
+	
+	/**
+	 * Page class of userpage
+	 * 
+	 * @var Page
+	 * @access private
+	 */
 	private $userpage;
+	
+	/**
+	 * Whether or not user has email enabled
+	 * 
+	 * @var bool
+	 * @access private
+	 */
 	private $hasemail = false;
 	
+	/**
+	 * Construction method for the User class
+	 * 
+	 * @access public
+	 * @param Wiki &$wikiClass The Wiki class object
+	 * @param mixed $username Username
+	 * @return void
+	 */
 	function __construct( &$wikiClass, $username ) {
 		global $pgHTTP;
 		
@@ -73,6 +143,13 @@ class User {
 		}
 	}
 	
+	/**
+	 * Returns whether or not the user is blocked
+	 * 
+	 * @access public
+	 * @param bool $force Whether or not to use the locally stored cache. Default false.
+	 * @return bool
+	 */
 	public function isBlocked( $force = false ) {
 		global $pgHTTP;
 		
@@ -98,7 +175,15 @@ class User {
 	
 	public function unblock() {}
 	
-	public function get_editcount( $force = false, $database = null ) {
+	/**
+	 * Returns the editcount of the user
+	 * 
+	 * @access public
+	 * @param bool $force Whether or not to use the locally stored cache. Default false.
+	 * @param Database &$database Use an instance of the Database class to get a more accurate count
+	 * @return int Edit count
+	 */
+	public function get_editcount( $force = false, &$database = null ) {
 		//First check if $database exists, because that returns a more accurate count
 		if( !is_null( $database ) && $database instanceOf Database ) {
 			$count = Database::mysql2array($database->select(
@@ -150,6 +235,14 @@ class User {
 		return $this->editcount;
 	}
 	
+	/**
+	 * Returns a list of all user contributions
+	 * 
+	 * @access public
+	 * @param bool $mostrecentfirst Set to true to get the most recent edits first. Default true.
+	 * @param bool $limit Only get this many edits. Default null.
+	 * @return void
+	 */
 	public function get_contribs( $mostrecentfirst = true, $limit = null ) {
 		$ucArray = array(
 			'code' => 'uc',
@@ -169,6 +262,12 @@ class User {
 		return $result;
 	}
 	
+	/**
+	 * Returns whether or not the user has email enabled
+	 * 
+	 * @access public
+	 * @return bool
+	 */
 	public function has_email() {
 		return $this->hasemail;
 	}
@@ -179,6 +278,18 @@ class User {
 	
 	public function createaccount() {}
 	
+	/**
+	 * List all deleted contributions.
+	 * The logged in user must have the 'deletedhistory' right
+	 * 
+	 * @access public
+	 * @param bool $content Whether or not to return content of each contribution. Default false
+	 * @param string $start Timestamp to start at. Default null.
+	 * @param string $end Timestamp to end at. Default null.
+	 * @param string $dir Direction to list. Default 'older'
+	 * @param array $prop Information to retrieve. Default array( 'revid', 'user', 'parsedcomment', 'minor', 'len', 'content', 'token' )
+	 * @return array 
+	 */
 	public function deletedcontribs( $content = false, $start = null, $end = null, $dir = 'older', $prop = array( 'revid', 'user', 'parsedcomment', 'minor', 'len', 'content', 'token' ) ) {
 		if( !in_array( 'deletedhistory', $this->wiki->get_userrights() ) ) {
 			throw new PermissionsError( "User is not allowed to view deleted revisions" );

@@ -19,20 +19,113 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class Image {
 
+	/**
+	 * Wiki class
+	 * 
+	 * @var Wiki
+	 * @access protected
+	 */
 	protected $wiki;
+	
+	/**
+	 * Image name, with namespace
+	 * 
+	 * @var string
+	 * @access protected
+	 */
 	protected $name; //including "Image"
+	
+	/**
+	 * MIME type of image
+	 * 
+	 * @var string
+	 * @access protected
+	 */
 	protected $mime;
+	
+	/**
+	 * Page ID of image page
+	 * 
+	 * @var int
+	 * @access protected
+	 */
 	protected $pageid;
+	
+	/**
+	 * Whether or not image exists
+	 * 
+	 * @var bool
+	 * @access protected
+	 */
 	protected $exists = true;
+	
+	/**
+	 * URL to direct image
+	 * 
+	 * @var string
+	 * @access protected
+	 */
 	protected $url;
+	
+	/**
+	 * Whether or not image is hosted on a shared repository
+	 * 
+	 * @var bool
+	 * @access protected
+	 */
 	protected $commons = false;
+	
+	/**
+	 * SHA1 hash of image
+	 * 
+	 * @var string
+	 * @access protected
+	 */
 	protected $hash;
+	
+	/**
+	 * Bitdepth of image
+	 * 
+	 * @var int
+	 * @access protected
+	 */
 	protected $bitdepth;
+	
+	/**
+	 * Metadata stored in the image
+	 * ##FIXME: Is this a string or array?
+	 * 
+	 * @var string
+	 * @access protected
+	 */
 	protected $metadata;
-	protected $usage;
+	
+	/**
+	 * List of pages where the image is used
+	 * 
+	 * @var array
+	 * @access protected
+	 */
+	protected $usage = array();
+	
+	/**
+	 * History of image page
+	 * 
+	 * @var array
+	 * @access protected
+	 */
 	protected $history = array();
 	
-	
+	/**
+	 * Construction method for the Image class
+	 * 
+	 * @access public
+	 * @param Wiki &$wikiClass The Wiki class object
+	 * @param mixed $filename Filename
+	 * @param int $pageid Page ID of image
+	 * @param array $prop Informatation to set. Default array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' )
+	 * @return void
+	 */
 	function __construct( &$wikiClass, $filename = null, $pageid = null, $prop = array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' ) ) {
 		$this->wiki =& $wikiClass;
 		var_dump($filename);

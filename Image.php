@@ -133,7 +133,6 @@ class Image {
 	 */
 	function __construct( &$wikiClass, $filename = null, $pageid = null, $prop = array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' ) ) {
 		$this->wiki =& $wikiClass;
-		var_dump($filename);
 		
 		$imageInfoArray = array(
 			'action' => 'query',

@@ -1277,13 +1277,14 @@ class Page {
 			'list' => 'backlinks',
 			'code' => 'bl',
 			'blnamespace' => $namespaces,
-			'blfilterredir' => $redirects
+			'blfilterredir' => $redirects,
+			'bltitle' => $this->title
 		);
 		
 		if( $followredir ) $leArray['blredirect'] = 'yes';
 		
 		Hooks::runHook( 'PreQueryBacklinks', array( &$leArray ) );
-		return $this->listHandler( $leArray );
+		return $this->wiki->listHandler( $leArray );
 	}
 
 }

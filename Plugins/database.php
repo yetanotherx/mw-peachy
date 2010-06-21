@@ -123,7 +123,7 @@ class Database {
 				$this->mysqli = false;
 			}
 			else {
-				$this->mConn = new mysqli( $this->mHost.':'.$this->mPort, $this->mUser, $this->mPass, $this->mDb );
+				$this->mConn = new mysqli( $this->mHost, $this->mUser, $this->mPass, $this->mDb, $this->mPort );
 			}
 		}
 	
@@ -191,6 +191,28 @@ class Database {
 	}
 	
 	/**
+	 * Sends a prepared statment using PHP's mysqli functions.
+	 * @param string $query The database query.
+	 * @param string $bind A string containing the datatypes to bind to the query (i=int,s=string,d=double,b=blob)
+	 * @param array $values An array containg the values to bind to the query.
+	 * @return object Returns a MySQLi_STMT object.
+	 */
+	public function preparedStmt( $query, $bind=null, $values=array() ) {
+		if ($this->mysqli==false) throw new DBError( "Not in mysqli mode. PHP's mysqli functions are required." );
+		
+		$stmt = $this->mConn->prepare($query);
+		$params = array_merge(array($bind),$values);
+		
+       		$tmp = array();
+        	foreach($params as $key => $value) $tmp[$key] = &$params[$key];
+
+		call_user_func_array(array($stmt, "bind_param"), $tmp);
+		$stmt->execute();
+		
+		return $stmt;
+	}
+	
+	/**
 	 * Returns a string description of the last MySQL error
 	 * @return string|bool MySQL error string, null if no error
 	 */
@@ -247,7 +269,8 @@ class Database {
 	}
 	
 	/**
-	 * Shortcut for converting a MySQL result object to a plain array
+	 * Shortcut for converting a MySQL result object to a plain array.
+	 * Note: This is not compatible with results from preparedStmt()
 	 * @param object $data MySQL result
 	 * @return array Converted result
 	 * @static

@@ -17,10 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define( 'PEACHY', true );
+/**
+ * The version that Peachy is running 
+ */
 define( 'PEACHYVERSION', '0.1alpha' );
+
+/**
+ * Minimum MediaWiki version that is required for Peachy 
+ */
 define( 'MINMW', '1.15' );
 
+/**
+ * PECHO constants, used for {@link outputText}()
+ */
 define( 'PECHO_NORMAL', 0 );
 define( 'PECHO_NOTICE', 1 );
 define( 'PECHO_WARN', 2 );
@@ -61,7 +70,19 @@ $pgHTTP = new HTTP;
 $mwVersion = null;
 
 class Peachy {
-	static function newWiki( $config_name = null, $username = null, $password = null, $base_url = 'http://en.wikipedia.org/w/api.php' ) {
+
+	/**
+	 * Initializes Peachy, logs in with a either configuration file or a given username and password
+	 * 
+	 * @static
+	 * @access public
+	 * @param string $config_name Name of the config file stored in the Configs directory, minus the .cfg extension. Default null
+	 * @param string $username Username to log in if no config file specified. Default null
+	 * @param string $password Password to log in with if no config file specified. Default null
+	 * @param string $base_url URL to api.php if no config file specified. Defaults to English Wikipedia's API.
+	 * @return Wiki Instance of the Wiki class, where most functions are stored
+	 */
+	public static function newWiki( $config_name = null, $username = null, $password = null, $base_url = 'http://en.wikipedia.org/w/api.php' ) {
 		global $IP;
 		
 		//throw new APIError( array( 'code' => "nopage", 'text' => "nopage exists" ) );
@@ -90,7 +111,16 @@ class Peachy {
 		return $w;
 	}
 	
-	static function wikiChecks( $base_url ) {
+	/**
+	 * Performs various checks and settings
+	 * Checks if MW version is at least {@link MINMW}
+	 * 
+	 * @static
+	 * @access public
+	 * @param string $base_url URL to api.php
+	 * @return array Installed extensions
+	 */
+	public static function wikiChecks( $base_url ) {
 		global $pgHTTP, $mwVersion;
 		
 		$siteinfo = unserialize( $pgHTTP->get( 
@@ -123,7 +153,15 @@ class Peachy {
 		return $extensions;
 	}
 	
-	static function loadPlugin( $plugin_name ) {
+	/**
+	 * Loads a specific plugin into memory
+	 * 
+	 * @static
+	 * @access public
+	 * @param string $plugin_name Name of plugin to load from Plugins directory, minus .php ending
+	 * @return void
+	 */
+	public static function loadPlugin( $plugin_name ) {
 		global $IP;
 		if( is_file( $IP . 'Plugins/' . $plugin_name . '.php' ) ) {
 		
@@ -133,7 +171,14 @@ class Peachy {
 		}
 	}
 	
-	static function loadAllPlugins() {
+	/**
+	 * Loads all available plugins
+	 * 
+	 * @static
+	 * @access public
+	 * @return void
+	 */
+	public static function loadAllPlugins() {
 		global $IP;
 		
 		foreach( glob( $IP . 'Plugins/*.php' ) as $plugin ) {

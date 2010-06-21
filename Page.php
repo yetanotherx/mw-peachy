@@ -744,7 +744,8 @@ class Page {
 	
 	}
 	
-	public function undo() {}
+	public function undo() {
+	}
 	
 	/**
 	 * Returns a boolean depending on whether the page can have subpages or not.
@@ -854,7 +855,71 @@ class Page {
 		}
 	}
 	
-	public function protect() {}
+	/**
+	 * Protects the page.
+	 * 
+	 * @param array $levels Array of protections levels. The key is the type, the value is the level. Default: array( 'edit' => 'sysop', 'move' => 'sysop' )
+	 * @param string $reason Reason for protection. Default null
+	 * @param bool $cascade Whether or not to enable cascade protection. Default false
+	 * @param bool $watch Whether or not to watch the page
+	 * @return bool True on success
+	 */	
+	public function protect( $levels = array( 'edit' => 'sysop', 'move' => 'sysop' ), $reason = null, $cascade = false, $watch = false ) {
+	
+		if( !in_array( 'protect', $this->wiki->get_userrights() ) ) {
+			throw new PermissionsError( "User is not allowed to protect pages" );
+			return false;
+		}
+		
+		$tokens = $this->wiki->get_tokens();
+		
+		$editarray = array(
+			'action' => 'protect',
+			'title' => $this->title,
+			'token' => $tokens['protect'],
+			'reason' => $reason,
+			'protections' => array()
+		);
+		
+		foreach( $levels as $type => $level ) {
+			$editarray['protections'] = "$type=$level";
+		}
+		
+		$editarray['protections'] = implode( "|", $editarray['protections'] );
+		
+		if( $cascade ) $editarray['cascade'] = 'yes';
+		if( $watch ) $editarray['watch'] = 'yes';
+		
+		Hooks::runHook( 'StartProtect', array( &$editarray ) );
+		
+		$result = $this->wiki->apiQuery( $editarray, true);
+		
+		if( isset( $result['error'] ) ) {
+			throw new ProtectError( $result['error']['code'], $result['error']['info'] );
+		}
+		elseif( isset( $result['protect'] ) ) {
+			if( isset( $result['protect']['title'] ) ) {
+				$this->__construct( $this->wiki, $this->title );
+				return true;
+			}
+			else {
+				throw new ProtectError( "UnknownProtectError", print_r($result['protect'],true));
+			}
+		}
+		else {
+			throw new ProtectError( "UnknownProtectError", print_r($result['protect'],true));
+		}
+	}
+	
+	/**
+	 * Unprotects the page.
+	 * 
+	 * @param string $reason A reason for the unprotection. Defaults to null (blank).
+	 * @return bool True on success
+	 */	
+	public function unprotect( $reason = null ) {
+		return $this->protect( array(), $reason );
+	}
 	
 	/**
 	 * Deletes the page.
@@ -899,8 +964,6 @@ class Page {
 		}
 		
 	}
-	
-	public function unprotect() {}
 	
 	public function undelete( $reason = null, $timestamps = null ) {
 		if( !in_array( 'undelete', $this->wiki->get_userrights() ) ) {

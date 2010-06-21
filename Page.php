@@ -213,7 +213,7 @@ class Page {
 			throw new NoTitle();
 		}
 		
-		if( !is_null( $title ) && $normalize ) {
+		if( $normalize ) {
 			$title = str_replace( '_', ' ', $title );
 			$title = str_replace( '%20', ' ', $title );
 			if( $title[0] == ":" ){
@@ -1065,18 +1065,6 @@ class Page {
 		if( !is_null( $end ) ) $drArray['drend'] = $end;
 		
 		return $this->wiki->listHandler( $drArray );
-	}
-	
-	/**
-	 * Returns all the pages which start with a certain prefix
-	 * 
-	 * @param string $prefix Prefix to search for
-	 * @param array $namespace Namespace IDs to search in. Default array( 0 )
-	 * @param int $limit A hard limit on the number of pages to fetch. Default null (all). 
-	 * @return array Titles of pages that transclude this page
-	 */
-	public function prefixindex( $prefix = null, $namespace = array( 0 ), $limit = null ) {
-		return $this->wiki->allpages( $namespace, $prefix, null, 'all', null, null, array(), array(), 'ascending', 'all', $limit );
 	}
 	
 	/**

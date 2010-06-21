@@ -1327,5 +1327,17 @@ class Wiki {
 	public function get_userrights() {
 		return $this->userRights;
 	}
+	
+	/**
+	 * Returns all the pages which start with a certain prefix, shortcut for {@link Wiki}::{@link allpages}()
+	 * 
+	 * @param string $prefix Prefix to search for
+	 * @param array $namespace Namespace IDs to search in. Default array( 0 )
+	 * @param int $limit A hard limit on the number of pages to fetch. Default null (all). 
+	 * @return array Titles of pages that transclude this page
+	 */
+	public function prefixindex( $prefix = null, $namespace = array( 0 ), $limit = null ) {
+		return $this->wiki->allpages( $namespace, $prefix, null, 'all', null, null, array(), array(), 'ascending', 'all', $limit );
+	}
 
 }

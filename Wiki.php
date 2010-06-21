@@ -479,10 +479,10 @@ class Wiki {
 			}
 		} 
 		if( isset($tArray[$code . 'namespace']) && !is_null($tArray[$code . 'namespace']) ){
-			if(strlen($tArray[$code . 'namespace']) === 0){
-				$tArray[$code . 'namespace'] = null;
-			} elseif( is_array( $tArray[$code . 'namespace'] ) ) {
+			if( is_array( $tArray[$code . 'namespace'] )){
 				$tArray[$code . 'namespace'] = implode('|', $tArray[$code . 'namespace'] );
+			} elseif(strlen($tArray[$code . 'namespace']) === 0) {
+				$tArray[$code . 'namespace'] = null;
 			} else {
 				$tArray[$code . 'namespace'] = (string)$tArray[$code . 'namespace'];
 			}
@@ -907,11 +907,11 @@ class Wiki {
 	 * @param int limit How many results to retrieve (default: null i.e. all).
 	 * @return array List of links
 	 */
-	public function alllinks( $namespace = array( 0 ), $prefix = null, $from = null, $continue = null, $unique = true, $prop = array( 'ids', 'title' ), $limit = null ) {
+	public function alllinks( $namespace = array( 0 ), $prefix = null, $from = null, $continue = null, $unique = false, $prop = array( 'ids', 'title' ), $limit = null ) {
 		$leArray = array(
 			'list' => 'alllinks',
 			'code' => 'al',
-			'alnamespace' => $namespaces,
+			'alnamespace' => $namespace,
 			'alprop' => implode( '|', $prop ),
 			'limit' => $limit
 		);
@@ -949,7 +949,7 @@ class Wiki {
 		
 		if( !is_null( $from ) ) $leArray['aufrom'] = $from;
 		if( !is_null( $prefix ) ) $leArray['auprefix'] = $prefix;
-		if( !count( $groups ) ) $leArray['augroup'] = implode( '|', $groups );
+		if( count( $groups ) ) $leArray['augroup'] = implode( '|', $groups );
 		if( $editsonly ) $leArray['auwitheditsonly'] = 'yes';
 		
 		Hooks::runHook( 'PreQueryAllusers', array( &$leArray ) );

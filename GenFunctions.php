@@ -17,12 +17,33 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/**
+ * Case insensitive in_array function
+ * 
+ * @param mixed $needle What to search for
+ * @param array $haystack Array to search in
+ * @return bool True if $needle is found in $haystack, case insensitive
+ * @link http://us3.php.net/in_array
+ */
 function iin_array( $needle, $haystack ) {
 	return in_array( strtoupper( $needle ), array_map( 'strtoupper', $haystack ) );
 }
 
-function in_string( $needle, $haystack ) {
-	return strpos( $haystack, $needle ) !== false; 
+/**
+ * Returns whether or not a string is found in another
+ * Shortcut for strpos()
+ * 
+ * @param string $needle What to search for
+ * @param string $haystack What to search in
+ * @param bool Whether or not to do a case-insensitive search
+ * @return bool True if $needle is found in $haystack
+ * @link http://us3.php.net/strpos
+ */
+function in_string( $needle, $haystack, $insensitive = false ) {
+	$fnc = 'strpos';
+	if( $insensitive ) $fnc = 'stripos';
+	
+	return $fnc( $haystack, $needle ) !== false; 
 }
 
 /**
@@ -70,15 +91,13 @@ function checkExclusion( &$wiki, $text = '', $username = null, $optout = null ) 
 	}
 }
 
-/*
-
-0 = normal
-1 = notice
-2 = warning
-2 = error
-3 = fatal error
-
-*/
+/**
+ * Outputs text if the given category is in the allowed types
+ * 
+ * @param string $text Text to display
+ * @param int $cat Category of text, such as PECHO_WARN, PECHO_NORMAL
+ * @return void
+ */
 function outputText( $text, $cat = 0 ) {
 	global $pgVerbose;
 	
@@ -87,6 +106,14 @@ function outputText( $text, $cat = 0 ) {
 	if( in_array( $cat, $pgVerbose ) ) echo $text;
 }
 
+/**
+ * Shortcut for {@link outputText}
+ * 
+ * @param string $text Text to display
+ * @param int $cat Category of text, such as PECHO_WARN, PECHO_NORMAL
+ * @link outputText
+ * @return void
+ */
 function pecho( $text, $cat = 0 ) {
 	outputText( $text, $cat );
 }

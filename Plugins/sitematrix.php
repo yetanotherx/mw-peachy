@@ -31,7 +31,7 @@ class SiteMatrix {
 		global $pgHTTP;
 		
 		if( !array_key_exists( 'SiteMatrix', $wikiClass->get_extensions() ) ) {
-			throw new DependancyError( "SiteMatrix" );
+			throw new DependencyError( "SiteMatrix" );
 		}
 		
 		$SMres = $wikiClass->apiQuery(array(

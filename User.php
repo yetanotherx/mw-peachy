@@ -94,9 +94,9 @@ class User {
 	function __construct( &$wikiClass, $username ) {
 		global $pgHTTP;
 		
-		$this->wiki =& $wikiClass;
+		$this->wiki = &$wikiClass;
 		
-		$uiRes = $this->wiki->apiQuery(array(
+		$uiRes = $this->wiki->apiQuery( array(
 				'action' => 'query',
 				'format' => 'php',
 				'list' => 'users|logevents',
@@ -109,11 +109,11 @@ class User {
 		
 		$this->username = $uiRes['query']['users'][0]['name'];
 		
-		if( long2ip(ip2long($this->username) ) == $this->username ) {
+		if( long2ip(ip2long( $this->username ) ) == $this->username ) {
 			$this->exists = false;
 			$this->ip = true;
 			
-			if (isset($uiRes['query']['logevents'][0]['block']['expiry']) && strtotime($uiRes['query']['logevents'][0]['block']['expiry']) > time()) {
+			if( isset( $uiRes['query']['logevents'][0]['block']['expiry'] ) && strtotime( $uiRes['query']['logevents'][0]['block']['expiry'] ) > time() ) {
 				$this->blocked = true;
 			}
 		}
@@ -149,7 +149,7 @@ class User {
 			return $this->blocked;
 		}
 		
-		$biRes = $this->wiki->apiQuery(array(
+		$biRes = $this->wiki->apiQuery( array(
 				'action' => 'query',
 				'format' => 'php',
 				'list' => 'blocks',
@@ -176,9 +176,10 @@ class User {
 	 * @return int Edit count
 	 */
 	public function get_editcount( $force = false, &$database = null ) {
+	
 		//First check if $database exists, because that returns a more accurate count
 		if( !is_null( $database ) && $database instanceOf Database ) {
-			$count = Database::mysql2array($database->select(
+			$count = Database::mysql2array( $database->select(
 				'archive',
 				'COUNT(*) as count',
 				array( 
@@ -196,9 +197,10 @@ class User {
 			else {
 				$del_count = 0;
 			}
+			
 			unset($count);
 			
-			$count = Database::mysql2array($database->select(
+			$count = Database::mysql2array( $database->select(
 				'revision',
 				'COUNT(*) as count',
 				array( 

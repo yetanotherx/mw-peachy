@@ -77,7 +77,6 @@ class Database {
 		$this->mDb = $db;
 		$this->mPrefix = $prefix;
 		$this->mReadonly = $readonly;
-		$this->connectToServer();
 	}
 
 	public static function load( &$newclass = null, $host, $port, $user, $pass, $db, $prefix = '', $readonly = false ) {
@@ -141,6 +140,8 @@ class Database {
 	 * @return object|bool MySQL object, false if there's no result
 	 */
 	public function doQuery( $sql ) {
+		if( is_null( $this->mConn ) ) $this->connectToServer();
+		
 		$sql = trim($sql);		
 		
 		if( $this->mPG ) {

@@ -18,6 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
+ * @file
+ * Stores general functions that do not belong in a class
+ */
+
+/**
  * Case insensitive in_array function
  * 
  * @param mixed $needle What to search for

@@ -17,6 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/**
+ * @file
+ * Hooks object
+ * Stores the runHook function, which runs all hook functions
+ */
+
 class Hooks {
 
 	static function runHook( $hook_name, $args = array() ) {

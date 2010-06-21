@@ -18,6 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
+ * @file
+ * Main Peachy file
+ * Defines constants, initializes global variables
+ * Stores Peachy class
+ */
+
+/**
  * The version that Peachy is running 
  */
 define( 'PEACHYVERSION', '0.1alpha' );

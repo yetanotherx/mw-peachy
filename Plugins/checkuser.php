@@ -33,8 +33,6 @@ class CheckUser {
             throw new DependancyError( "CheckUser version 3.0 or up", "http://www.mediawiki.org/wiki/Extension:CheckUser" );
         }
         
-        ##FIXME: Check for version # too
-        
         $newclass = new CheckUser( $wikiclass );
     }
 }

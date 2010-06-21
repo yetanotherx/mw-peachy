@@ -193,3 +193,11 @@ class BadEntryError extends Exception {
 	}
 }
 
+class XMLError extends Exception {
+	public function __construct( $error ) {
+		parent::__construct( 
+			"XML Error: " . $error
+		);
+	}
+}
+

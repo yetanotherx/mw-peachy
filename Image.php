@@ -19,22 +19,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class Image {
 
-	private $wiki;
-	private $name; //including "Image"
-	private $mime;
-	private $pageid;
-	private $exists = true;
-	private $url;
-	private $commons = false;
-	private $hash;
-	private $bitdepth;
-	private $metadata;
-	private $usage;
-	private $history = array();
+	protected $wiki;
+	protected $name; //including "Image"
+	protected $mime;
+	protected $pageid;
+	protected $exists = true;
+	protected $url;
+	protected $commons = false;
+	protected $hash;
+	protected $bitdepth;
+	protected $metadata;
+	protected $usage;
+	protected $history = array();
 	
 	
 	function __construct( &$wikiClass, $filename = null, $pageid = null, $prop = array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' ) ) {
 		$this->wiki =& $wikiClass;
+		var_dump($filename);
 		
 		$imageInfoArray = array(
 			'action' => 'query',
@@ -181,7 +182,7 @@ class Image {
 	 * Upload an image to the wiki
 	 * 
 	 * @access public
-	 * @param mixed $file Location of the file to upload
+	 * @param mixed $file Location of the file to upload in the Images directory
 	 * @param string $text Text on the image file page (default: '')
 	 * @param string $comment Comment for inthe upload in logs (default: '')
 	 * @param bool $watch Should the upload be added to the watchlist (default: false)
@@ -189,36 +190,39 @@ class Image {
 	 * @return void
 	 */
 	public function upload( $file, $text = '', $comment = '', $watch = false, $ignorewarnings = true ) {
-		global $mwVersion;
+		global $mwVersion, $IP;
 		
 		$tokens = $this->wiki->get_tokens();
 		
+		$localfile = $IP . 'Images/' . str_replace( ' ', '_', $this->name );
+		
 		if( version_compare( $mwVersion, '1.16' ) >= 0 ) {
+		
 			$uploadArray = array(
 				'action' => 'upload',
-				'filename' => $this->name,
+				'filename' => $file,
 				'comment' => $comment,
 				'text' => $text,
 				'token' => $tokens['edit'],
 				'watch' => intval( $watch ),
 				'ignorewarnings' => intval( $ignorewarnings ),
-				'file' => "@$file"
+				'file' => "@$localfile"
 			);
 			
 			Hooks::runHook( 'APIUpload', array( &$uploadArray ) );
 			
-			$this->apiQuery( $uploadArray, true );
+			var_dump( $this->wiki->apiQuery( $uploadArray, true ) );
 		} else {
 			##FIXME: test the non-api upload
 			
 			Hooks::runHook( 'IndexUpload' );
 			
 			$pgHTTP->post(
-				str_replace( 'api.php', 'index.php', $this->base_url ),
+				str_replace( 'api.php', 'index.php', $this->wiki->base_url ),
 				array(
-					'wpUploadFile' => '@'.$file,
+					'wpUploadFile' => '@'.$localfile,
 		            'wpSourceType' => 'file',
-		            'wpDestFile' => $this->name,
+		            'wpDestFile' => $file,
 		            'wpUploadDescription' => $desc,
 		            'wpLicense' => '',
 		            'wpWatchthis' => '0',
@@ -230,7 +234,7 @@ class Image {
 		
 		##FIXME: Add error checking
 		
-		$this->__construct( $this->wiki, $this->name );
+		$this->__construct( $this->wiki, $file );
 	}
 	
 	public function history() {}
@@ -238,12 +242,12 @@ class Image {
 	/**
 	 * Downloads an image to the local disk
 	 * 
-	 * @param string $name Filename to store image as. Default false.
-	 * @param int $width Width of image to download. Cannot be used together with $height. Default false.
-	 * @param int $height Height of image to download. Cannot be used together with $width. Default false.
+	 * @param string $name Filename to store image as. Default null.
+	 * @param int $width Width of image to download. Cannot be used together with $height. Default null.
+	 * @param int $height Height of image to download. Cannot be used together with $width. Default null.
 	 * @return void
 	 */
-	public function download( $name = false, $width = false, $height = false ) {
+	public function download( $name = null, $width = null, $height = null ) {
 		global $pgHTTP, $IP;
 		
 		if( $this->commons ) {
@@ -254,37 +258,38 @@ class Image {
 			throw new ImageError( "Attempted to download a non-existant file." );
 		}
 		
-		if( $width ^ $height ) {
-			$iiParams = array(
-				'action' => 'query',
-				'prop' => 'imageinfo',
-				'iiprop' => 'url',
-				'titles' => $this->name
-			);
+		$iiParams = array(
+			'action' => 'query',
+			'prop' => 'imageinfo',
+			'iiprop' => 'url',
+			'titles' => $this->name
+		);
+		
+		if( !is_null( $height ) && is_null( $width ) ) {
+			throw new BadEntryError( "HeightWOWidth", "Height cannot be used without sending Width as well" );
+		}
+		elseif( is_null( $height ) && !is_null( $width ) ) {
+			$iiParams['iiurlwidth'] = $width;
+		}
+		elseif( !is_null( $height ) && !is_null( $width ) ) {
+			$iiParams['iiurlwidth'] = $width;
+			$iiParams['iiurlheight'] = $height;
+		}	
 			
-			if( $width ) {
-				$iiParams['iiurlwidth'] = $width;
+		$iiRes = $this->wiki->apiQuery( $iiParams );
+		
+		if( !isset( $iiRes['query']['pages'] ) ) {
+			throw new APIError( "Unknown API error", print_r($iiRes,true) );
+		}
+		
+		foreach( $iiRes['query']['pages'] as $x ) {
+			if( !is_null( $width ) ) {
+				$url = $x['imageinfo'][0]['thumburl'];
 			}
 			else {
-				$iiParams['iiurlheight'] = $height;
-			}
-			
-			$iiRes = $this->wiki->apiQuery( $iiParams );
-			
-			if( !isset( $iiRes['query']['pages'] ) ) {
-				throw new APIError( "Unknown API error", print_r($iiRes,true) );
-			}
-			
-			foreach( $iiRes['query']['pages'] as $x ) {
 				$url = $x['imageinfo'][0]['url'];
-				break;
 			}
-		}
-		elseif( $width && $height ) {
-			throw new ImageError( "Both width and height were specifying when downloading an image." );
-		}
-		else {
-			$url = $this->url;
+			break;
 		}
 		
 		$localname = str_replace(' ','_',$this->name);
@@ -292,7 +297,7 @@ class Image {
 		
 		Hooks::runHook( 'DownloadImage', array( &$url, &$name ) );
 		
-		$pgHTTP->download( $url, $IP . 'Images/' . $name );
+		$pgHTTP->download( $url, $IP . 'Images/' . $localname );
 	}
 	
 	/**

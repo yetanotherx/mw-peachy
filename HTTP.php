@@ -66,7 +66,6 @@ class HTTP {
 		curl_setopt($this->curl_instance,CURLOPT_FOLLOWLOCATION,1);
 		curl_setopt($this->curl_instance,CURLOPT_HTTPGET,1);
 		
-		
 		/*if( !is_null( $this->use_cookie ) ) {
 			curl_setopt($this->curl_instance,CURLOPT_COOKIE, $this->use_cookie);
 		}*/
@@ -76,15 +75,16 @@ class HTTP {
 		}
 		
 		curl_setopt($this->curl_instance,CURLOPT_URL,$url);
+		
+		if( (!is_null( $argv ) && in_array( 'peachyecho', $argv )) || $pgHTTPEcho ) {
+			pecho( "GET: $url\n", PECHO_NORMAL );
+		}
 
 		$data = curl_exec( $this->curl_instance );
 		
 		if( curl_errno( $this->curl_instance ) != 0 ) {
 			throw new CURLError( curl_errno( $this->curl_instance ), curl_error( $this->curl_instance ) );
 			return false;
-		}
-		if( (!is_null( $argv ) && in_array( 'peachyecho', $argv )) || $pgHTTPEcho ) {
-			pecho( "GET: $url\n", PECHO_NORMAL );
 		}
 		
 		return $data;
@@ -116,16 +116,16 @@ class HTTP {
 		}*/
 		
 		curl_setopt($this->curl_instance,CURLOPT_URL,$url);
-
+		
+		if( (!is_null( $argv ) && in_array( 'peachyecho', $argv )) || $pgHTTPEcho ) {
+			pecho( "POST: $url\n", PECHO_NORMAL );
+		}
+		
 		$data = curl_exec( $this->curl_instance );
 		
 		if( curl_errno( $this->curl_instance ) != 0 ) {
 			throw new CURLError( curl_errno( $this->curl_instance ), curl_error( $this->curl_instance ) );
 			return false;
-		}
-		
-		if( (!is_null( $argv ) && in_array( 'peachyecho', $argv )) || $pgHTTPEcho ) {
-			pecho( "POST: $url\n", PECHO_NORMAL );
 		}
 		
 		return $data;
@@ -150,22 +150,26 @@ class HTTP {
 		}
 		
 
-		curl_setopt($this->curl_instance, CURLOPT_FILE, $out);
+		//curl_setopt($this->curl_instance, CURLOPT_FILE, $out);
 		curl_setopt($this->curl_instance, CURLOPT_URL, $url);
 		curl_setopt($this->curl_instance, CURLOPT_HEADER, 0);
 		
-		curl_exec( $this->curl_instance );
+		if( (!is_null( $argv ) && in_array( 'peachyecho', $argv )) || $pgHTTPEcho ) {
+			pecho( "DLOAD: $url\n", PECHO_NORMAL );
+		}
+		
+		$ret = curl_exec( $this->curl_instance );
 		
 		if( curl_errno( $this->curl_instance ) != 0 ) {
 			throw new CURLError( curl_errno( $this->curl_instance ), curl_error( $this->curl_instance ) );
 			return false;
 		}
 		
-		if( (!is_null( $argv ) && in_array( 'peachyecho', $argv )) || $pgHTTPEcho ) {
-			pecho( "DLOAD: $url\n", PECHO_NORMAL );
-		}
+		fwrite( $out, $ret );
 		
 		fclose($out);
+		
+		
 	}
 	
 	function __destruct () {

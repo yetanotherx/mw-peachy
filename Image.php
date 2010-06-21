@@ -111,7 +111,7 @@ class Image {
 	 * @var array
 	 * @access protected
 	 */
-	protected $usage = array();
+	protected $usage;
 	
 	/**
 	 * History of image page

@@ -760,7 +760,7 @@ class Page {
 			if( $result['edit']['result'] == "Success" ) {
 				if( array_key_exists( 'nochange', $result['edit'] ) ) return $this->lastedit;
 				
-				$this->__construct( $this->wiki, $this->pageid );
+				$this->__construct( $this->wiki, null, $this->pageid );
 				return $result['edit']['newrevid'];
 			}
 			else {
@@ -872,7 +872,7 @@ class Page {
 		}
 		elseif( isset( $result['move'] ) ) {
 			if( isset( $result['move']['to'] ) ) {
-				$this->__construct( $this->wiki, $this->pageid );
+				$this->__construct( $this->wiki, null, $this->pageid );
 				return true;
 			}
 			else {

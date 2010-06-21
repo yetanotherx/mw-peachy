@@ -219,7 +219,7 @@ class Wiki {
 		}
 		
 		if( isset( $configuration['stoponnewmessages'] ) ) {
-			$this->stoponnewmessages = 'true';
+			$this->stoponnewmessages = true;
 		}
 		
 		if( isset( $configuration['verbose'] ) ) {
@@ -394,6 +394,19 @@ class Wiki {
 	 */
 	public function logout() {
 		$this->apiQuery( array( 'action' => 'logout' ), true );
+	}
+	
+	/**
+	 * Sets a specific runpage for a script.
+	 *
+	 * @param string $page Page to set as the runpage. Default null.
+	 * @access public
+	 * @return void
+	 */
+	public function set_runpage( $page = null ) {
+		global $pgRunPage;
+		
+		$pgRunPage = $page;
 	}
 	
 	/**

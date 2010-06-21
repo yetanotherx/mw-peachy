@@ -605,7 +605,7 @@ class Page {
 		else {
 			// If we don't have mb_strlen we compromise and use strlen
 			if( strlen( $summary) > 255 ) {
-				throw new EditError( "LongSummary", "Summary is over 255 bytes, the maximum allowed" );
+				throw new EditError( "LongSummary", "Summary is over 255 characters, the maximum allowed" );
 			}
 		}
 		

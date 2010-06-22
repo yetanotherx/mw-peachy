@@ -22,6 +22,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Stores all the subclasses of Exception
  */
 
+/**
+ * Generic API Error
+ * 
+ * @package Peachy_Exceptions
+ */
 class APIError extends Exception {
 
 	public function __construct( $error ) {
@@ -31,6 +36,11 @@ class APIError extends Exception {
 	}
 }
 
+/**
+ * Error with user permissions
+ * 
+ * @package Peachy_Exceptions
+ */
 class PermissionsError extends Exception {
 	public function __construct( $error ) {
 		parent::__construct( 
@@ -39,6 +49,11 @@ class PermissionsError extends Exception {
 	}
 }
 
+/**
+ * Generic cURL Error
+ * 
+ * @package Peachy_Exceptions
+ */
 class CURLError extends Exception {
 	private $errno;
 	private $error;
@@ -61,6 +76,11 @@ class CURLError extends Exception {
 
 }
 
+/**
+ * Invalid Title Error
+ * 
+ * @package Peachy_Exceptions
+ */
 class BadTitle extends Exception {
 
 	public function __construct( $title ) {
@@ -71,6 +91,11 @@ class BadTitle extends Exception {
 	}
 }
 
+/**
+ * No Title Error
+ * 
+ * @package Peachy_Exceptions
+ */
 class NoTitle extends Exception {
 
 	public function __construct() {
@@ -81,6 +106,11 @@ class NoTitle extends Exception {
 	}
 }
 
+/**
+ * No User Error
+ * 
+ * @package Peachy_Exceptions
+ */
 class NoUser extends Exception {
 
 	public function __construct( $title ) {
@@ -91,6 +121,11 @@ class NoUser extends Exception {
 	}
 }
 
+/**
+ * Blocked User Error
+ * 
+ * @package Peachy_Exceptions
+ */
 class UserBlocked extends Exception {
 
 	public function __construct( $username = "User" ) {
@@ -102,6 +137,11 @@ class UserBlocked extends Exception {
 
 }
 
+/**
+ * Logged Out Error
+ * 
+ * @package Peachy_Exceptions
+ */
 class LoggedOut extends Exception {
 
 	public function __construct() {
@@ -113,6 +153,11 @@ class LoggedOut extends Exception {
 
 }
 
+/**
+ * Missing DependencyError Error
+ * 
+ * @package Peachy_Exceptions
+ */
 class DependencyError extends Exception {
 
 	public function __construct( $software, $url = false ) {
@@ -126,6 +171,22 @@ class DependencyError extends Exception {
 
 }
 
+/**
+ * Misspelling of "dependency", used for backwards compatibility
+ * 
+ * @package Peachy_Exceptions
+ */
+class DependancyError extends class DependencyError {
+	public function __construct( $software, $url = false ) {
+		parent::__construct( $software, $url );
+	}
+}
+
+/**
+ * Login Error
+ * 
+ * @package Peachy_Exceptions
+ */
 class LoginError extends Exception {
 	public function __construct( $error ) {
 		parent::__construct( 
@@ -134,6 +195,12 @@ class LoginError extends Exception {
 	}
 }
 
+/**
+ * Peachy Hook Error
+ * 
+ * @package Peachy_Exceptions
+ * @package Peachy_Hooks
+ */
 class HookError extends Exception {
 	public function __construct( $error ) {
 		parent::__construct( 
@@ -142,6 +209,12 @@ class HookError extends Exception {
 	}
 }
 
+/**
+ * Generic Database Error
+ * 
+ * @package Peachy_Exceptions
+ * @package Peachy_Database
+ */
 class DBError extends Exception {
 	public function __construct( $error ) {
 		parent::__construct( 
@@ -150,6 +223,11 @@ class DBError extends Exception {
 	}
 }
 
+/**
+ * Generic Edit Error
+ * 
+ * @package Peachy_Exceptions
+ */
 class EditError extends Exception {
 	public function __construct( $error, $text ) {
 		parent::__construct( 
@@ -158,6 +236,11 @@ class EditError extends Exception {
 	}
 }
 
+/**
+ * Generic Move Error
+ * 
+ * @package Peachy_Exceptions
+ */
 class MoveError extends Exception {
 	public function __construct( $error, $text ) {
 		parent::__construct( 
@@ -166,6 +249,11 @@ class MoveError extends Exception {
 	}
 }
 
+/**
+ * Generic Delete Error
+ * 
+ * @package Peachy_Exceptions
+ */
 class DeleteError extends Exception {
 	public function __construct( $error, $text ) {
 		parent::__construct( 
@@ -174,6 +262,11 @@ class DeleteError extends Exception {
 	}
 }
 
+/**
+ * Generic Undelete Error
+ * 
+ * @package Peachy_Exceptions
+ */
 class UndeleteError extends Exception {
 	public function __construct( $error, $text ) {
 		parent::__construct( 
@@ -182,6 +275,11 @@ class UndeleteError extends Exception {
 	}
 }
 
+/**
+ * Generic Protect Error
+ * 
+ * @package Peachy_Exceptions
+ */
 class ProtectError extends Exception {
 	public function __construct( $error, $text ) {
 		parent::__construct( 
@@ -190,6 +288,11 @@ class ProtectError extends Exception {
 	}
 }
 
+/**
+ * Generic Email Error
+ * 
+ * @package Peachy_Exceptions
+ */
 class EmailError extends Exception {
 	public function __construct( $error, $text ) {
 		parent::__construct( 
@@ -198,6 +301,11 @@ class EmailError extends Exception {
 	}
 }
 
+/**
+ * Generic Image Error
+ * 
+ * @package Peachy_Exceptions
+ */
 class ImageError extends Exception {
 	public function __construct( $error ) {
 		parent::__construct( 
@@ -206,6 +314,11 @@ class ImageError extends Exception {
 	}
 }
 
+/**
+ * Error for wrong parameters in a function
+ * 
+ * @package Peachy_Exceptions
+ */
 class BadEntryError extends Exception {
 	public function __construct( $error, $text ) {
 		parent::__construct( 
@@ -214,6 +327,12 @@ class BadEntryError extends Exception {
 	}
 }
 
+/**
+ * Generic XML Error
+ * 
+ * @package Peachy_Exceptions
+ * @package XML
+ */
 class XMLError extends Exception {
 	public function __construct( $error ) {
 		parent::__construct( 

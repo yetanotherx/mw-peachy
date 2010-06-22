@@ -38,9 +38,25 @@ define( 'MINMW', '1.15' );
  * PECHO constants, used for {@link outputText}()
  */
 define( 'PECHO_NORMAL', 0 );
+
+/**
+ * PECHO constants, used for {@link outputText}()
+ */
 define( 'PECHO_NOTICE', 1 );
+
+/**
+ * PECHO constants, used for {@link outputText}()
+ */
 define( 'PECHO_WARN', 2 );
+
+/**
+ * PECHO constants, used for {@link outputText}()
+ */
 define( 'PECHO_ERORR', 3 );
+
+/**
+ * PECHO constants, used for {@link outputText}()
+ */
 define( 'PECHO_FATAL', 4 );
 
 $version = explode( '.', phpversion() );
@@ -74,6 +90,9 @@ $pgHTTP = new HTTP;
 
 $mwVersion = null;
 
+/**
+ * Base Peachy class, used to generate all other classes
+ */
 class Peachy {
 
 	/**

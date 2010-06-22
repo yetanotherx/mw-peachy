@@ -20,6 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 require_once( $IP . 'Diff/textdiff/Diff.php' );
 require_once( $IP . 'Diff/textdiff/Diff/Renderer.php' );
 
+/**
+ * Generates a diff between two strings
+ * 
+ * @param string $method Which style of diff to generate: unified or inline (HTML)
+ * @param string $diff1 Old text
+ * @param string $diff2 New text
+ * @return string Generated diff
+ * @link http://pear.php.net/package/Text_Diff/redirected
+ */
 function getTextDiff($method, $diff1, $diff2) {
 	switch ($method) {
 		case 'unified':

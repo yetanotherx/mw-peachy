@@ -22,6 +22,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * User object
  */
 
+/**
+ * User class, stores methods that relate to a specific user
+ */
 class User {
 
 	/**
@@ -269,6 +272,14 @@ class User {
 		return $this->hasemail;
 	}
 	
+	/**
+	 * Send an email to another wiki user
+	 * 
+	 * @access public
+	 * @param string $text Text to send
+	 * @param string $subject Subject of email. Default 'Wikipedia Email'
+	 * @param bool $ccme Whether or not to send a copy of the email to "myself". Default false.
+	 */
 	public function email( $text = null, $subject = "Wikipedia Email", $ccme = false ) {
 		if( !$this->has_email() ) {
 			pecho( "Cannot email {$this->username}, user has email disabled", PECHO_WARNING );

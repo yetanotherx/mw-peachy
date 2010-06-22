@@ -22,6 +22,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Page object
  */
 
+/**
+ * Page class, defines methods that all get/modify page info
+ */
 class Page {
 	
 	/**
@@ -775,8 +778,7 @@ class Page {
 	
 	}
 	
-	public function undo() {
-	}
+	public function undo() {}
 	
 	/**
 	 * Returns a boolean depending on whether the page can have subpages or not.
@@ -997,6 +999,14 @@ class Page {
 		
 	}
 	
+	/**
+	 * Undeletes the page
+	 * 
+	 * @access public
+	 * @param string $reason Reason for undeletion
+	 * @param array $timestamps Array of timestamps to selectively restore
+	 * @return bool
+	 */
 	public function undelete( $reason = null, $timestamps = null ) {
 		if( !in_array( 'undelete', $this->wiki->get_userrights() ) ) {
 			throw new PermissionsError( "User is not allowed to undelete pages" );
@@ -1040,6 +1050,19 @@ class Page {
 		}
 	}
 	
+	/**
+	 * List deleted revisions of the page
+	 * 
+	 * @access public
+	 * @param bool $content Whether or not to retrieve the content of each revision, Default false
+	 * @param string $user Only list revisions by this user. Default null.
+	 * @param string $excludeuser Don't list revisions by this user. Default null
+	 * @param string $start Timestamp to start at. Default null
+	 * @param string $end Timestamp to end at. Default null
+	 * @param string $dir Direction to enumerate. Default 'older'
+	 * @param array $prop Properties to retrieve. Default array( 'revid', 'user', 'parsedcomment', 'minor', 'len', 'content', 'token' )
+	 * @return array List of deleted revisions
+	 */
 	public function deletedrevs( $content = false, $user = null, $excludeuser = null, $start = null, $end = null, $dir = 'older', $prop = array( 'revid', 'user', 'parsedcomment', 'minor', 'len', 'content', 'token' ) ) {
 		if( !in_array( 'deletedhistory', $this->wiki->get_userrights() ) ) {
 			throw new PermissionsError( "User is not allowed to view deleted revisions" );
@@ -1258,6 +1281,15 @@ class Page {
 		}
 	}
 	
+	/**
+	 * Returns all links to the page
+	 * 
+	 * @access public
+	 * @param array $namespaces Namespaces to get. Default array( 0 );
+	 * @param string $redirects How to handle redirects. 'all' = List all pages. 'redirects' = Only list redirects. 'nonredirects' = Don't list redirects. Default 'all'
+	 * @param bool $followredir List links through redirects to the page
+	 * @return array List of backlinks
+	 */
 	public function get_backlinks( $namespaces = array( 0 ), $redirects = 'all', $followredir = true ) {
 		$leArray = array(
 			'list' => 'backlinks',

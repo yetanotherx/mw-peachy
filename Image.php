@@ -22,6 +22,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Image object
  */
 
+/**
+ * Image class, contains methods that get info about/modify images
+ */
 class Image {
 
 	/**

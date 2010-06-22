@@ -23,8 +23,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Stores the runHook function, which runs all hook functions
  */
 
+/**
+ * Hooks class
+ * Stores and runs {@link http://compwhizii.net/peachy/wiki/Manual/Hooks hooks} 
+ * 
+ * @package Hooks
+ */
 class Hooks {
 
+	/**
+	 * Search for hook functions and run them if defined
+	 * 
+	 * @param string $hook_name Name of hook to search for
+	 * @param array $args Arguments to pass to the hook function
+	 * @return mixed Output of hook function
+	 * @package Hooks
+	 */
 	static function runHook( $hook_name, $args = array() ) {
 		 global $pgHooks;
 		 

@@ -22,6 +22,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Wiki object
  */
 
+/**
+ * Wiki class
+ * Stores and runs methods that don't fit in User, Page, or Image, etc.
+ */
 class Wiki {
 	
 	/**
@@ -725,6 +729,9 @@ class Wiki {
 	
 	public function rollback() {}
 	
+	/**
+	 * Someone else can document this... >:-)
+	 */
 	public function recentchanges( $namespace = 0, $tag = false, $start = false, $end = false, $user = false, $excludeuser = false, $dir = 'older', $minor = null, $bot = null, $anon = null, $redirect = null, $patrolled = null, $prop = array( 'user', 'comment', 'flags', 'timestamp', 'title', 'ids', 'sizes', 'tags' ), $limit = null ) {
 
 		if( is_array( $namespace ) ) {
@@ -1246,6 +1253,14 @@ class Wiki {
 		
 	}
 	
+	/**
+	 * Regenerate and return edit tokens
+	 * 
+	 * @access public
+	 * @param bool $force Whether or not to return the tokens stored in cache. Default false
+	 * @param bool $rollback Whether or not to get rollback tokens
+	 * @return array Edit tokens
+	 */
 	public function get_tokens( $force = false, $rollback = false ) {
 		Hooks::runHook( 'GetTokens', array( &$this->tokens ) );
 		

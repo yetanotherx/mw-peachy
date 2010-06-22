@@ -20,13 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class OpenSearch {
 	
 	public static function load( &$wikiClass, $text, $limit = 100, $namespaces = array( 0 ) ) {
-		global $pgHTTP;
-		
 		if( !array_key_exists( 'OpenSearchXml', $wikiClass->get_extensions() ) ) {
 			throw new DependancyError( "OpenSearchXml", "http://www.mediawiki.org/wiki/Extension:OpenSearchXML" );
 		}
 		
-		$OSres = $pgHTTP->get(
+		$OSres = $wikiClass->get_http()->get(
 			$wikiClass->get_base_url(),
 			array(
 				'search' => $text,
@@ -35,8 +33,6 @@ class OpenSearch {
 				'namespace' => implode( '|', $namespaces )
 			)
 		);
-		 
-		##FIXME: Shift this whole mess to json_decode
 		
 		return json_decode( $OSres, true );
 		

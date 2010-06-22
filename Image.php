@@ -314,7 +314,7 @@ class Image {
 			
 			Hooks::runHook( 'IndexUpload' );
 			
-			$pgHTTP->post(
+			$this->wiki->get_http()->post(
 				str_replace( 'api.php', 'index.php', $this->wiki->base_url ),
 				array(
 					'wpUploadFile' => '@'.$localfile,
@@ -345,7 +345,7 @@ class Image {
 	 * @return void
 	 */
 	public function download( $name = null, $width = null, $height = null ) {
-		global $pgHTTP, $IP;
+		global $IP;
 		
 		if( $this->commons ) {
 			throw new ImageError( "Attempted to download a file on a shared respository instead of a local one" );
@@ -394,7 +394,7 @@ class Image {
 		
 		Hooks::runHook( 'DownloadImage', array( &$url, &$name ) );
 		
-		$pgHTTP->download( $url, $IP . 'Images/' . $localname );
+		$this->wiki->get_http()->download( $url, $IP . 'Images/' . $localname );
 	}
 	
 	/**

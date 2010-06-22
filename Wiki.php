@@ -157,12 +157,28 @@ class Wiki {
 	private $stoponnewmessages = false;
 	
 	/**
+	 * Page title to use for enable page
+	 * 
+	 * @var string
+	 * @access private
+	 */
+	private $runpage;
+	
+	/**
 	 * Configuration (sans password)
 	 * 
 	 * @var array
 	 * @access private
 	 */
 	private $configuration;
+	
+	/**
+	 * HTTP Class
+	 * 
+	 * @var HTTP
+	 * @access private
+	 */
+	private $http;
 	
 	/**
 	 * Contruct function for the wiki. Handles login and related functions.
@@ -176,7 +192,7 @@ class Wiki {
 	 * @return void
 	 */
 	function __construct( $configuration, $extensions = array(), $recursed = false, $token = null ) {
-		global $pgHTTP, $pgProxy, $pgHTTPEcho, $pgRunPage, $pgVerbose, $pgUA;
+		global $pgProxy, $pgVerbose, $pgUA;
 		
 		$this->base_url = $configuration['baseurl'];
 		$this->username = $configuration['username'];
@@ -203,11 +219,14 @@ class Wiki {
 		}
 		
 		if( isset( $configuration['httpecho'] ) && $configuration['httpecho'] == "true" ) {
-			$pgHTTPEcho = true;
+			$http_echo = true;
+		}
+		else {
+			$http_echo = false;
 		}
 		
 		if( isset( $configuration['runpage'] ) ) {
-			$pgRunPage = $configuration['runpage'];
+			$this->runpage = $configuration['runpage'];
 		}
 		
 		if( isset( $configuration['useragent'] ) ) {
@@ -282,6 +301,8 @@ class Wiki {
 		}
 		
 		Hooks::runHook( 'PreLogin', array( &$lgarray ) );
+		
+		if( is_null( $this->http ) ) $this->http = new HTTP( $http_echo );
 		
 		$loginRes = $this->apiQuery( $lgarray, true );
 		
@@ -404,9 +425,7 @@ class Wiki {
 	 * @return void
 	 */
 	public function set_runpage( $page = null ) {
-		global $pgRunPage;
-		
-		$pgRunPage = $page;
+		$this->runpage() = $page;
 	}
 	
 	/**
@@ -418,8 +437,7 @@ class Wiki {
 	 * @return array Returns an array with the API result
 	 */
 	public function apiQuery( $arrayParams = array(), $post = false ) {
-		global $pgHTTP;
-		
+
 		$arrayParams['format'] = 'php';
 		$assert = false;
 		
@@ -429,7 +447,7 @@ class Wiki {
 		}
 		
 		if( $post ) {
-			$data = unserialize( $pgHTTP->post(
+			$data = unserialize( $this->get_http()->post(
 				$this->base_url,
 				$arrayParams
 			));
@@ -441,7 +459,7 @@ class Wiki {
 			return $data;
 		}
 		else {
-			return unserialize( $pgHTTP->get(
+			return unserialize( $this->get_http()->get(
 				$this->base_url,
 				$arrayParams
 			));
@@ -566,6 +584,17 @@ class Wiki {
 	}
 	
 	/**
+	 * Returns a reference to the HTTP Class
+	 * 
+	 * @access public
+	 * @see Wiki::$http
+	 * @return HTTP
+	 */
+	public function &get_http() {
+		return $this->http;
+	}
+	
+	/**
 	 * Returns the base URL for the wiki.
 	 * 
 	 * @access public
@@ -585,6 +614,17 @@ class Wiki {
 	 */
 	public function get_api_limit() {
 		return $this->apiQueryLimit;
+	}
+	
+	/**
+	 * Returns the runpage.
+	 * 
+	 * @access public
+	 * @see Wiki::$runpage
+	 * @return string Runpage for the user
+	 */
+	public function get_runpage() {
+		return $this->runpage;
 	}
 	
 	/**
@@ -665,8 +705,7 @@ class Wiki {
 	}
 	
 	public function purge( $titles ) {
-		global $pgHTTP;
-		
+
 		Hooks::runHook( 'StartPurge', array( &$titles ) );
 		
 		if( is_array( $titles ) ) {

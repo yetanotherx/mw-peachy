@@ -42,18 +42,28 @@ class HTTP {
 	private $cookie_hash;
 	
 	/**
+	 * Whether or not to enable GET:, POST:, and DLOAD: messages being sent to the terminal.
+	 * 
+	 * @var bool
+	 * @access private
+	 */
+	private $echo;
+	
+	/**
 	 * Construction method for the HTTP class
 	 * 
 	 * @access public
+	 * @param bool $echo Whether or not to enable GET:, POST:, and DLOAD: messages being sent to the terminal. Default false;
 	 * @return void
 	 */	
-	function __construct() {
+	function __construct( $echo = false ) {
 		global $pgUA;
 		
 		if( !function_exists( 'curl_init' ) ) {
 			throw new DependencyError( "cURL", "http://us2.php.net/manual/en/curl.requirements.php" );
 		}
 		
+		$this->echo = $echo;
 		$this->curl_instance = curl_init();
 		$this->cookie_hash = md5( time() . '-' . rand( 0, 999 ) );
 		
@@ -80,7 +90,7 @@ class HTTP {
 	 * @return bool|string Result
 	 */
 	function get( $url, $data = null ) {
-		global $argv, $pgProxy, $pgHTTPEcho;
+		global $argv, $pgProxy;
 		
 		if( count( $pgProxy ) ) {
 			curl_setopt($this->curl_instance,CURLOPT_PROXY, $pgProxy['addr']);
@@ -108,7 +118,7 @@ class HTTP {
 		
 		curl_setopt($this->curl_instance,CURLOPT_URL,$url);
 		
-		if( (!is_null( $argv ) && in_array( 'peachyecho', $argv )) || $pgHTTPEcho ) {
+		if( (!is_null( $argv ) && in_array( 'peachyecho', $argv )) || $this->echo ) {
 			pecho( "GET: $url\n", PECHO_NORMAL );
 		}
 
@@ -143,7 +153,7 @@ class HTTP {
 	 * @return bool|string Result
 	 */
 	function post( $url, $data ) {
-		global $argv, $pgProxy, $pgHTTPEcho;
+		global $argv, $pgProxy;
 		
 		if( count( $pgProxy ) ) {
 			curl_setopt($this->curl_instance,CURLOPT_PROXY, $pgProxy['addr']);
@@ -168,7 +178,7 @@ class HTTP {
 		
 		curl_setopt($this->curl_instance,CURLOPT_URL,$url);
 		
-		if( (!is_null( $argv ) && in_array( 'peachyecho', $argv )) || $pgHTTPEcho ) {
+		if( (!is_null( $argv ) && in_array( 'peachyecho', $argv )) || $this->echo ) {
 			pecho( "POST: $url\n", PECHO_NORMAL );
 		}
 		
@@ -191,7 +201,7 @@ class HTTP {
 	 * @return bool
 	 */
 	function download( $url, $local ) {
-		global $argv, $pgProxy, $pgHTTPEcho;
+		global $argv, $pgProxy;
 		
 		$out = fopen($local, 'wb'); 
 		
@@ -213,7 +223,7 @@ class HTTP {
 		curl_setopt($this->curl_instance, CURLOPT_URL, $url);
 		curl_setopt($this->curl_instance, CURLOPT_HEADER, 0);
 		
-		if( (!is_null( $argv ) && in_array( 'peachyecho', $argv )) || $pgHTTPEcho ) {
+		if( (!is_null( $argv ) && in_array( 'peachyecho', $argv )) || $this->echo ) {
 			pecho( "DLOAD: $url\n", PECHO_NORMAL );
 		}
 		

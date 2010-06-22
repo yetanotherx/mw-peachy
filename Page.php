@@ -458,7 +458,6 @@ class Page {
 	 * @return bool|array False on error, returns array of image titles
 	 */
 	public function get_images( $force = false ) {
-		global $pgHTTP;
 		
 		if( !$force && count( $this->images ) > 0 ) {
 			return $this->images;
@@ -614,8 +613,6 @@ class Page {
 		$pend = false, 
 		$create = false
 	)  {
-	
-		global $pgRunPage;
 		
 		$tokens = $this->wiki->get_tokens();
 		
@@ -692,8 +689,8 @@ class Page {
 				'rvprop' => 'content'
 			) );
 			
-			if( !is_null($pgRunPage) ) {
-				$preeditinfo['titles'] .=  "|" . $pgRunPage;
+			if( !is_null( $this->wiki->get_runpage() ) ) {
+				$preeditinfo['titles'] .=  "|" . $this->wiki->get_runpage();
 			}
 		
 			if( isset( $preeditinfo['query']['pages'] ) ) {
@@ -703,7 +700,7 @@ class Page {
 						$oldtext = $page['revisions'][0]['*'];
 					}
 					elseif( $pageid == "-1" ) {
-						if( $page['title'] == $pgRunPage ) {
+						if( $page['title'] == $this->wiki->get_runpage() ) {
 							pecho("Edit failed, enable page does not exist.", PECHO_WARN);
 							return false;
 						}
@@ -730,7 +727,7 @@ class Page {
 				throw new EditError("Nobots", "The page has a nobots template");
 			}
 			
-			if( !is_null( $pgRunPage ) && !preg_match( '/enable|yes|run|go|true/i', $runtext ) ) {
+			if( !is_null( $this->wiki->get_runpage() ) && !preg_match( '/enable|yes|run|go|true/i', $runtext ) ) {
 				throw new EditError("Enablepage", "Script was disabled by Run page");
 			}
 			

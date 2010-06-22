@@ -97,7 +97,6 @@ class User {
 	 * @return void
 	 */
 	function __construct( &$wikiClass, $username ) {
-		global $pgHTTP;
 		
 		$this->wiki = &$wikiClass;
 		
@@ -148,7 +147,6 @@ class User {
 	 * @return bool
 	 */
 	public function isBlocked( $force = false ) {
-		global $pgHTTP;
 		
 		if( $force ) {
 			return $this->blocked;

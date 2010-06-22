@@ -28,8 +28,7 @@ class SiteMatrix {
 	 * @return array List of all wikis
 	 */
 	public static function load( &$wikiClass ) {
-		global $pgHTTP;
-		
+
 		if( !array_key_exists( 'SiteMatrix', $wikiClass->get_extensions() ) ) {
 			throw new DependencyError( "SiteMatrix" );
 		}

@@ -213,7 +213,7 @@ class Page {
 			throw new NoTitle();
 		}
 		
-		if( $normalize ) {
+		if( !is_null( $title ) && $normalize ) {
 			$title = str_replace( '_', ' ', $title );
 			$title = str_replace( '%20', ' ', $title );
 			if( $title[0] == ":" ){

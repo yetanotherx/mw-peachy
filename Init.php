@@ -52,7 +52,7 @@ define( 'PECHO_WARN', 2 );
 /**
  * PECHO constants, used for {@link outputText}()
  */
-define( 'PECHO_ERORR', 3 );
+define( 'PECHO_ERROR', 3 );
 
 /**
  * PECHO constants, used for {@link outputText}()

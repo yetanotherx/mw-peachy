@@ -425,7 +425,7 @@ class Wiki {
 	 * @return void
 	 */
 	public function set_runpage( $page = null ) {
-		$this->runpage() = $page;
+		$this->runpage = $page;
 	}
 	
 	/**

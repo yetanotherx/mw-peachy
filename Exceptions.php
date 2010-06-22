@@ -176,7 +176,7 @@ class DependencyError extends Exception {
  * 
  * @package Peachy_Exceptions
  */
-class DependancyError extends class DependencyError {
+class DependancyError extends DependencyError {
 	public function __construct( $software, $url = false ) {
 		parent::__construct( $software, $url );
 	}

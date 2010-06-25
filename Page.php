@@ -678,66 +678,7 @@ class Page {
 			$editarray['bot'] = 'yes';
 		}
 		
-		if( !$force ) {
-			$preeditinfo = $this->wiki->apiQuery( array(
-				'action' => 'query',
-				'meta' => 'userinfo',
-				'uiprop' => 'hasmsg|blockinfo',
-				'prop' => 'revisions',
-				'titles' => $this->title,
-				'rvprop' => 'content'
-			) );
-			
-			if( !is_null( $this->wiki->get_runpage() ) ) {
-				$preeditinfo['titles'] .=  "|" . $this->wiki->get_runpage();
-			}
-		
-			if( isset( $preeditinfo['query']['pages'] ) ) {
-				//$oldtext = $preeditinfo['query']['pages'][$this->pageid]['revisions'][0]['*'];
-				foreach( $preeditinfo['query']['pages'] as $pageid => $page ) {
-					if( $pageid == $this->pageid ) {
-						$oldtext = $page['revisions'][0]['*'];
-					}
-					elseif( $pageid == "-1" ) {
-						if( $page['title'] == $this->wiki->get_runpage() ) {
-							pecho("Edit failed, enable page does not exist.", PECHO_WARN);
-							return false;
-						}
-						else {
-							$oldtext = '';
-						}
-					}
-					else {
-						$runtext = $page['revisions'][0]['*'];
-					}
-				}
-				$messages = (bool) (isset( $preeditinfo['query']['userinfo']['messages']));
-				$blocked = (bool) (isset( $preeditinfo['query']['userinfo']['blockedby']));
-			}
-			else {
-				$oldtext = '';
-				$runtext = '';
-				$messages = false;
-				$blocked = false;
-			}
-			
-			//Perform nobots checks, login checks, /Run checks
-			if( checkExclusion( $this->wiki, $oldtext, $this->wiki->get_username(), $this->wiki->get_optout() ) && $this->wiki->get_nobots() ) {
-				throw new EditError("Nobots", "The page has a nobots template");
-			}
-			
-			if( !is_null( $this->wiki->get_runpage() ) && !preg_match( '/enable|yes|run|go|true/i', $runtext ) ) {
-				throw new EditError("Enablepage", "Script was disabled by Run page");
-			}
-			
-			if( $messages && $this->wiki->get_stoponnewmessages() ) {
-				throw new EditError("NewMessages", "User has new messages");
-			}
-			
-			if( $blocked ) {
-				throw new EditError("Blocked", "User has been blocked");
-			}
-		}
+		if( !$force ) 	$this->preEditChecks();
 		
 		Hooks::runHook( 'StartEdit', array( &$editarray ) );
 		
@@ -774,7 +715,54 @@ class Page {
 	
 	}
 	
-	public function undo() {}
+	/*
+	 * Undoes one or more edits. (Subject to standard editing restrictions.)
+	 *
+	 * @access public
+	 * @param bool $force Force an undo, despite e.g. new messages (default false)).
+	 * @param int $revisions The number of revisions to undo (default 1).
+	 * @return int The new revision id of the page edited.
+	 */
+	public function undo($force = false, $revisions = 1) {
+		$info = $this->history($revisions);
+		$oldrev = $info[(count($info) - 1)]['revid'];
+		$newrev = $info[0]['revid'];
+		
+		$tokens = $this->wiki->get_tokens();
+		
+		if( $tokens['edit'] == '+\\' ) {
+			throw new EditError( "LoggedOut", "User has logged out" );
+		}
+		elseif( $tokens['edit'] == '' ) {
+			throw new EditError( "PermissionDenied", "User is not allowed to edit {$this->title}" );
+		}
+		
+		$params = array(
+			'title' => $this->title,
+			'action' => 'edit',
+			'token' => $tokens['edit'],
+			'starttimestamp' => '',
+			'basetimestamp' => $this->lastedit,
+			'md5' => md5($text),
+			'undo' => $curid,
+			'undoafter' => $oldid,
+			'assert' => 'user',
+		);
+		
+		if(!$force) preEditChecks();
+		$result = $this->wiki->apiQuery( $editarray, true );
+		if( $result['edit']['result'] == "Success" ) {
+			if( array_key_exists( 'nochange', $result['edit'] ) ) return $this->lastedit;
+			
+			$this->__construct( $this->wiki, null, $this->pageid );
+			
+			if( !is_null( $this->wiki->get_edit_rate() ) && $this->wiki->get_edit_rate() != 0 ) {
+				sleep( intval( 60 / $this->wiki->get_edit_rate() ) - 1 );
+			}
+			
+			return $result['edit']['newrevid'];
+		}
+	}
 	
 	/**
 	 * Returns a boolean depending on whether the page can have subpages or not.
@@ -1306,11 +1294,13 @@ class Page {
 	 * 
 	 * @access public
 	 * @see http://www.mediawiki.org/wiki/API:Edit_-_Rollback
+	 * @param bool $force Whether to force an (attempt at an) edit, regardless of news messages, etc.
 	 * @param string $summary Override the default edit summary for this rollback. Default null.
 	 * @param bool $markbot If set, both the rollback and the revisions being rolled back will be marked as bot edits.
 	 * @return array Details of the rollback perform. ['revid']: The revision ID of the rollback. ['old_revid']: The revision ID of the first (most recent) revision that was rolled back. ['last_revid']: The revision ID of the last (oldest) revision that was rolled back.
 	 */
-	public function rollback($summary = null, $markbot = null){
+	public function rollback($force = false, $summary = null, $markbot = null){
+		if(!$force) preEditChecks();
 		$history = $this->history(1, 'older', false, null, true);
 		$params = array(
 			'action' => 'rollback',
@@ -1318,10 +1308,84 @@ class Page {
 			'user' => $history[0]['user'],
 			'token' => $history[0]['rollbacktoken'],
 		);
-		if(!is_null($summary)) $params['summary'] = $summary;
+		if(!is_null($summary)){
+			if( function_exists( 'mb_strlen' ) ) {
+				if( mb_strlen( $summary, '8bit' ) > 255 ) {
+					throw new EditError( "LongSummary", "Summary is over 255 bytes, the maximum allowed" );
+				}
+			}
+			else {
+				// If we don't have mb_strlen we compromise and use strlen
+				if( strlen( $summary) > 255 ) {
+					throw new EditError( "LongSummary", "Summary is over 255 characters, the maximum allowed" );
+				}
+			}
+			$params['summary'] = $summary;
+		}
 		if(!is_null($markbot) && $markbot) $params['markbot'] = $summary;
 		$result = $this->wiki->apiQuery($params, true);
 		return $result['rollback'];
+	}
+	
+	private function preEditCheck(){
+		$preeditinfo = $this->wiki->apiQuery( array(
+			'action' => 'query',
+			'meta' => 'userinfo',
+			'uiprop' => 'hasmsg|blockinfo',
+			'prop' => 'revisions',
+			'titles' => $this->title,
+			'rvprop' => 'content'
+		) );
+		
+		if( !is_null( $this->wiki->get_runpage() ) ) {
+			$preeditinfo['titles'] .=  "|" . $this->wiki->get_runpage();
+		}
+	
+		if( isset( $preeditinfo['query']['pages'] ) ) {
+			//$oldtext = $preeditinfo['query']['pages'][$this->pageid]['revisions'][0]['*'];
+			foreach( $preeditinfo['query']['pages'] as $pageid => $page ) {
+				if( $pageid == $this->pageid ) {
+					$oldtext = $page['revisions'][0]['*'];
+				}
+				elseif( $pageid == "-1" ) {
+					if( $page['title'] == $this->wiki->get_runpage() ) {
+						pecho("Edit failed, enable page does not exist.", PECHO_WARN);
+						return false;
+					}
+					else {
+						$oldtext = '';
+					}
+				}
+				else {
+					$runtext = $page['revisions'][0]['*'];
+				}
+			}
+			$messages = (bool) (isset( $preeditinfo['query']['userinfo']['messages']));
+			$blocked = (bool) (isset( $preeditinfo['query']['userinfo']['blockedby']));
+		}
+		else {
+			$oldtext = '';
+			$runtext = '';
+			$messages = false;
+			$blocked = false;
+		}
+		
+		//Perform nobots checks, login checks, /Run checks
+		if( checkExclusion( $this->wiki, $oldtext, $this->wiki->get_username(), $this->wiki->get_optout() ) && $this->wiki->get_nobots() ) {
+			throw new EditError("Nobots", "The page has a nobots template");
+		}
+		
+		if( !is_null( $this->wiki->get_runpage() ) && !preg_match( '/enable|yes|run|go|true/i', $runtext ) ) {
+			throw new EditError("Enablepage", "Script was disabled by Run page");
+		}
+		
+		if( $messages && $this->wiki->get_stoponnewmessages() ) {
+			throw new EditError("NewMessages", "User has new messages");
+		}
+		
+		if( $blocked ) {
+			throw new EditError("Blocked", "User has been blocked");
+		}
 	}
 
 }

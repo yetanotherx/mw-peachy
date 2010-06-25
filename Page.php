@@ -719,11 +719,12 @@ class Page {
 	 * Undoes one or more edits. (Subject to standard editing restrictions.)
 	 *
 	 * @access public
-	 * @param bool $force Force an undo, despite e.g. new messages (default false)).
+	 * @param bool $force Force an undo, despite e.g. new messages (default false).
+	 * @param string $summary Override the default edit summary (default null).
 	 * @param int $revisions The number of revisions to undo (default 1).
 	 * @return int The new revision id of the page edited.
 	 */
-	public function undo($force = false, $revisions = 1) {
+	public function undo($force = false, $summary = null, $revisions = 1) {
 		$info = $this->history($revisions);
 		$oldrev = $info[(count($info) - 1)]['revid'];
 		$newrev = $info[0]['revid'];
@@ -736,21 +737,36 @@ class Page {
 		elseif( $tokens['edit'] == '' ) {
 			throw new EditError( "PermissionDenied", "User is not allowed to edit {$this->title}" );
 		}
-		
 		$params = array(
 			'title' => $this->title,
 			'action' => 'edit',
 			'token' => $tokens['edit'],
 			'starttimestamp' => '',
 			'basetimestamp' => $this->lastedit,
-			'md5' => md5($text),
-			'undo' => $curid,
-			'undoafter' => $oldid,
+			'undo' => $oldrev,
+			'undoafter' => $newrev,
 			'assert' => 'user',
 		);
+		if(!is_null($summary)){
+			if( function_exists( 'mb_strlen' ) ) {
+				if( mb_strlen( $summary, '8bit' ) > 255 ) {
+					throw new EditError( "LongSummary", "Summary is over 255 bytes, the maximum allowed" );
+				}
+			}
+			else {
+				// If we don't have mb_strlen we compromise and use strlen
+				if( strlen( $summary ) > 255 ) {
+					throw new EditError( "LongSummary", "Summary is over 255 characters, the maximum allowed" );
+				}
+			}
+			$params['summary'] = $summary;
+		}
 		
-		if(!$force) preEditChecks();
-		$result = $this->wiki->apiQuery( $editarray, true );
+		if(!$force) $this->preEditChecks();
+		
+		pecho( "Undoing revision(s) on {$this->title}...\n\n", PECHO_NORMAL );
+		$result = $this->wiki->apiQuery( $params, true );
+		
 		if( $result['edit']['result'] == "Success" ) {
 			if( array_key_exists( 'nochange', $result['edit'] ) ) return $this->lastedit;
 			
@@ -761,6 +777,8 @@ class Page {
 			}
 			
 			return $result['edit']['newrevid'];
+		} else {
+			throw new EditError( "UnknownEditError", print_r($result['edit'],true));
 		}
 	}
 	
@@ -1300,7 +1318,7 @@ class Page {
 	 * @return array Details of the rollback perform. ['revid']: The revision ID of the rollback. ['old_revid']: The revision ID of the first (most recent) revision that was rolled back. ['last_revid']: The revision ID of the last (oldest) revision that was rolled back.
 	 */
 	public function rollback($force = false, $summary = null, $markbot = null){
-		if(!$force) preEditChecks();
+		if(!$force) $this->preEditChecks();
 		$history = $this->history(1, 'older', false, null, true);
 		$params = array(
 			'action' => 'rollback',
@@ -1327,7 +1345,7 @@ class Page {
 		return $result['rollback'];
 	}
 	
-	private function preEditCheck(){
+	private function preEditChecks(){
 		$preeditinfo = $this->wiki->apiQuery( array(
 			'action' => 'query',
 			'meta' => 'userinfo',

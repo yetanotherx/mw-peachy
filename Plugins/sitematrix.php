@@ -34,7 +34,6 @@ class SiteMatrix {
 		}
 		
 		$SMres = $wikiClass->apiQuery(array(
-				'format' => 'php',
 				'action' => 'sitematrix',
 			)
 		);

@@ -105,7 +105,6 @@ class User {
 		
 		$uiRes = $this->wiki->apiQuery( array(
 				'action' => 'query',
-				'format' => 'php',
 				'list' => 'users|logevents',
 				'ususers' => $username,
 				'letype' => 'block',
@@ -157,7 +156,6 @@ class User {
 		
 		$biRes = $this->wiki->apiQuery( array(
 				'action' => 'query',
-				'format' => 'php',
 				'list' => 'blocks',
 				'bkusers' => $this->username,
 				'bkprop' => 'id'

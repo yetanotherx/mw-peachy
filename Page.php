@@ -266,12 +266,12 @@ class Page {
 	}
 	
 	/**
-	 * Returns page history. Can be specified to return ontent aswell
+	 * Returns page history. Can be specified to return content as well
 	 * 
 	 * @access public
 	 * @param int $count Revisions to return (default: 1)
 	 * @param string $dir Direction to return revisions (default: "older")
-	 * @param bool $content Should content of that revision be returned aswell (default: false)
+	 * @param bool $content Should content of that revision be returned as well (default: false)
 	 * @param int $revid Revision ID to start from (default: null)
 	 * @param bool $rollback_token Should a rollback token be returned (default: false)
 	 * @return array Revision data
@@ -582,11 +582,6 @@ class Page {
 		);
 			
 		$tRes = $this->wiki->apiQuery( $tArray );
-			
-		if( isset( $tRes['error'] ) ) {
-			throw new APIError( array( 'error' => $tRes['error']['code'], 'text' => $tRes['error']['info'] ) );
-			return false;
-		}
 		
 		$this->protection = $tRes['query']['pages'][$this->pageid]['protection'];
 		
@@ -606,6 +601,7 @@ class Page {
 	 * @param bool $force Override nobots check (default: false)
 	 * @param string $pend Set to 'pre' or 'ap' to prepend or append, respectively (default: null)
 	 * @param bool $create Set to 'never' or 'only' to never create a new page or only create a new page, respectively (default: false) 
+	 * @return int The revision id of the successful edit
 	 */
 	public function edit( 
 		$text, 
@@ -1303,6 +1299,29 @@ class Page {
 		
 		Hooks::runHook( 'PreQueryBacklinks', array( &$leArray ) );
 		return $this->wiki->listHandler( $leArray );
+	}
+	
+	/*
+	 * Rollbacks the latest edit(s) to a page.
+	 * 
+	 * @access public
+	 * @see http://www.mediawiki.org/wiki/API:Edit_-_Rollback
+	 * @param string $summary Override the default edit summary for this rollback. Default null.
+	 * @param bool $markbot If set, both the rollback and the revisions being rolled back will be marked as bot edits.
+	 * @return array Details of the rollback perform. ['revid']: The revision ID of the rollback. ['old_revid']: The revision ID of the first (most recent) revision that was rolled back. ['last_revid']: The revision ID of the last (oldest) revision that was rolled back.
+	 */
+	public function rollback($summary = null, $markbot = null){
+		$history = $this->history(1, 'older', false, null, true);
+		$params = array(
+			'action' => 'rollback',
+			'title' => $this->title,
+			'user' => $history[0]['user'],
+			'token' => $history[0]['rollbacktoken'],
+		);
+		if(!is_null($summary)) $params['summary'] = $summary;
+		if(!is_null($markbot) && $markbot) $params['markbot'] = $summary;
+		$result = $this->wiki->apiQuery($params, true);
+		return $result['rollback'];
 	}
 
 }

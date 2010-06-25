@@ -460,6 +460,11 @@ class Wiki {
 				throw new EditError( 'AssertFailure', print_r( $data['edit'], true ) );
 			}
 			
+			if( isset( $data['error'] ) ) {
+				throw new APIError( array( 'error' => $tRes['error']['code'], 'text' => $tRes['error']['info'] ) );
+				return false;
+			}
+			
 			return $data;
 		}
 		else {
@@ -475,7 +480,7 @@ class Wiki {
 	 * 
 	 * @access public
 	 * @link http://compwhizii.net/peachy/wiki/Manual/Wiki::listHandler
-	 * @param array $tArray Parameters given to query with (default: array()). In addition to those recognised by the API, ['code'] is the first two characters of all the parameters in a list=XXX API call. For example: with allpages, the parameters start with 'ap'. With recentchanges, the parameters start with 'rc' (required), ['limit'] to impose a hard limit on the number of results returned (optional) and ['lhtitle'] to simplify a multidimendional result into a unidimensional result. lhtitle is the key of the sub-array to return. (optional)
+	 * @param array $tArray Parameters given to query with (default: array()). In addition to those recognised by the API, ['code'] is the first two characters of all the parameters in a list=XXX API call - for example, with allpages, the parameters start with 'ap', with recentchanges, the parameters start with 'rc' -  and is required; ['limit'] imposes a hard limit on the number of results returned (optional) and ['lhtitle'] simplififies a multidimendional result into a unidimensional result - lhtitle is the key of the sub-array to return. (optional)
 	 * @return array Returns an array with the API result
 	 */
 	public function listHandler( $tArray = array() ) {
@@ -536,12 +541,7 @@ class Wiki {
 			if( !is_null( $start ) ) $tArray[$code . 'start'] = $start;
 			
 			$tRes = $this->apiQuery( $tArray );
-				
-			if( isset( $tRes['error'] ) ) {
-				throw new APIError( array( 'error' => $tRes['error']['code'], 'text' => $tRes['error']['info'] ) );
-				return false;
-			}
-			
+						
 			foreach( $tRes['query'] as $x ) {
 				foreach( $x as $y ) {
 					if( isset( $tArray['lhtitle'] ) ) {
@@ -717,7 +717,6 @@ class Wiki {
 		}
 		
 		$SMres = $this->apiQuery(array(
-				'format' => 'php',
 				'action' => 'purge',
 				'titles' => $titles
 			),
@@ -727,10 +726,26 @@ class Wiki {
 		##FIXME: Make sure this works
 	}
 	
-	public function rollback() {}
-	
+
 	/**
-	 * Someone else can document this... >:-)
+	 * Returns a list of recent changes
+	 *
+	 * @access public
+	 * @param int|array $namespace Namespace(s) to check
+	 * @param string $tag Only list recent changes bearing this tag.
+	 * @param int $start Only list changes after this timestamp.
+	 * @param int $end Only list changes before this timestamp.
+	 * @param string $user Only list changes by this user.
+	 * @param string $excludeuser Only list changes not by this user.
+	 * @param string $dir 'older' lists changes, most recent first; 'newer' least recent first.
+	 * @param bool $minor Whether to only include minor edits (true), only non-minor edits (false) or both (null). Default null.
+	 * @param bool $bot Whether to only include bot edits (true), only non-bot edits (false) or both (null). Default null.
+	 * @param bool $anon Whether to only include anonymous edits (true), only non-anonymous edits (false) or both (null). Default null.
+	 * @param bool $redirect Whether to only include edits to redirects (true), edits to non-redirects (false) or both (null). Default null.
+	 * @param bool $patrolled Whether to only include patrolled edits (true), only non-patrolled edits (false) or both (null). Default null.
+	 * @param array $prop What properties to retrieve. Default array( 'user', 'comment', 'flags', 'timestamp', 'title', 'ids', 'sizes', 'tags' ).
+	 * @param int $limit A hard limit to impose on the number of results returned.
+	 * @return array Recent changes matching the description.
 	 */
 	public function recentchanges( $namespace = 0, $tag = false, $start = false, $end = false, $user = false, $excludeuser = false, $dir = 'older', $minor = null, $bot = null, $anon = null, $redirect = null, $patrolled = null, $prop = array( 'user', 'comment', 'flags', 'timestamp', 'title', 'ids', 'sizes', 'tags' ), $limit = null ) {
 
@@ -1084,13 +1099,13 @@ class Wiki {
 	}
 	
 	/**
-	 * Returns array of pages that embed (transclude) the page given
+	 * Returns array of pages that embed (transclude) the page given.
 	 * 
 	 * @access public
 	 * @param string $title The title of the page being embedded.
-	 * @param array $namespace Which namespaces to search (default: null)
+	 * @param array $namespace Which namespaces to search (default: null).
 	 * @param int limit How many results to retrieve (default: null i.e. all).
-	 * @return void
+	 * @return array A list of pages the title is transcluded in.
 	 */
 	public function embeddedin( $title, $namespace = null, $limit = null ) {
 		$eiArray = array(
@@ -1257,50 +1272,29 @@ class Wiki {
 	 * Regenerate and return edit tokens
 	 * 
 	 * @access public
-	 * @param bool $force Whether or not to return the tokens stored in cache. Default false
-	 * @param bool $rollback Whether or not to get rollback tokens
+	 * @param bool $force Whether to force use of the API, not cache.
 	 * @return array Edit tokens
 	 */
-	public function get_tokens( $force = false, $rollback = false ) {
+	public function get_tokens( $force = false ) {
 		Hooks::runHook( 'GetTokens', array( &$this->tokens ) );
 		
 		if( $force ) return $this->tokens;
+		$tokens = $this->apiQuery( array(
+			'action' => 'query',
+			'prop' => "info",
+			'titles' => 'Main Page',
+			'intoken' => 'edit|delete|protect|move|block|unblock|email|import'
+		));
+				
+		foreach( $tokens['query']['pages'] as $x ) {
+			foreach( $x as $y => $z ) {
+				if( in_string( 'token', $y ) ) {
+					$this->tokens[str_replace('token','',$y)] = $z;
+				}
+			}
+		}
 		
-		if( $rollback ) {
-			$tokens = $this->apiQuery( array(
-				'action' => 'query',
-				'prop' => "revisions",
-				'titles' => 'Main Page',
-				'rvtoken' => 'rollback'
-			));
-					
-			foreach( $tokens['query']['pages'] as $x ) {
-				foreach( $x as $y => $z ) {
-					if( in_string( 'token', $y ) ) {
-						$this->tokens[str_replace('token','',$y)] = $z;
-					}
-				}
-			}
-			
-		}
-		else {
-			$tokens = $this->apiQuery( array(
-				'action' => 'query',
-				'prop' => "info",
-				'titles' => 'Main Page',
-				'intoken' => 'edit|delete|protect|move|block|unblock|email|import'
-			));
-					
-			foreach( $tokens['query']['pages'] as $x ) {
-				foreach( $x as $y => $z ) {
-					if( in_string( 'token', $y ) ) {
-						$this->tokens[str_replace('token','',$y)] = $z;
-					}
-				}
-			}
-			
-			return $this->tokens;
-		}
+		return $this->tokens;
 		
 	}
 	
@@ -1330,11 +1324,6 @@ class Wiki {
 				'siprop' => 'namespaces'
 			);
 			$tRes = $this->apiQuery( $tArray );
-			
-			if( isset( $tRes['error'] ) ) {
-				throw new APIError( array( 'error' => $tRes['error']['code'], 'text' => $tRes['error']['info'] ) );
-				return false;
-			}
 			
 			foreach($tRes['query']['namespaces'] as $namespace){
 				$this->namespaces[$namespace['id']] = $namespace['*'];

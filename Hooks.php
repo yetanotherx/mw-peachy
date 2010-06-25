@@ -88,6 +88,10 @@ class Hooks {
 			
 			is_callable( $fncarr ); //Apparently this is a bug. Thanks, MW!
 			
+			if( !is_callable( $fncarr ) ) {
+				throw new BadEntryError( "MissingFunction", "Hook function $fncarr was not defined" );
+			}
+			
 			$hookRet = call_user_func_array( $fncarr, $args );
 			
 			if( !is_null( $hookRet ) ) return $hookRet;

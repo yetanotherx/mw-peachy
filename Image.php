@@ -129,7 +129,7 @@ class Image {
 	 * 
 	 * @access public
 	 * @param Wiki &$wikiClass The Wiki class object
-	 * @param mixed $filename Filename
+	 * @param string $filename Filename
 	 * @param int $pageid Page ID of image
 	 * @param array $prop Informatation to set. Default array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' )
 	 * @return void

@@ -1382,5 +1382,47 @@ class Wiki {
 	public function prefixindex( $prefix = null, $namespace = array( 0 ), $limit = null ) {
 		return $this->wiki->allpages( $namespace, $prefix, null, 'all', null, null, array(), array(), 'ascending', 'all', $limit );
 	}
+	
+	/**
+	 * Returns an instance of the Page class as specified by $title or $pageid
+	 * 
+	 * @access public
+	 * @param mixed $title Title of the page (default: null)
+	 * @param mixed $pageid ID of the page (default: null)
+	 * @param bool $followRedir Should it follow a redirect when retrieving the page (default: true)
+	 * @param bool $normalize Should the class automatically normalize the title (default: true)
+	 * @return Page
+	 */
+	public function &initPage( $title = null, $pageid = null, $followRedir = true, $normalize = true ) {
+		$page = new Page( $this, $title, $pageid, $followRedir, $normalize );
+		return $page;
+	}
+	
+	/**
+	 * Returns an instance of the User class as specified by $username
+	 * 
+	 * @access public
+	 * @param mixed $username Username
+	 * @return User
+	 */
+	public function &initUser( $username ) {
+		$user = new User( $this, $username );
+		return $user;
+	}
+	
+	/**
+	 * Returns an instance of the Image class as specified by $filename or $pageid
+	 * 
+	 * @access public
+	 * @param string $filename Filename
+	 * @param int $pageid Page ID of image
+	 * @param array $prop Informatation to set. Default array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' )
+	 * @return Image
+	 */
+	public function &initImage( $filename = null, $pageid = null, $prop = array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' ) ) {
+		$image = new Image( $this, $filename, $pageid, $prop );
+		return $image;
+	}
+
 
 }

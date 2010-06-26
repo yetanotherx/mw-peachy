@@ -101,12 +101,11 @@ class Image {
 	
 	/**
 	 * Metadata stored in the image
-	 * ##FIXME: Is this a string or array?
 	 * 
-	 * @var string
+	 * @var array
 	 * @access protected
 	 */
-	protected $metadata;
+	protected $metadata = array();
 	
 	/**
 	 * List of pages where the image is used
@@ -477,7 +476,7 @@ class Image {
 	/**
 	 * Returns the metadata of the image
 	 * 
-	 * @return string
+	 * @return array
 	 */
 	public function getMetadata() {
 		return $this->metadata;

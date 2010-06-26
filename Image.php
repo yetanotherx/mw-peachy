@@ -394,7 +394,7 @@ class Image {
 		$localname = str_replace(' ','_',$this->name);
 		if( $name ) $localname = $name;
 		
-		Hooks::runHook( 'DownloadImage', array( &$url, &$name ) );
+		Hooks::runHook( 'DownloadImage', array( &$url, &$name, &$localname ) );
 		
 		$this->wiki->get_http()->download( $url, $IP . 'Images/' . $localname );
 	}

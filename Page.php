@@ -241,12 +241,16 @@ class Page {
 		
 		if( !is_null( $pageid ) ) {
 			$pageInfoArray['pageids'] = $pageid;
+			$peachout = "page ID $pageid";
 		}
 		else {
 			$pageInfoArray['titles'] = $title;
+			$peachout = $title;
 		}
 		
 		if( $followRedir ) $pageInfoArray['redirects'] = '';
+		
+		pecho( "Getting page info for {$peachout}..\n\n", PECHO_NORMAL );
 		
 		$info = $this->get_metadata( $pageInfoArray );
 		
@@ -298,6 +302,8 @@ class Page {
 		
 		if( $rollback_token ) $historyArray['rvtoken'] = 'rollback';
 		
+		pecho( "Getting page history for {$this->title}..\n\n", PECHO_NORMAL );
+		
 		$historyResult = $this->wiki->apiQuery($historyArray);
 		
 		return $historyResult['query']['pages'][$this->pageid]['revisions'];
@@ -314,6 +320,8 @@ class Page {
 	public function get_text( $force = false ) {
 		
 		##FIXME: Allow getting sections
+		
+		pecho( "Getting page content for {$this->title}..\n\n", PECHO_NOTICE );
 		
 		if( !$force && !empty($this->content) ) {
 			return $this->content;
@@ -370,6 +378,9 @@ class Page {
 		);
 		
 		$this->links = array();
+		
+		pecho( "Getting internal links on {$this->title}..\n\n", PECHO_NORMAL );
+		
 		$result = $this->wiki->listHandler($tArray);
 		
 		if( count( $result ) > 0 ) {
@@ -405,6 +416,9 @@ class Page {
 		);
 		
 		$this->templates = array();
+		
+		pecho( "Getting templates transcluded on {$this->title}..\n\n", PECHO_NORMAL );
+		
 		$result = $this->wiki->listHandler($tArray);
 		
 		if( count( $result ) > 0 ) {
@@ -440,6 +454,9 @@ class Page {
 		);
 		
 		$this->categories = array();
+		
+		pecho( "Getting categories {$this->title} is part of..\n\n", PECHO_NORMAL );
+		
 		$result = $this->wiki->listHandler($tArray);
 		
 		if( count( $result ) > 0 ) {
@@ -476,6 +493,9 @@ class Page {
 		);
 		
 		$this->images = array();
+		
+		pecho( "Getting images used on {$this->title}..\n\n", PECHO_NORMAL );
+		
 		$result = $this->wiki->listHandler($tArray);
 		
 		if( count( $result ) > 0 ) {
@@ -513,6 +533,9 @@ class Page {
 		);
 		
 		$this->extlinks = array();
+		
+		pecho( "Getting external links used on {$this->title}..\n\n", PECHO_NORMAL );
+		
 		$result = $this->wiki->listHandler($tArray);
 		
 		if( count( $result ) > 0 ) {
@@ -547,6 +570,9 @@ class Page {
 		);
 		
 		$this->langlinks = array();
+		
+		pecho( "Getting all interwiki links for {$this->title}..\n\n", PECHO_NORMAL );
+		
 		$result = $this->wiki->listHandler($tArray);
 		
 		if( count( $result ) > 0 ) {
@@ -580,6 +606,8 @@ class Page {
 			'inprop' => 'protection',
 			'titles' => $this->title,
 		);
+		
+		pecho( "Getting protection levels for {$this->title}..\n\n", PECHO_NORMAL );
 			
 		$tRes = $this->wiki->apiQuery( $tArray );
 		
@@ -681,6 +709,8 @@ class Page {
 		if( !$force ) 	$this->preEditChecks();
 		
 		Hooks::runHook( 'StartEdit', array( &$editarray ) );
+		
+		pecho( "Making edit to {$this->title}..\n\n", PECHO_NOTICE );
 		
 		$result = $this->wiki->apiQuery( $editarray, true );
 		
@@ -850,7 +880,7 @@ class Page {
 			throw new EditError( "LongReason", "Reason is over 255 bytes, the maximum allowed" );
 		}
 		
-		pecho( "Moving {$this->title} to $newTitle...\n\n", PECHO_NORMAL );
+		pecho( "Moving {$this->title} to $newTitle...\n\n", PECHO_NOTICE );
 		
 		$editarray = array(
 			'from' => $this->title,
@@ -926,6 +956,8 @@ class Page {
 		if( $cascade ) $editarray['cascade'] = 'yes';
 		if( $watch ) $editarray['watch'] = 'yes';
 		
+		pecho( "Protecting {$this->title}...\n\n", PECHO_NOTICE );
+		
 		Hooks::runHook( 'StartProtect', array( &$editarray ) );
 		
 		$result = $this->wiki->apiQuery( $editarray, true);
@@ -980,6 +1012,8 @@ class Page {
 		);
 		
 		Hooks::runHook( 'StartDelete', array( &$editarray ) );
+		
+		pecho( "Deleting {$this->title}...\n\n", PECHO_NOTICE );
 		
 		$result = $this->wiki->apiQuery( $editarray, true);
 		

@@ -154,11 +154,15 @@ class Image {
 				##FIXME: This is incredibly hacky, and doesn't work for non-english-wikis
 				if( !preg_match( '/^(File|Image)/i', $filename ) ) $filename = "Image:" . $filename;
 				$imageInfoArray['titles'] = $filename;
+				$peachout = $filename;
 			}
 			else {
 				$imageInfoArray['pageids'] = $pageid;
+				$peachout = "page ID $pageid";
 			}
 		}
+		
+		pecho( "Getting image info for $peachout..\n\n", PECHO_NORMAL );
 		
 		$ii = $this->wiki->apiQuery( $imageInfoArray );
 		
@@ -219,6 +223,7 @@ class Image {
 			
 			if( $followRedir ) $iuArray['iuredirect'] = 'yes';
 			
+			pecho( "Getting image usage for {$this->name}..\n\n", PECHO_NORMAL );
 			$this->usage = $this->wiki->listHandler( $iuArray );
 		}
 		
@@ -247,6 +252,8 @@ class Image {
 		$dupes = array();
 		
 		$continue = null;
+		
+		pecho( "Getting duplicate images of {$this->name}..\n\n", PECHO_NORMAL );
 		
 		while( 1 ) {
 			if( !is_null( $continue ) ) $tArray['dfcontinue'] = $continue;
@@ -294,6 +301,8 @@ class Image {
 		$tokens = $this->wiki->get_tokens();
 		
 		$localfile = $IP . 'Images/' . str_replace( ' ', '_', $this->name );
+		
+		pecho( "Uploading $file to {$this->name}..\n\n", PECHO_NOTICE );
 		
 		if( version_compare( $mwVersion, '1.16' ) >= 0 ) {
 		
@@ -395,6 +404,8 @@ class Image {
 		if( $name ) $localname = $name;
 		
 		Hooks::runHook( 'DownloadImage', array( &$url, &$name, &$localname ) );
+		
+		pecho( "Downloading {$this->name} to $localname..\n\n", PECHO_NOTICE );
 		
 		$this->wiki->get_http()->download( $url, $IP . 'Images/' . $localname );
 	}

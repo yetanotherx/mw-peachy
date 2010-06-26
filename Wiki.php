@@ -278,6 +278,9 @@ class Wiki {
 						case 'FATAL':
 							$pgVerbose[] = PECHO_FATAL;
 							break;
+						case 'VERBOSE':
+							$pgVerbose[] = PECHO_VERBOSE;
+							break;
 					}
 				}
 			}
@@ -307,6 +310,8 @@ class Wiki {
 		Hooks::runHook( 'PreLogin', array( &$lgarray ) );
 		
 		if( is_null( $this->http ) ) $this->http = new HTTP( $http_echo );
+		
+		pecho( "Logging in to {$this->base_url}...\n\n", PECHO_NOTICE );
 		
 		$loginRes = $this->apiQuery( $lgarray, true );
 		
@@ -418,6 +423,8 @@ class Wiki {
 	 * @return void
 	 */
 	public function logout() {
+		pecho( "Logging out of {$this->base_url}...\n\n", PECHO_NOTICE );
+		
 		$this->apiQuery( array( 'action' => 'logout' ), true );
 	}
 	
@@ -445,10 +452,12 @@ class Wiki {
 		$arrayParams['format'] = 'php';
 		$assert = false;
 		
-		if( $post && $this->isFlagged && in_array( 'assert', array_values( $arrayParams ) ) && $post['assert'] == 'user' ) {
-			$post['assert'] = 'bot';
+		if( $post && $this->isFlagged && in_array( 'assert', array_values( $arrayParams ) ) && $arrayParams['assert'] == 'user' ) {
+			$arrayParams['assert'] = 'bot';
 			$assert = true;
 		}
+		
+		pecho( "Running API query with params " . implode( ";", $arrayParams ) . "...\n\n", PECHO_VERBOSE );
 		
 		if( $post ) {
 			$data = unserialize( $this->get_http()->post(
@@ -482,6 +491,7 @@ class Wiki {
 	 * @link http://compwhizii.net/peachy/wiki/Manual/Wiki::listHandler
 	 * @param array $tArray Parameters given to query with (default: array()). In addition to those recognised by the API, ['code'] is the first two characters of all the parameters in a list=XXX API call - for example, with allpages, the parameters start with 'ap', with recentchanges, the parameters start with 'rc' -  and is required; ['limit'] imposes a hard limit on the number of results returned (optional) and ['lhtitle'] simplififies a multidimendional result into a unidimensional result - lhtitle is the key of the sub-array to return. (optional)
 	 * @return array Returns an array with the API result
+	 * @todo Really document this...
 	 */
 	public function listHandler( $tArray = array() ) {
 		
@@ -533,6 +543,8 @@ class Wiki {
 		$continue = null;
 		$offset = null;
 		$start = null;
+		
+		pecho( "Running list handler function with params " . implode( ";", $tArray ) . "...\n\n", PECHO_VERBOSE );
 		
 		while( 1 ) { 
 			
@@ -716,6 +728,8 @@ class Wiki {
 			$titles = implode( '|', $titles );
 		}
 		
+		pecho( "Purging " . implode( ',', explode( '|', $this->titles ) ) . "...\n\n", PECHO_NOTICE );
+		
 		$SMres = $this->apiQuery(array(
 				'action' => 'purge',
 				'titles' => $titles
@@ -820,6 +834,9 @@ class Wiki {
 		$rcArray['limit'] = $this->apiQueryLimit;
 		
 		Hooks::runHook( 'PreQueryRecentchanges', array( &$rcArray ) );
+		
+		pecho( "Getting recent changes...\n\n", PECHO_NORMAL );
+		
 		return $this->listHandler( $rcArray );
 		
 	}
@@ -848,6 +865,8 @@ class Wiki {
 			'srprop' => implode( '|', $prop ),
 			'srredirects' => $includeredirects
 		);
+		
+		pecho( "Searching for $search...\n\n", PECHO_NORMAL );
 		
 		return $this->listHandler($srArray);
 	}
@@ -887,6 +906,9 @@ class Wiki {
 		$leArray['limit'] = $this->apiQueryLimit;
 		
 		Hooks::runHook( 'PreQueryLog', array( &$leArray ) );
+		
+		pecho( "Getting $type logs for {$title}{$user}...\n\n", PECHO_NORMAL );
+		
 		return $this->listHandler( $leArray );
 	}
 	
@@ -923,6 +945,9 @@ class Wiki {
 		if( !is_null( $base36 ) ) $leArray['aisha1base36'] = $base36;
 		
 		Hooks::runHook( 'PreQueryAllimages', array( &$leArray ) );
+		
+		pecho( "Getting list of all images...\n\n", PECHO_NORMAL );
+		
 		return $this->listHandler( $leArray );
 	
 	}
@@ -972,6 +997,9 @@ class Wiki {
 		if( !is_null( $maxsize ) ) $leArray['apmaxsize'] = $maxsize; // 
 		
 		Hooks::runHook( 'PreQueryAllpages', array( &$leArray ) );
+		
+		pecho( "Getting list of all pages...\n\n", PECHO_NORMAL );
+		
 		return $this->listHandler( $leArray );
 	}
 	
@@ -1005,6 +1033,9 @@ class Wiki {
 		$leArray['limit'] = $this->apiQueryLimit;
 		
 		Hooks::runHook( 'PreQueryAlllinks', array( &$leArray ) );
+		
+		pecho( "Getting list of all internal links...\n\n", PECHO_NORMAL );
+		
 		return $this->listHandler( $leArray );
 	}
 	
@@ -1035,6 +1066,9 @@ class Wiki {
 		if( $editsonly ) $leArray['auwitheditsonly'] = 'yes';
 		
 		Hooks::runHook( 'PreQueryAllusers', array( &$leArray ) );
+		
+		pecho( "Getting list of all users...\n\n", PECHO_NORMAL );
+		
 		return $this->listHandler( $leArray );
 	}
 	
@@ -1079,6 +1113,9 @@ class Wiki {
 		}
 		
 		Hooks::runHook( 'PreQueryCategorymembers', array( &$cmArray ) );
+		
+		pecho( "Getting list of pages in the $category category...\n\n", PECHO_NORMAL );
+		
 		$top_category = $this->listHandler( $cmArray );
 		$final_titles = array();
 		
@@ -1106,6 +1143,7 @@ class Wiki {
 	 * @param array $namespace Which namespaces to search (default: null).
 	 * @param int limit How many results to retrieve (default: null i.e. all).
 	 * @return array A list of pages the title is transcluded in.
+	 * @todo Move this to the Page class
 	 */
 	public function embeddedin( $title, $namespace = null, $limit = null ) {
 		$eiArray = array(
@@ -1121,10 +1159,11 @@ class Wiki {
 		}
 		
 		Hooks::runHook( 'PreQueryEmbeddedin', array( &$eiArray ) );
+		
+		pecho( "Getting list of pages that include $title...\n\n", PECHO_NORMAL );
+		
 		return $this->listHandler( $eiArray );
 	}
-	
-	public function logevents() {}
 	
 	/**
 	 * List change tags enabled on the wiki.
@@ -1143,12 +1182,15 @@ class Wiki {
 		);
 		
 		Hooks::runHook( 'PreQueryTags', array( &$tgArray ) );
+		
+	pecho( "Getting list of all tags...\n\n", PECHO_NORMAL );
+
 		return $this->listHandler( $tgArray );
 	}
 	
-	public function watchlist() {}
+	public function get_watchlist() {}
 	
-	public function watchlistraw() {}
+	public function get_watchlistraw() {}
 	
 	/** 
 	 * Returns details of usage of an external URL on the wiki.
@@ -1176,8 +1218,11 @@ class Wiki {
 		}
 		
 		Hooks::runHook( 'PreQueryExturlusage', array( &$tArray ) );
-		$result = $this->listHandler($tArray);
-		return $result;
+		
+		pecho( "Getting list of all pages that $url is used in...\n\n", PECHO_NORMAL );
+		
+		return $this->listHandler($tArray);
+
 	}
 	
 	public function users() {}
@@ -1186,12 +1231,12 @@ class Wiki {
 	 * Returns the titles of some random pages.
 	 * 
 	 * @access public
-	 * @param string $namespaces A pipe '|' separated list of namespaces to select from (default: "0" i.e. mainspace).
+	 * @param array|string $namespaces Namespaces to select from (default:  array( 0 ) ).
 	 * @param int $limit The number of titles to return (default: 1).
 	 * @param bool $onlyredirects Only include redirects (true) or only include non-redirects (default; false).
 	 * @return array A series of random titles.
 	 */
-	public function random($namespaces = 0, $limit = 1, $onlyredirects = false) {
+	public function random( $namespaces = array( 0 ), $limit = 1, $onlyredirects = false) {
 		$rnArray = array(
 			'code' => 'rn',
 			'list' => 'random',
@@ -1202,6 +1247,9 @@ class Wiki {
 		);
 		
 		Hooks::runHook( 'PreQueryRandom', array( &$rnArray ) );
+		
+		pecho( "Getting random page...\n\n", PECHO_NORMAL );
+		
 		return $this->listHandler($rnArray);
 	}
 	
@@ -1243,6 +1291,10 @@ class Wiki {
 			'revids' => $rev2,
 			'rvprop' => 'content'
 		);
+		
+		Hooks::runHook( 'PreDiff', array( &$r1array, &$r2array, &$method ) );
+		
+		pecho( "Getting $method diff of revisions $rev1 and $rev2...\n\n", PECHO_NORMAL );
 		
 		$r1 = $this->apiQuery( $r1array );
 		$r2 = $this->apiQuery( $r2array );

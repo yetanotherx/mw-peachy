@@ -1065,6 +1065,8 @@ class Page {
 			}
 		}
 		
+		pecho( "Undeleting {$this->title}...\n\n", PECHO_NOTICE );
+		
 		Hooks::runHook( 'StartUndelete', array( &$undelArray ) );
 		
 		$result = $this->wiki->apiQuery( $undelArray, true);
@@ -1120,6 +1122,8 @@ class Page {
 		if( !is_null( $start ) ) $drArray['drstart'] = $start;
 		if( !is_null( $end ) ) $drArray['drend'] = $end;
 		
+		pecho( "Getting deleted revisions of {$this->title}...\n\n", PECHO_NORMAL );
+		
 		return $this->wiki->listHandler( $drArray );
 	}
 	
@@ -1147,6 +1151,8 @@ class Page {
 	public function watch() {
 		
 		Hooks::runHook( 'StartWatch' );
+		
+		pecho( "Watching {$this->title}...\n\n", PECHO_NOTICE );
 		
 		$result = $this->wiki->apiQuery( array(
 			'action' => 'watch',
@@ -1177,6 +1183,8 @@ class Page {
 	 */	
 	public function unwatch() {
 		Hooks::runHook( 'StartUnwatch' );
+		
+		pecho( "Unwatching {$this->title}...\n\n", PECHO_NOTICE );
 		
 		$result = $this->wiki->apiQuery( array(
 			'action' => 'watch',
@@ -1338,6 +1346,9 @@ class Page {
 		if( $followredir ) $leArray['blredirect'] = 'yes';
 		
 		Hooks::runHook( 'PreQueryBacklinks', array( &$leArray ) );
+		
+		pecho( "Getting all links to {$this->title}...\n\n", PECHO_NORMAL );
+		
 		return $this->wiki->listHandler( $leArray );
 	}
 	
@@ -1352,15 +1363,18 @@ class Page {
 	 * @return array Details of the rollback perform. ['revid']: The revision ID of the rollback. ['old_revid']: The revision ID of the first (most recent) revision that was rolled back. ['last_revid']: The revision ID of the last (oldest) revision that was rolled back.
 	 */
 	public function rollback($force = false, $summary = null, $markbot = null){
-		if(!$force) $this->preEditChecks();
-		$history = $this->history(1, 'older', false, null, true);
+		if( !$force ) $this->preEditChecks();
+		
+		$history = $this->history( 1, 'older', false, null, true );
+		
 		$params = array(
 			'action' => 'rollback',
 			'title' => $this->title,
 			'user' => $history[0]['user'],
 			'token' => $history[0]['rollbacktoken'],
 		);
-		if(!is_null($summary)){
+		
+		if( !is_null( $summary ) ) {
 			if( function_exists( 'mb_strlen' ) ) {
 				if( mb_strlen( $summary, '8bit' ) > 255 ) {
 					throw new EditError( "LongSummary", "Summary is over 255 bytes, the maximum allowed" );
@@ -1374,11 +1388,37 @@ class Page {
 			}
 			$params['summary'] = $summary;
 		}
-		if(!is_null($markbot) && $markbot) $params['markbot'] = $summary;
+		
+		if( !is_null( $markbot ) && $markbot ) $params['markbot'] = $summary;
+		
+		Hooks::runHook( 'PreRollback', array( &$params ) );
+		
+		pecho( "Rolling back {$this->title}...\n\n", PECHO_NOTICE );
+		
 		$result = $this->wiki->apiQuery($params, true);
-		return $result['rollback'];
+		
+		if( isset( $result['error'] ) ) {
+			throw new APIError( $result['error'] );
+		}
+		elseif( isset( $result['rollback'] ) ) {
+			if( isset( $result['rollback']['title'] ) ) {
+				return true;
+			}
+			else {
+				throw new APIError( "UnknownRollbackError", print_r($result['rollback'],true));
+			}
+		}
+		else {
+			throw new APIError( "UnknownRollbackError", print_r($result['rollback'],true));
+		}
 	}
 	
+	/*
+	 * Performs nobots checking, new message checking, etc
+	 * 
+	 * @access public
+	 * @return void
+	 */
 	private function preEditChecks(){
 		$preeditinfo = $this->wiki->apiQuery( array(
 			'action' => 'query',

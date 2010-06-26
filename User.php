@@ -103,6 +103,8 @@ class User {
 		
 		$this->wiki = &$wikiClass;
 		
+		pecho( "Getting user information for $username...\n\n", PECHO_NORMAL );
+		
 		$uiRes = $this->wiki->apiQuery( array(
 				'action' => 'query',
 				'list' => 'users|logevents',
@@ -154,6 +156,8 @@ class User {
 			return $this->blocked;
 		}
 		
+		pecho( "Checking if {$this->username} is blocked...\n\n", PECHO_NORMAL );
+		
 		$biRes = $this->wiki->apiQuery( array(
 				'action' => 'query',
 				'list' => 'blocks',
@@ -190,7 +194,7 @@ class User {
 					array(
 						'ar_user_text',
 						'=',
-						$param
+						$this->username
 					)
 				)
 			));
@@ -204,6 +208,8 @@ class User {
 			
 			unset($count);
 			
+			pecho( "Getting edit count for {$this->username} using the Database class...\n\n", PECHO_NORMAL );
+			
 			$count = Database::mysql2array( $database->select(
 				'revision',
 				'COUNT(*) as count',
@@ -211,7 +217,7 @@ class User {
 					array(
 						'rev_user_text',
 						'=',
-						$param
+						$this->username
 					)
 				)
 			));
@@ -257,6 +263,9 @@ class User {
 		}
 		
 		$result = $this->wiki->listHandler( $ucArray );
+		
+		pecho( "Getting list of contributions by {$this->username}...\n\n", PECHO_NORMAL );
+		
 		return $result;
 	}
 	
@@ -298,6 +307,8 @@ class User {
 		
 		Hooks::runHook( 'StartEmail', array( &$editarray ) );
 		
+		pecho( "Emailing {$this->username}...\n\n", PECHO_NOTICE );
+		
 		$result = $this->wiki->apiQuery( $editarray, true);
 		
 		if( isset( $result['error'] ) ) {
@@ -313,7 +324,7 @@ class User {
 			}
 		}
 		else {
-			throw new DeleteError( "UnknownEmailError", print_r($result['email'],true));
+			throw new EmailError( "UnknownEmailError", print_r($result['email'],true));
 		}
 	}
 	
@@ -351,6 +362,10 @@ class User {
 		
 		if( !is_null( $start ) ) $drArray['drstart'] = $start;
 		if( !is_null( $end ) ) $drArray['drend'] = $end;
+		
+		Hooks::runHook( 'StartDelrevs', array( &$drArray ) );
+		
+		pecho( "Getting deleted revisions by {$this->username}...\n\n", PECHO_NORMAL );
 		
 		return $this->wiki->listHandler( $drArray );
 	}

@@ -37,6 +37,11 @@ define( 'MINMW', '1.15' );
 /**
  * PECHO constants, used for {@link outputText}()
  */
+define( 'PECHO_VERBOSE', -1 );
+
+/**
+ * PECHO constants, used for {@link outputText}()
+ */
 define( 'PECHO_NORMAL', 0 );
 
 /**
@@ -78,13 +83,6 @@ require_once( $IP . 'HTTP.php' );
 $pgProxy = array();
 $pgVerbose = array(0,1,2,3,4);
 $pgUA = 'Peachy MediaWiki Bot API Version ' . PEACHYVERSION;
-$pgPechoTypes = array(
-	'NORMAL',
-	'NOTICE',
-	'WARN',
-	'ERROR',
-	'FATAL'
-);
 
 $pgHTTP = new HTTP;
 

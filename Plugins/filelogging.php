@@ -20,12 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class Logging {
 
 	public static function doLog( $loggingstuff, &$text, &$cat ) {
-		global $pgPechoTypes;
 		
 		$types = $loggingstuff[0];
 		$logFile = $loggingstuff[1];
 		
-		if( in_array( $pgPechoTypes[$cat], $types ) ) {
+		if( in_array( $cat, $types ) ) {
 			file_put_contents( $logFile, trim($text) . "\n", FILE_APPEND );
 		}
 		

@@ -111,6 +111,10 @@ class Peachy {
 		
 		//throw new APIError( array( 'code' => "nopage", 'text' => "nopage exists" ) );
 		if( !is_null( $config_name ) ) {
+			if( !is_file( $IP . 'Configs/' . $config_name . '.cfg' ) ) {
+				throw new BadEntryError( "BadConfig", "A non-existent configuration file was specified." );
+			}
+			
 			$config_params = parse_ini_file( $IP . 'Configs/' . $config_name . '.cfg' );
 		}
 		else {

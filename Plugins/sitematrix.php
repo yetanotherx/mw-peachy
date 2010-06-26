@@ -39,9 +39,40 @@ class SiteMatrix {
 		);
 		
 		$wikis = $SMres['sitematrix'];
-		return $wikis;
+		//return $wikis;
 		
-		##FIXME: More user friendly format
+		$retarray = array(
+			'raw' => $wikis,
+			'urls' => array(),
+			'langs' => array(),
+			'names' => array(),
+			'privates' => array()
+		);
+		
+		foreach( $wikis as $site ) {
+			if( is_array($site ) ) {
+				if( isset( $site['site'])) {
+				
+					$retarray['langs'][] = $site['code'];
+					$retarray['names'][$site['code']] = $site['name'];
+					
+					foreach( $site['site'] as $site2 ) {
+						$retarray['urls'][] = $site2['url'];
+						
+						if( isset( $site2['private'] ) ) $retarray['privates'][] = $site2;
+					}
+				}
+				else {
+					foreach( $site as $site2 ) {
+						$sites2['urls'][] = $site2['url'];
+						
+						if( isset( $site2['private'] ) ) $retarray['privates'][] = $site2;
+					}
+				}
+			}
+		}
+		
+		return $retarray;
 		
 	}
 

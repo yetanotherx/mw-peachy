@@ -391,7 +391,7 @@ class Image {
 			break;
 		}
 		
-		$localname = str_replace(' ','_',$this->name);
+		$localname = str_replace(' ','_',$this->getName(false));
 		if( $name ) $localname = $name;
 		
 		Hooks::runHook( 'DownloadImage', array( &$url, &$name, &$localname ) );

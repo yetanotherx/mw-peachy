@@ -117,6 +117,7 @@ class Peachy {
 			}
 			
 			$config_params = parse_ini_file( $IP . 'Configs/' . $config_name . '.cfg' );
+		
 		}
 		else {
 			$config_params = array(
@@ -124,17 +125,20 @@ class Peachy {
 				'password' => $password,
 				'baseurl' => $base_url
 			);
+			
+		}
+		
+		if( is_null( $config_params['baseurl'] ) || !isset( $config_params['baseurl'] ) ) {
+			throw new LoginError( array( "MissingParam", "The baseurl parameter was not set." ) );
+		}
+		
+		if( !isset( $config_params['username'] ) || !isset( $config_params['password'] ) ) {
+			$config_params['nologin'] = true;
 		}
 		
 		$extensions = Peachy::wikiChecks( $config_params['baseurl'] );
 		
 		Hooks::runHook( 'StartLogin', array( &$config_params, &$extensions ) );
-		
-		if( !isset( $config_params['username'] ) || 
-			!isset( $config_params['password'] ) ||
-			!isset( $config_params['baseurl'] ) ) {
-			throw new LoginError( array( "MissingParam", "Either the username, password, or baseurl parameter was not set." ) );
-		}
 		
 		$w = new Wiki( $config_params, $extensions, false, null );
 		return $w;

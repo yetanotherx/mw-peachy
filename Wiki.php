@@ -185,6 +185,14 @@ class Wiki {
 	private $http;
 	
 	/**
+	 * Whether or not to log in. True restricts logging in, false lets it log in. Setting to true restricts the available functions.
+	 * 
+	 * @var bool
+	 * @access private
+	 */
+	private $nologin;
+	
+	/**
 	 * Contruct function for the wiki. Handles login and related functions.
 	 * 
 	 * @access public
@@ -228,6 +236,8 @@ class Wiki {
 		else {
 			$http_echo = false;
 		}
+		
+		if( is_null( $this->http ) ) $this->http = new HTTP( $http_echo );
 		
 		if( isset( $configuration['runpage'] ) ) {
 			$this->runpage = $configuration['runpage'];
@@ -307,9 +317,12 @@ class Wiki {
 			$lgarray['lgtoken'] = $token;
 		}
 		
-		Hooks::runHook( 'PreLogin', array( &$lgarray ) );
+		if( isset( $configuration['nologin'] ) ) {
+			$this->nologin = true;
+			return;
+		}
 		
-		if( is_null( $this->http ) ) $this->http = new HTTP( $http_echo );
+		Hooks::runHook( 'PreLogin', array( &$lgarray ) );
 		
 		pecho( "Logging in to {$this->base_url}...\n\n", PECHO_NOTICE );
 		
@@ -460,6 +473,8 @@ class Wiki {
 		pecho( "Running API query with params " . implode( ";", $arrayParams ) . "...\n\n", PECHO_VERBOSE );
 		
 		if( $post ) {
+			if( $this->get_nologin() ) throw new LoggedOut();
+			
 			$data = unserialize( $this->get_http()->post(
 				$this->base_url,
 				$arrayParams
@@ -608,6 +623,17 @@ class Wiki {
 	 */
 	public function &get_http() {
 		return $this->http;
+	}
+	
+	/**
+	 * Returns whether or not to log in
+	 * 
+	 * @access public
+	 * @see Wiki::$nologin
+	 * @return bool
+	 */
+	public function get_nologin() {
+		return $this->nologin;
 	}
 	
 	/**

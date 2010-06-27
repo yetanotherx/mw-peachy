@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * The version that Peachy is running 
  */
-define( 'PEACHYVERSION', '0.1alpha' );
+define( 'PEACHYVERSION', '0.1beta' );
 
 /**
  * Minimum MediaWiki version that is required for Peachy 
@@ -83,6 +83,7 @@ require_once( $IP . 'HTTP.php' );
 $pgProxy = array();
 $pgVerbose = array(0,1,2,3,4);
 $pgUA = 'Peachy MediaWiki Bot API Version ' . PEACHYVERSION;
+$pgUseIntro = true;
 
 $pgHTTP = new HTTP;
 
@@ -105,7 +106,9 @@ class Peachy {
 	 * @return Wiki Instance of the Wiki class, where most functions are stored
 	 */
 	public static function newWiki( $config_name = null, $username = null, $password = null, $base_url = 'http://en.wikipedia.org/w/api.php' ) {
-		global $IP;
+		global $IP, $pgUseIntro;
+		
+		echo "Loading Peachy (version " . PEACHYVERSION . ")...\n\n";
 		
 		//throw new APIError( array( 'code' => "nopage", 'text' => "nopage exists" ) );
 		if( !is_null( $config_name ) ) {

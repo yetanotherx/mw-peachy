@@ -19,12 +19,187 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class GlobalUserInfo {
 
-    public static function load( &$wikiClass ) {
-    
-        if( !array_key_exists( 'CentralAuth', $wikiClass->get_extensions() ) ) {
-            throw new DependancyError( "CentralAuth" );
-        }
-        
-    }
+	/**
+	 * Wiki class
+	 * 
+	 * @var Wiki
+	 * @access private
+	 */
+	private $wiki;
+	
+	/**
+	 * Username
+	 * 
+	 * @var string
+	 * @access private
+	 */
+	private $username;
+	
+	/**
+	 * Global groups member is a part of
+	 * 
+	 * @var array
+	 * @access private
+	 */
+	private $groups = array();
+	
+	/**
+	 * Accounts that user has merged on other wikis
+	 * 
+	 * @var array
+	 * @access private
+	 */
+	private $merged = array();
+	
+	/**
+	 * Accounts that are not attached to the global account
+	 * 
+	 * @var array
+	 * @access private
+	 */
+	private $unattached = array();
+	
+	/**
+	 * Whether or not global account exists
+	 * 
+	 * @var bool
+	 * @access private
+	 */
+	private $exists = true;
+	
+	/**
+	 * Date that global account was created
+	 * 
+	 * @var string
+	 * @access private
+	 */
+	private $registration;
+	
+	/**
+	 * Global account ID
+	 * 
+	 * @var int
+	 * @access private
+	 */
+	private $id;
+
+	/**
+	 * Construction method for the GlobalUserInfo class
+	 * 
+	 * @access public
+	 * @param Wiki &$wikiClass The Wiki class object
+	 * @param mixed $username Username
+	 * @return void
+	 */
+	function __construct( &$wikiClass, $username ) {
+		$this->username = ucfirst( $username );
+		$this->wiki = $wikiClass;
+		
+		$guiRes = $this->wiki->apiQuery(
+			array(
+				'action' => 'query',
+				'meta' => 'globaluserinfo',
+				'guiuser' => ucfirst( $username ),
+				'guiprop' => 'groups|merged|unattached',
+		));
+		
+		if( !isset( $guiRes['query']['globaluserinfo'] ) ) {
+			$this->exists = false;
+			if( isset( $guiRes['error'] ) ) {
+				throw new APIError( $guiRes['error'] );
+			}
+			else {
+				throw new APIError( array( 'code' => 'UnknownError', 'info' => 'Unknown API Error' ) );
+			}
+		}
+		else {
+			$this->groups = $guiRes['query']['globaluserinfo']['groups'];
+			$this->merged = $guiRes['query']['globaluserinfo']['merged'];
+			$this->merged = $guiRes['query']['globaluserinfo']['unattached'];
+			$this->id = $guiRes['query']['globaluserinfo']['id'];
+			$this->registration = $guiRes['query']['globaluserinfo']['registration'];
+		}
+		
+	}
+	
+	/**
+	 * Loads and constructs GlobalUserInfo class
+	 * 
+	 * @static
+	 * @access public
+	 * @param Wiki &$wikiClass The Wiki class object
+	 * @param string $username Username
+	 * @return GlobalUserInfo
+	 */
+	public static function load( &$wikiClass, $username ) {
+	
+		print_r($wikiClass->get_extensions());
+		if( !array_key_exists( 'Central Auth', $wikiClass->get_extensions() ) ) {
+			throw new DependancyError( "CentralAuth", "http://www.mediawiki.org/wiki/Extension:CentralAuth" );
+		}
+		
+		return new GlobalUserInfo( $wikiClass, $username );
+		
+	}
+	
+	/**
+	 * Returns the global account ID
+	 * 
+	 * @return int
+	 * @access public
+	 */
+	public function get_id() {
+		return $this->id;
+	}
+	
+	/**
+	 * Returns the date that global account was created
+	 * 
+	 * @return string
+	 * @access public
+	 */
+	public function get_registration() {
+		return $this->registration;
+	}
+	
+	/**
+	 * Returns the global groups member is a part of
+	 * 
+	 * @return array
+	 * @access public
+	 */
+	public function get_groups() {
+		return $this->groups;
+	}
+	
+	/**
+	 * Returns the accounts that user has merged on other wikis
+	 * 
+	 * @return array
+	 * @access public
+	 */
+	public function get_merged() {
+		return $this->merged;
+	}
+	
+	/**
+	 * Returns the accounts that are not attached to the global account
+	 * 
+	 * @return array
+	 * @access public
+	 */
+	public function get_unattached() {
+		return $this->unattached;
+	}
+	
+	/**
+	 * Returns whether or not global account exists
+	 * 
+	 * @return bool
+	 * @access public
+	 */
+	public function get_exists() {
+		return $this->unattached;
+	}
 
 }

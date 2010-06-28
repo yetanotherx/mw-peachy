@@ -112,11 +112,18 @@ class Peachy {
 		
 		//throw new APIError( array( 'code' => "nopage", 'text' => "nopage exists" ) );
 		if( !is_null( $config_name ) ) {
-			if( !is_file( $IP . 'Configs/' . $config_name . '.cfg' ) ) {
-				throw new BadEntryError( "BadConfig", "A non-existent configuration file was specified." );
+			if( !is_file( $config_name ) ) {
+				if( !is_file( $IP . 'Configs/' . $config_name . '.cfg' ) ) {
+					throw new BadEntryError( "BadConfig", "A non-existent configuration file was specified." );
+				}
+				else {
+					$config_name = $IP . 'Configs/' . $config_name . '.cfg';
+				}
 			}
 			
-			$config_params = parse_ini_file( $IP . 'Configs/' . $config_name . '.cfg' );
+			
+			
+			$config_params = parse_ini_file( $config_name );
 		
 		}
 		else {
@@ -191,16 +198,32 @@ class Peachy {
 	 * 
 	 * @static
 	 * @access public
-	 * @param string $plugin_name Name of plugin to load from Plugins directory, minus .php ending
+	 * @param string|array $plugins Name of plugin(s) to load from Plugins directory, minus .php ending
 	 * @return void
 	 */
-	public static function loadPlugin( $plugin_name ) {
+	public static function loadPlugin( $plugins ) {
 		global $IP;
-		if( is_file( $IP . 'Plugins/' . $plugin_name . '.php' ) ) {
 		
-			Hooks::runHook( 'LoadPlugin', array( &$plugin_name ) );
+		if( is_string( $plugins ) ) {
+			$plugins = array( $plugins );
+		}
+		
+		foreach( $plugins as $plugin_name ) {
+			if( !is_file( $plugin_name ) ) {
+				if( is_file( $IP . 'Plugins/' . $plugin_name . '.php' ) ) {
+					Hooks::runHook( 'LoadPlugin', array( &$plugin_name ) );
+				
+					require_once( $IP . 'Plugins/' . $plugin_name . '.php' );
+				}
+			}
+			else {
 			
-			require_once( $IP . 'Plugins/' . $plugin_name . '.php' );
+				Hooks::runHook( 'LoadPlugin', array( &$plugin_name ) );
+				
+				require_once( $plugin_name );
+			}
+		
+			
 		}
 	}
 	

@@ -280,6 +280,16 @@ class User {
 	}
 	
 	/**
+	 * Returns whether or not the user exists
+	 * 
+	 * @access public
+	 * @return bool
+	 */
+	public function exists() {
+		return $this->exists;
+	}
+	
+	/**
 	 * Send an email to another wiki user
 	 * 
 	 * @access public

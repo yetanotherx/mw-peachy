@@ -1452,8 +1452,8 @@ class Page {
 					$runtext = $page['revisions'][0]['*'];
 				}
 			}
-			$messages = (bool) (isset( $preeditinfo['query']['userinfo']['messages']));
-			$blocked = (bool) (isset( $preeditinfo['query']['userinfo']['blockedby']));
+			if( isset( $preeditinfo['query']['userinfo']['messages']) ) $messages = true;
+			if( isset( $preeditinfo['query']['userinfo']['blockedby']) ) $blocked = true;;
 		}
 		else {
 			$oldtext = '';

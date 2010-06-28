@@ -714,16 +714,7 @@ class Page {
 		
 		$result = $this->wiki->apiQuery( $editarray, true );
 		
-		if( isset( $result['error'] ) ) {
-			if( $result['error']['code'] == 'maxlag' ) {
-				pecho("Edit failed, database lag is too high.", PECHO_WARN);
-				return false;
-			}
-			else {
-				throw new EditError( $result['error']['code'], $result['error']['info'] );
-			}
-		}
-		elseif( isset( $result['edit'] ) ) {
+		if( isset( $result['edit'] ) ) {
 			if( $result['edit']['result'] == "Success" ) {
 				if( array_key_exists( 'nochange', $result['edit'] ) ) return $this->lastedit;
 				
@@ -903,10 +894,7 @@ class Page {
 		
 		$result = $this->wiki->apiQuery( $editarray, true );
 		
-		if( isset( $result['error'] ) ) {
-			throw new MoveError( $result['error']['code'], $result['error']['info'] );
-		}
-		elseif( isset( $result['move'] ) ) {
+		if( isset( $result['move'] ) ) {
 			if( isset( $result['move']['to'] ) ) {
 				$this->__construct( $this->wiki, null, $this->pageid );
 				return true;
@@ -962,10 +950,7 @@ class Page {
 		
 		$result = $this->wiki->apiQuery( $editarray, true);
 		
-		if( isset( $result['error'] ) ) {
-			throw new ProtectError( $result['error']['code'], $result['error']['info'] );
-		}
-		elseif( isset( $result['protect'] ) ) {
+		if( isset( $result['protect'] ) ) {
 			if( isset( $result['protect']['title'] ) ) {
 				$this->__construct( $this->wiki, $this->title );
 				return true;
@@ -1017,10 +1002,7 @@ class Page {
 		
 		$result = $this->wiki->apiQuery( $editarray, true);
 		
-		if( isset( $result['error'] ) ) {
-			throw new DeleteError( $result['error']['code'], $result['error']['info'] );
-		}
-		elseif( isset( $result['delete'] ) ) {
+		if( isset( $result['delete'] ) ) {
 			if( isset( $result['delete']['title'] ) ) {
 				$this->__construct( $this->wiki, $this->title );
 				return true;
@@ -1071,10 +1053,7 @@ class Page {
 		
 		$result = $this->wiki->apiQuery( $undelArray, true);
 		
-		if( isset( $result['error'] ) ) {
-			throw new UndeleteError( $result['error']['code'], $result['error']['info'] );
-		}
-		elseif( isset( $result['undelete'] ) ) {
+		if( isset( $result['undelete'] ) ) {
 			if( isset( $result['undelete']['title'] ) ) {
 				$this->__construct( $this->wiki, $this->title );
 				return true;
@@ -1159,10 +1138,7 @@ class Page {
 			'title' => $this->title,
 		), true );
 		
-		if( isset( $result['error'] ) ) {
-			throw new APIError( $result['error'] );
-		}
-		elseif( isset( $result['watch'] ) ) {
+		if( isset( $result['watch'] ) ) {
 			if( isset( $result['watch']['watched'] ) ) {
 				return true;
 			}
@@ -1192,10 +1168,7 @@ class Page {
 			'unwatch' => 'yes'
 		), true );
 		
-		if( isset( $result['error'] ) ) {
-			throw new APIError( $result['error'] );
-		}
-		elseif( isset( $result['watch'] ) ) {
+		if( isset( $result['watch'] ) ) {
 			if( isset( $result['watch']['unwatched'] ) ) {
 				return true;
 			}
@@ -1397,10 +1370,7 @@ class Page {
 		
 		$result = $this->wiki->apiQuery($params, true);
 		
-		if( isset( $result['error'] ) ) {
-			throw new APIError( $result['error'] );
-		}
-		elseif( isset( $result['rollback'] ) ) {
+		if( isset( $result['rollback'] ) ) {
 			if( isset( $result['rollback']['title'] ) ) {
 				return true;
 			}

@@ -30,6 +30,7 @@ require_once( $IP . 'Diff/textdiff/Diff/Renderer.php' );
  * @link http://pear.php.net/package/Text_Diff/redirected
  */
 function getTextDiff($method, $diff1, $diff2) {
+	global $IP;
 	switch ($method) {
 		case 'unified':
 			require_once $IP . 'Diff/textdiff/Diff/Renderer/unified.php';

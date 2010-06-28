@@ -79,6 +79,7 @@ require_once( $IP . 'Hooks.php' );
 require_once( $IP . 'Page.php' );
 require_once( $IP . 'User.php' );
 require_once( $IP . 'HTTP.php' );
+require_once( $IP . 'Update.php' );
 
 $pgProxy = array();
 $pgVerbose = array(0,1,2,3,4);
@@ -93,13 +94,12 @@ $PeachyInfo = unserialize( $pgHTTP->get( 'http://compwhizii.net/peachy/wiki/Temp
 
 if( version_compare( $PeachyInfo['minversion'], PEACHYVERSION, '>' ) ) {
 	echo "Peachy version is below minimum version {$PeachyInfo['minversion']}\n\n";
+	runAutoupdater( $PeachyInfo );
 }
 elseif( version_compare( $PeachyInfo['nowversion'], PEACHYVERSION, '>' ) ) {
 	echo "New version of Peachy available: {$PeachyInfo['nowversion']}\n\n";
+	runAutoupdater( $PeachyInfo );
 }
-
-
-
 
 
 /**

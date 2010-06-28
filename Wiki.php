@@ -470,28 +470,40 @@ class Wiki {
 			$assert = true;
 		}
 		
+		Hooks::runHook( 'QueryAssert', array( &$arrayParams['assert'], &$assert ) );
+		
 		pecho( "Running API query with params " . implode( ";", $arrayParams ) . "...\n\n", PECHO_VERBOSE );
 		
 		if( $post ) {
-			if( $this->get_nologin() ) throw new LoggedOut();
+			$is_loggedin = $this->get_nologin();
+			Hooks::runHook( 'APIQueryCheckLogin', array( &$is_loggedin ) );
+			if( $is_loggedin ) throw new LoggedOut();
 			
+			Hooks::runHook( 'PreAPIPostQuery', array( &$arrayParams ) );
 			$data = unserialize( $this->get_http()->post(
 				$this->base_url,
 				$arrayParams
 			));
 			
+			Hooks::runHook( 'PostAPIPostQuery', array( &$data ) );
+			
+			Hooks::runHook( 'APIQueryCheckAssertion', array( &$assert, &$data['edit']['assert'] ) );
 			if( $assert && $data['edit']['assert'] == 'Failure' ) {
 				throw new EditError( 'AssertFailure', print_r( $data['edit'], true ) );
 			}
 			
+			Hooks::runHook( 'APIQueryCheckError', array( &$data['error'] ) );
 			if( isset( $data['error'] ) ) {
-				throw new APIError( array( 'error' => $tRes['error']['code'], 'text' => $tRes['error']['info'] ) );
+				throw new APIError( array( 'error' => $data['error']['code'], 'text' => $data['error']['info'] ) );
 				return false;
 			}
 			
 			return $data;
 		}
 		else {
+		
+			Hooks::runHook( 'PreAPIGetQuery', array( &$arrayParams ) );
+			
 			return unserialize( $this->get_http()->get(
 				$this->base_url,
 				$arrayParams

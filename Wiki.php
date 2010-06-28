@@ -1110,7 +1110,9 @@ class Wiki {
 		return $this->listHandler( $leArray );
 	}
 	
-	public function listblocks() {}
+	public function listblocks() {
+		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+	}
 	
 	/**
 	 * Retrieves the titles of member pages of the given category
@@ -1170,7 +1172,8 @@ class Wiki {
 		return $final_titles;
 	}
 	
-	public function deletedrevs() {
+	public function deletedrevs( $namespace = array( 0 ), $user = null, $excludeuser = null, $start = null, $end = null, $dir = 'older', $prop = array( 'revid', 'user', 'comment', 'parsedcomment', 'minor', 'len', 'content', 'token' ), $limit = null ) {
+		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
 	}
 	
 	/**
@@ -1221,14 +1224,18 @@ class Wiki {
 		
 		Hooks::runHook( 'PreQueryTags', array( &$tgArray ) );
 		
-	pecho( "Getting list of all tags...\n\n", PECHO_NORMAL );
+		pecho( "Getting list of all tags...\n\n", PECHO_NORMAL );
 
 		return $this->listHandler( $tgArray );
 	}
 	
-	public function get_watchlist() {}
+	public function get_watchlist( $minor = null, $bot = null, $anon = null, $patrolled = null,$namespace = null, $user = null, $excludeuser = null, $start = null, $end = null, $prop = array( 'ids', 'title', 'flags', 'user', 'comment', 'parsedcomment', 'timestamp', 'patrol', 'sizes', 'notificationtimestamp' ), $limit = null) {
+		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+	}
 	
-	public function get_watchlistraw() {}
+	public function get_watchlistraw( $namespace = null, $changed = null ) {
+		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+	}
 	
 	/** 
 	 * Returns details of usage of an external URL on the wiki.
@@ -1263,7 +1270,9 @@ class Wiki {
 
 	}
 	
-	public function users() {}
+	public function users( $users = array(), $prop = array( 'blockinfo', 'groups', 'editcount', 'registration', 'emailable', 'gender' ) ) {
+		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+	}
 	
 	/**
 	 * Returns the titles of some random pages.
@@ -1291,21 +1300,37 @@ class Wiki {
 		return $this->listHandler($rnArray);
 	}
 	
-	public function protectedtitles() {}
+	public function protectedtitles( $namespace = array( 0 ) ) {
+		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+	}
 	
-	public function siteinfo() {}
+	public function siteinfo() {
+		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+	}
 	
-	public function allmessages() {}
+	public function allmessages() {
+		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+	}
 	
-	public function expandtemplates() {}
+	public function expandtemplates() {
+		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+	}
 	
-	public function parse() {}
+	public function parse() {
+		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+	}
 	
-	public function patrol() {}
+	public function patrol() {
+		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+	}
 	
-	public function import() {}
+	public function import() {
+		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+	}
 	
-	public function export() {}
+	public function export() {
+		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+	}
 	
 	/**
 	 * Returns a unified or HTML diff between two revisions

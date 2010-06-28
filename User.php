@@ -171,9 +171,13 @@ class User {
 		return false;
 	}
 	
-	public function block() {}
+	public function block(  $reason = '', $expiry = 'indefinite', $params = array() ) {
+		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+	}
 	
-	public function unblock() {}
+	public function unblock( $reason = '', $id = null ) {
+		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+	}
 	
 	/**
 	 * Returns the editcount of the user
@@ -338,9 +342,9 @@ class User {
 		}
 	}
 	
-	public function userrights() {}
-	
-	public function createaccount() {}
+	public function userrights( $add = array(), $remove = array(), $reason = '' ) {
+		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+	}
 	
 	/**
 	 * List all deleted contributions.

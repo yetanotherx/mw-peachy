@@ -1453,7 +1453,7 @@ class Page {
 				}
 			}
 			if( isset( $preeditinfo['query']['userinfo']['messages']) ) $messages = true;
-			if( isset( $preeditinfo['query']['userinfo']['blockedby']) ) $blocked = true;;
+			if( isset( $preeditinfo['query']['userinfo']['blockedby']) ) $blocked = true;
 		}
 		else {
 			$oldtext = '';

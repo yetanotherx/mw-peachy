@@ -345,7 +345,9 @@ class Image {
 		$this->__construct( $this->wiki, $file );
 	}
 	
-	public function history() {}
+	public function history() {
+		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+	}
 	
 	/**
 	 * Downloads an image to the local disk

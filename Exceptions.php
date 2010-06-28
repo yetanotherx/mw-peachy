@@ -23,6 +23,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
+ * Generic Peachy Error
+ * 
+ * @package Peachy_Exceptions
+ */
+class PeachyError extends Exception {
+
+	public function __construct( $code, $text ) {
+		parent::__construct( 
+			"API Error: " . $code . " (" . $text . ")"
+		);
+	}
+}
+
+/**
  * Generic API Error
  * 
  * @package Peachy_Exceptions

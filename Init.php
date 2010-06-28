@@ -84,10 +84,23 @@ $pgProxy = array();
 $pgVerbose = array(0,1,2,3,4);
 $pgUA = 'Peachy MediaWiki Bot API Version ' . PEACHYVERSION;
 $pgUseIntro = true;
+$mwVersion = null;
 
 $pgHTTP = new HTTP;
 
-$mwVersion = null;
+//Last version check
+$PeachyInfo = unserialize( $pgHTTP->get( 'http://compwhizii.net/peachy/wiki/Template:Autoupdate/Check?action=raw' ) );
+
+if( version_compare( $PeachyInfo['minversion'], PEACHYVERSION, '>' ) ) {
+	echo "Peachy version is below minimum version {$PeachyInfo['minversion']}\n\n";
+}
+elseif( version_compare( $PeachyInfo['nowversion'], PEACHYVERSION, '>' ) ) {
+	echo "New version of Peachy available: {$PeachyInfo['nowversion']}\n\n";
+}
+
+
+
+
 
 /**
  * Base Peachy class, used to generate all other classes

@@ -150,7 +150,7 @@ class User {
 	 * @param bool $force Whether or not to use the locally stored cache. Default false.
 	 * @return bool
 	 */
-	public function isBlocked( $force = false ) {
+	public function is_blocked( $force = false ) {
 		
 		if( $force ) {
 			return $this->blocked;

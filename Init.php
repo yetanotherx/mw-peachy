@@ -64,13 +64,14 @@ define( 'PECHO_ERROR', 3 );
  */
 define( 'PECHO_FATAL', 4 );
 
-$version = explode( '.', phpversion() );
-
-if( $version[0] < '5' ) die( "PHP 5 or higher is require_onced to use Peachy.\n" );
-
 $IP = dirname(__FILE__) . '/';
 
 require_once( $IP . 'Exceptions.php' );
+
+$version = explode( '.', phpversion() );
+
+if( $version[0] < '5' ) throw new DependancyError( "PHP 5", "http://php.net/downloads.php" );
+
 require_once( $IP . 'GenFunctions.php' );
 require_once( $IP . 'Diff/Diff.php' );
 require_once( $IP . 'Wiki.php' );

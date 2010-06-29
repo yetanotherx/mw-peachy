@@ -303,7 +303,7 @@ class User {
 	 */
 	public function email( $text = null, $subject = "Wikipedia Email", $ccme = false ) {
 		if( !$this->has_email() ) {
-			pecho( "Cannot email {$this->username}, user has email disabled", PECHO_WARNING );
+			pecho( "Cannot email {$this->username}, user has email disabled", PECHO_FATAL );
 			return false;
 		}
 		
@@ -334,11 +334,13 @@ class User {
 				return true;
 			}
 			else {
-				throw new EmailError( "UnknownEmailError", print_r($result['email'],true));
+				pecho( "Email error...\n\n" . print_r($result['emailuser'], true) . "\n\n", PECHO_FATAL );
+				return false;
 			}
 		}
 		else {
-			throw new EmailError( "UnknownEmailError", print_r($result['email'],true));
+			pecho( "Email error...\n\n" . print_r($result['edit'], true) . "\n\n", PECHO_FATAL );
+			return false;
 		}
 	}
 	
@@ -360,7 +362,7 @@ class User {
 	 */
 	public function deletedcontribs( $content = false, $start = null, $end = null, $dir = 'older', $prop = array( 'revid', 'user', 'parsedcomment', 'minor', 'len', 'content', 'token' ) ) {
 		if( !in_array( 'deletedhistory', $this->wiki->get_userrights() ) ) {
-			throw new PermissionsError( "User is not allowed to view deleted revisions" );
+			pecho( "User is not allowed to view deleted revisions", PECHO_FATAL );
 			return false;
 		}
 		

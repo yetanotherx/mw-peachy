@@ -39,7 +39,7 @@ class Hooks {
 	 * @return mixed Output of hook function
 	 * @package Hooks
 	 */
-	static function runHook( $hook_name, $args = array() ) {
+	public static function runHook( $hook_name, $args = array() ) {
 		 global $pgHooks;
 		 
 		 if( !isset( $pgHooks[$hook_name] ) ) return null;

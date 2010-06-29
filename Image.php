@@ -144,10 +144,10 @@ class Image {
 		);
 		
 		if( is_null( $filename ) && is_null( $pageid ) ) {
-			throw new ImageError( 'Either $filename or $pageid must be set when initializing Image' );
+			throw new BadEntryError( 'MissingParams', 'Either $filename or $pageid must be set when initializing Image' );
 		}
 		elseif( !is_null( $pageid ) && !is_null( $filename ) ) {
-			throw new ImageError( '$filename and $pageid cannot be used in conjunction.' );
+			throw new BadEntryError( 'TooManyParams', '$filename and $pageid cannot be used in conjunction.' );
 		}
 		else {
 			if( is_null( $pageid ) ) {
@@ -185,7 +185,7 @@ class Image {
 	}
 	
 	public function getHistory() {
-	
+		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
 	}
 	
 	/**
@@ -389,7 +389,8 @@ class Image {
 		$iiRes = $this->wiki->apiQuery( $iiParams );
 		
 		if( !isset( $iiRes['query']['pages'] ) ) {
-			throw new APIError( "Unknown API error", print_r($iiRes,true) );
+			pecho( "Unknown API Error...\n\n" . print_r($iiRes,true) . "\n\n", PECHO_ERROR );
+			return false;
 		}
 		
 		foreach( $iiRes['query']['pages'] as $x ) {

@@ -489,12 +489,13 @@ class Wiki {
 			
 			Hooks::runHook( 'APIQueryCheckAssertion', array( &$assert, &$data['edit']['assert'] ) );
 			if( $assert && $data['edit']['assert'] == 'Failure' && $errorcheck ) {
-				throw new EditError( 'AssertFailure', print_r( $data['edit'], true ) );
+				pecho( "Assertion has failed.\n\n" . print_r( $data['edit'], true ) . "\n\n", PECHO_FATAL );
+				return false;
 			}
 			
 			Hooks::runHook( 'APIQueryCheckError', array( &$data['error'] ) );
 			if( isset( $data['error'] ) && $errorcheck ) {
-				throw new APIError( array( 'error' => $data['error']['code'], 'text' => $data['error']['info'] ) );
+				pecho( "API Error...\n\nCode: {$data['error']['code']}\nText: {$data['error']['info']}", PECHO_FATAL );
 				return false;
 			}
 			
@@ -543,11 +544,11 @@ class Wiki {
 		
 		if( isset($limit) && !is_null($limit) ){
 			if(!is_numeric($limit)){
-				throw new BadEntryError("listHandler","limit should be a number or null");
+				throw new BadEntryError( "listHandler", "limit should be a number or null" );
 			} else {
 				$limit = intval($limit);
 				if($limit < 0 || (floor($limit) != $limit)){
-					throw new BadEntryError("listHandler","limit should an integer greater than 0");
+					throw new BadEntryError( "listHandler", "limit should an integer greater than 0" );
 				}
 
 				if($limit < $tArray[$code . 'limit']){
@@ -1020,7 +1021,8 @@ class Wiki {
 		);
 		
 		if( count( $protectiontypes ) && count( $protectionlevels ) ) {
-			throw new BadEntryError( "AllPages", '$protectionlevels and $protectiontypes cannot be used in conjunction' );
+			pecho( '$protectionlevels and $protectiontypes cannot be used in conjunction', PECHO_FATAL );
+			return false;
 		}
 		elseif( count( $protectiontypes ) ) {
 			$leArray['apprtype'] = implode( '|', $protectiontypes );
@@ -1157,6 +1159,9 @@ class Wiki {
 		pecho( "Getting list of pages in the $category category...\n\n", PECHO_NORMAL );
 		
 		$top_category = $this->listHandler( $cmArray );
+		
+		if( !$subcat ) return $top_category;
+		
 		$final_titles = array();
 		
 		foreach( array_values($top_category) as $category ) {
@@ -1363,11 +1368,13 @@ class Wiki {
 		$r2 = $this->apiQuery( $r2array );
 		
 		
-		if( isset( $r1['query']['badrevids'] ) || isset( $r2['query']['badrevids'] ) ) {
-			throw new BadEntryError( "BadRevids", "A bad revision ID was passed" );
+		if( isset( $r1['query']['badrevids'] ) ) {
+			pecho( "A bad first revision ID was passed.\n\n", PECHO_FATAL );
+			return false;
 		}
-		elseif( !isset( $r1['query']['pages'] ) || !isset( $r2['query']['pages'] ) ) {
-			throw new APIError( "UnknownAPIError", print_r( $r1, true ), print_r( $r2, true ) );
+		elseif( isset( $r2['query']['badrevids'] ) ) {
+			pecho( "A bad second revision ID was passed.\n\n", PECHO_FATAL );
+			return false;
 		}
 		else {
 			foreach( $r1['query']['pages'] as $r1pages ) {

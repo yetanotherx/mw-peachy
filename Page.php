@@ -232,7 +232,7 @@ class Page {
 				}
 				elseif( $namespace == $namespaces[-1] || $namespace == "special" ){
 					//Special or local variant, error
-					throw new BadTitle( "Special pages are not currently supported by the API." );
+					pecho( "Special pages are not currently supported by the API.\n\n", PECHO_ERROR );
 				}
 			}
 		}
@@ -644,21 +644,25 @@ class Page {
 		$tokens = $this->wiki->get_tokens();
 		
 		if( $tokens['edit'] == '+\\' ) {
-			throw new EditError( "LoggedOut", "User has logged out" );
+			pecho( "User has logged out.\n\n", PECHO_FATAL );
+			return false;
 		}
 		elseif( $tokens['edit'] == '' ) {
-			throw new EditError( "PermissionDenied", "User is not allowed to edit {$this->title}" );
+			pecho( "User is not allowed to edit {$this->title}\n\n", PECHO_FATAL );
+			return false;
 		}
 		
 		if( function_exists( 'mb_strlen' ) ) {
 			if( mb_strlen( $summary, '8bit' ) > 255 ) {
-				throw new EditError( "LongSummary", "Summary is over 255 bytes, the maximum allowed" );
+				pecho( "Summary is over 255 bytes, the maximum allowed.\n\n", PECHO_FATAL );
+				return false;
 			}
 		}
 		else {
 			// If we don't have mb_strlen we compromise and use strlen
 			if( strlen( $summary) > 255 ) {
-				throw new EditError( "LongSummary", "Summary is over 255 characters, the maximum allowed" );
+				pecho( "Summary is over 255 characters, the maximum allowed.\n\n", PECHO_FATAL );
+				return false;
 			}
 		}
 		
@@ -706,7 +710,15 @@ class Page {
 			$editarray['bot'] = 'yes';
 		}
 		
-		if( !$force ) 	$this->preEditChecks();
+		if( !$force ) {
+			try {
+				$this->preEditChecks();
+			}
+			catch( EditError $e ) {
+				pecho( "Error: $e\n\n", PECHO_FATAL );
+				return false;
+			}
+		}
 		
 		Hooks::runHook( 'StartEdit', array( &$editarray ) );
 		
@@ -727,11 +739,13 @@ class Page {
 				return $result['edit']['newrevid'];
 			}
 			else {
-				throw new EditError( "UnknownEditError", print_r($result['edit'],true));
+				pecho( "Edit error...\n\n" . print_r($result['edit'], true) . "\n\n", PECHO_FATAL );
+				return false;
 			}
 		}
 		else {
-			throw new EditError( "UnknownEditError", print_r($result['edit'],true));
+			pecho( "Edit error...\n\n" . print_r($result['edit'], true) . "\n\n", PECHO_FATAL );
+			return false;
 		}
 	
 	}
@@ -753,11 +767,14 @@ class Page {
 		$tokens = $this->wiki->get_tokens();
 		
 		if( $tokens['edit'] == '+\\' ) {
-			throw new EditError( "LoggedOut", "User has logged out" );
+			pecho( "User has logged out.\n\n", PECHO_FATAL );
+			return false;
 		}
 		elseif( $tokens['edit'] == '' ) {
-			throw new EditError( "PermissionDenied", "User is not allowed to edit {$this->title}" );
+			pecho( "User is not allowed to edit {$this->title}\n\n", PECHO_FATAL );
+			return false;
 		}
+		
 		$params = array(
 			'title' => $this->title,
 			'action' => 'edit',
@@ -771,19 +788,30 @@ class Page {
 		if(!is_null($summary)){
 			if( function_exists( 'mb_strlen' ) ) {
 				if( mb_strlen( $summary, '8bit' ) > 255 ) {
-					throw new EditError( "LongSummary", "Summary is over 255 bytes, the maximum allowed" );
+					pecho( "Summary is over 255 bytes, the maximum allowed.\n\n", PECHO_FATAL );
+					return false;
 				}
 			}
 			else {
 				// If we don't have mb_strlen we compromise and use strlen
-				if( strlen( $summary ) > 255 ) {
-					throw new EditError( "LongSummary", "Summary is over 255 characters, the maximum allowed" );
+				if( strlen( $summary) > 255 ) {
+					pecho( "Summary is over 255 characters, the maximum allowed.\n\n", PECHO_FATAL );
+					return false;
 				}
 			}
+			
 			$params['summary'] = $summary;
 		}
 		
-		if(!$force) $this->preEditChecks();
+		if( !$force ) {
+			try {
+				$this->preEditChecks();
+			}
+			catch( EditError $e ) {
+				pecho( "Error: $e\n\n", PECHO_FATAL );
+				return false;
+			}
+		}
 		
 		pecho( "Undoing revision(s) on {$this->title}...\n\n", PECHO_NORMAL );
 		$result = $this->wiki->apiQuery( $params, true );
@@ -799,7 +827,8 @@ class Page {
 			
 			return $result['edit']['newrevid'];
 		} else {
-			throw new EditError( "UnknownEditError", print_r($result['edit'],true));
+			pecho( "Undo error...\n\n" . print_r($result['edit'], true) . "\n\n", PECHO_FATAL );
+			return false;
 		}
 	}
 	
@@ -835,7 +864,7 @@ class Page {
 		if($this->namespace_id < 0 || $this->namespace_id === "") {
 			// No discussion page exists
 			// Guessing we want to error
-			throw new BadEntryError("get_discussion","tried to find the discussion page of a page which could never have one");
+			throw new BadEntryError( "get_discussion", "Tried to find the discussion page of a page which could never have one" );
 			return false;
 		} else {
 			$namespaces = $this->wiki->get_namespaces();
@@ -860,15 +889,27 @@ class Page {
 	public function move( $newTitle, $reason = '', $movetalk = true, $movesubpages = true, $noredirect = false ) {
 		$tokens = $this->wiki->get_tokens();
 		
-		if( $tokens['move'] == '+\\' ) {
-			throw new EditError( "LoggedOut", "User has logged out" );
+		if( $tokens['edit'] == '+\\' ) {
+			pecho( "User has logged out.\n\n", PECHO_FATAL );
+			return false;
 		}
-		elseif( $tokens['move'] == '' ) {
-			throw new EditError( "PermissionDenied", "User is not allowed to move {$this->title}" );
+		elseif( $tokens['edit'] == '' ) {
+			pecho( "User is not allowed to edit {$this->title}\n\n", PECHO_FATAL );
+			return false;
 		}
 		
-		if( mb_strlen( $reason, '8bit' ) > 255 ) {
-			throw new EditError( "LongReason", "Reason is over 255 bytes, the maximum allowed" );
+		if( function_exists( 'mb_strlen' ) ) {
+			if( mb_strlen( $reason, '8bit' ) > 255 ) {
+				pecho( "Reason is over 255 bytes, the maximum allowed.\n\n", PECHO_FATAL );
+				return false;
+			}
+		}
+		else {
+			// If we don't have mb_strlen we compromise and use strlen
+			if( strlen( $reason ) > 255 ) {
+				pecho( "Reason is over 255 characters, the maximum allowed.\n\n", PECHO_FATAL );
+				return false;
+			}
 		}
 		
 		pecho( "Moving {$this->title} to $newTitle...\n\n", PECHO_NOTICE );
@@ -900,11 +941,13 @@ class Page {
 				return true;
 			}
 			else {
-				throw new MoveError( "UnknownMoveError", print_r($result['move'],true));
+				pecho( "Move error...\n\n" . print_r($result['move'], true) . "\n\n", PECHO_FATAL );
+				return false;
 			}
 		}
 		else {
-			throw new MoveError( "UnknownMoveError", print_r($result['move'],true));
+			pecho( "Move error...\n\n" . print_r($result, true), PECHO_FATAL );
+			return false;
 		}
 	}
 	
@@ -920,7 +963,7 @@ class Page {
 	public function protect( $levels = array( 'edit' => 'sysop', 'move' => 'sysop' ), $reason = null, $expiry = 'indefinite', $cascade = false, $watch = false ) {
 	
 		if( !in_array( 'protect', $this->wiki->get_userrights() ) ) {
-			throw new PermissionsError( "User is not allowed to protect pages" );
+			pecho( "User is not allowed to protect pages", PECHO_FATAL );
 			return false;
 		}
 		
@@ -956,11 +999,13 @@ class Page {
 				return true;
 			}
 			else {
-				throw new ProtectError( "UnknownProtectError", print_r($result['protect'],true));
+				pecho( "Protect error...\n\n" . print_r($result['protect'], true) . "\n\n", PECHO_FATAL );
+				return false;
 			}
 		}
 		else {
-			throw new ProtectError( "UnknownProtectError", print_r($result['protect'],true));
+			pecho( "Protect error...\n\n" . print_r($result, true), PECHO_FATAL );
+			return false;
 		}
 	}
 	
@@ -983,7 +1028,7 @@ class Page {
 	public function delete( $reason = null ) {
 	
 		if( !in_array( 'delete', $this->wiki->get_userrights() ) ) {
-			throw new PermissionsError( "User is not allowed to delete pages" );
+			pecho( "User is not allowed to delete pages", PECHO_FATAL );
 			return false;
 		}
 		
@@ -1008,11 +1053,13 @@ class Page {
 				return true;
 			}
 			else {
-				throw new DeleteError( "UnknownDeleteError", print_r($result['delete'],true));
+				pecho( "Delete error...\n\n" . print_r($result['delete'], true) . "\n\n", PECHO_FATAL );
+				return false;
 			}
 		}
 		else {
-			throw new DeleteError( "UnknownDeleteError", print_r($result['delete'],true));
+			pecho( "Delete error...\n\n" . print_r($result, true), PECHO_FATAL );
+			return false;
 		}
 		
 	}
@@ -1026,8 +1073,10 @@ class Page {
 	 * @return bool
 	 */
 	public function undelete( $reason = null, $timestamps = null ) {
+		
+		##FIXME: MAke this work for users who can't undelete but can view deleted
 		if( !in_array( 'undelete', $this->wiki->get_userrights() ) ) {
-			throw new PermissionsError( "User is not allowed to undelete pages" );
+			pecho( "User is not allowed to undelete pages", PECHO_FATAL );
 			return false;
 		}
 		
@@ -1059,11 +1108,13 @@ class Page {
 				return true;
 			}
 			else {
-				throw new UndeleteError( "UnknownUndeleteError", print_r($result['undelete'],true));
+				pecho( "Undelete error...\n\n" . print_r($result['undelete'], true) . "\n\n", PECHO_FATAL );
+				return false;
 			}
 		}
 		else {
-			throw new UndeleteError( "UnknownUndeleteError", print_r($result['undelete'],true));
+			pecho( "Undelete error...\n\n" . print_r($result, true), PECHO_FATAL );
+			return false;
 		}
 	}
 	
@@ -1082,7 +1133,7 @@ class Page {
 	 */
 	public function deletedrevs( $content = false, $user = null, $excludeuser = null, $start = null, $end = null, $dir = 'older', $prop = array( 'revid', 'user', 'parsedcomment', 'minor', 'len', 'content', 'token' ) ) {
 		if( !in_array( 'deletedhistory', $this->wiki->get_userrights() ) ) {
-			throw new PermissionsError( "User is not allowed to view deleted revisions" );
+			pecho( "User is not allowed to view deleted revisions", PECHO_FATAL );
 			return false;
 		}
 		
@@ -1143,11 +1194,13 @@ class Page {
 				return true;
 			}
 			else {
-				throw new APIError( "UnknownWatchError", print_r($result['watch'],true));
+				pecho( "Watch error...\n\n" . print_r($result['watch'], true) . "\n\n", PECHO_FATAL );
+				return false;
 			}
 		}
 		else {
-			throw new APIError( "UnknownWatchError", print_r($result['watch'],true));
+			pecho( "Watch error...\n\n" . print_r($result, true), PECHO_FATAL );
+			return false;
 		}
 		
 	}
@@ -1173,11 +1226,13 @@ class Page {
 				return true;
 			}
 			else {
-				throw new APIError( "UnknownUnwatchError", print_r($result['watch'],true));
+				pecho( "Unwatch error...\n\n" . print_r($result['watch'], true) . "\n\n", PECHO_FATAL );
+				return false;
 			}
 		}
 		else {
-			throw new APIError( "UnknownUnwatchError", print_r($result['watch'],true));
+			pecho( "Unwatch error...\n\n" . print_r($result, true), PECHO_FATAL );
+			return false;
 		}
 		
 	}
@@ -1336,7 +1391,15 @@ class Page {
 	 * @return array Details of the rollback perform. ['revid']: The revision ID of the rollback. ['old_revid']: The revision ID of the first (most recent) revision that was rolled back. ['last_revid']: The revision ID of the last (oldest) revision that was rolled back.
 	 */
 	public function rollback($force = false, $summary = null, $markbot = null){
-		if( !$force ) $this->preEditChecks();
+		if( !$force ) {
+			try {
+				$this->preEditChecks();
+			}
+			catch( EditError $e ) {
+				pecho( "Error: $e\n\n", PECHO_FATAL );
+				return false;
+			}
+		}
 		
 		$history = $this->history( 1, 'older', false, null, true );
 		
@@ -1350,15 +1413,18 @@ class Page {
 		if( !is_null( $summary ) ) {
 			if( function_exists( 'mb_strlen' ) ) {
 				if( mb_strlen( $summary, '8bit' ) > 255 ) {
-					throw new EditError( "LongSummary", "Summary is over 255 bytes, the maximum allowed" );
+					pecho( "Summary is over 255 bytes, the maximum allowed.\n\n", PECHO_FATAL );
+					return false;
 				}
 			}
 			else {
 				// If we don't have mb_strlen we compromise and use strlen
 				if( strlen( $summary) > 255 ) {
-					throw new EditError( "LongSummary", "Summary is over 255 characters, the maximum allowed" );
+					pecho( "Summary is over 255 characters, the maximum allowed.\n\n", PECHO_FATAL );
+					return false;
 				}
 			}
+
 			$params['summary'] = $summary;
 		}
 		
@@ -1375,11 +1441,13 @@ class Page {
 				return true;
 			}
 			else {
-				throw new APIError( "UnknownRollbackError", print_r($result['rollback'],true));
+				pecho( "Rollback error...\n\n" . print_r($result['rollback'], true) . "\n\n", PECHO_FATAL );
+				return false;
 			}
 		}
 		else {
-			throw new APIError( "UnknownRollbackError", print_r($result['rollback'],true));
+			pecho( "Rollback error...\n\n" . print_r($result, true), PECHO_FATAL );
+			return false;
 		}
 	}
 	

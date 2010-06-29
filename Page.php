@@ -1390,18 +1390,20 @@ class Page {
 	 * @return void
 	 */
 	private function preEditChecks(){
-		$preeditinfo = $this->wiki->apiQuery( array(
+		$preeditinfo = array(
 			'action' => 'query',
 			'meta' => 'userinfo',
 			'uiprop' => 'hasmsg|blockinfo',
 			'prop' => 'revisions',
 			'titles' => $this->title,
 			'rvprop' => 'content'
-		) );
+		);
 		
 		if( !is_null( $this->wiki->get_runpage() ) ) {
 			$preeditinfo['titles'] .=  "|" . $this->wiki->get_runpage();
 		}
+		
+		$preeditinfo = $this->wiki->apiQuery( $preeditinfo );
 	
 		if( isset( $preeditinfo['query']['pages'] ) ) {
 			//$oldtext = $preeditinfo['query']['pages'][$this->pageid]['revisions'][0]['*'];
@@ -1427,10 +1429,12 @@ class Page {
 		}
 		else {
 			$oldtext = '';
-			$runtext = '';
+			$runtext = 'enable';
 			$messages = false;
 			$blocked = false;
 		}
+		
+		var_dump($runtext);
 		
 		//Perform nobots checks, login checks, /Run checks
 		if( checkExclusion( $this->wiki, $oldtext, $this->wiki->get_username(), $this->wiki->get_optout() ) && $this->wiki->get_nobots() ) {

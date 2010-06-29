@@ -460,7 +460,7 @@ class Wiki {
 	 * @param bool $post Should it be a POST reqeust? (default: false)
 	 * @return array Returns an array with the API result
 	 */
-	public function apiQuery( $arrayParams = array(), $post = false ) {
+	public function apiQuery( $arrayParams = array(), $post = false, $errorcheck = true ) {
 
 		$arrayParams['format'] = 'php';
 		$assert = false;
@@ -477,7 +477,7 @@ class Wiki {
 		if( $post ) {
 			$is_loggedin = $this->get_nologin();
 			Hooks::runHook( 'APIQueryCheckLogin', array( &$is_loggedin ) );
-			if( $is_loggedin ) throw new LoggedOut();
+			if( $is_loggedin && $errorcheck ) throw new LoggedOut();
 			
 			Hooks::runHook( 'PreAPIPostQuery', array( &$arrayParams ) );
 			$data = unserialize( $this->get_http()->post(
@@ -488,12 +488,12 @@ class Wiki {
 			Hooks::runHook( 'PostAPIPostQuery', array( &$data ) );
 			
 			Hooks::runHook( 'APIQueryCheckAssertion', array( &$assert, &$data['edit']['assert'] ) );
-			if( $assert && $data['edit']['assert'] == 'Failure' ) {
+			if( $assert && $data['edit']['assert'] == 'Failure' && $errorcheck ) {
 				throw new EditError( 'AssertFailure', print_r( $data['edit'], true ) );
 			}
 			
 			Hooks::runHook( 'APIQueryCheckError', array( &$data['error'] ) );
-			if( isset( $data['error'] ) ) {
+			if( isset( $data['error'] ) && $errorcheck ) {
 				throw new APIError( array( 'error' => $data['error']['code'], 'text' => $data['error']['info'] ) );
 				return false;
 			}

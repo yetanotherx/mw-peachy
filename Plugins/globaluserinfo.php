@@ -101,14 +101,14 @@ class GlobalUserInfo {
 				'meta' => 'globaluserinfo',
 				'guiuser' => ucfirst( $username ),
 				'guiprop' => 'groups|merged|unattached',
-		));
+		), false, false);
 		
 		if( !isset( $guiRes['query']['globaluserinfo'] ) ) {
 			$this->exists = false;
-			if( isset( $guiRes['error'] ) ) {
+			if( isset( $guiRes['error'] ) && $guiRes['error']['code'] != 'guinosuchuser' ) {
 				throw new APIError( $guiRes['error'] );
 			}
-			else {
+			elseif( @$guiRes['error']['code'] != 'guinosuchuser' ) {
 				throw new APIError( array( 'code' => 'UnknownError', 'info' => 'Unknown API Error' ) );
 			}
 		}
@@ -133,7 +133,6 @@ class GlobalUserInfo {
 	 */
 	public static function load( &$wikiClass, $username ) {
 	
-		print_r($wikiClass->get_extensions());
 		if( !array_key_exists( 'Central Auth', $wikiClass->get_extensions() ) ) {
 			throw new DependancyError( "CentralAuth", "http://www.mediawiki.org/wiki/Extension:CentralAuth" );
 		}

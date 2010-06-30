@@ -44,7 +44,7 @@ class RPED {
 	 */
 	function __construct( &$wikiClass ) {
 		$this->wiki = $wikiClass;
-		$defaultMaxURLLength = 1000;
+		$defaultMaxURLLength = 10000;
 		return;
 	}
  
@@ -108,7 +108,7 @@ class RPED {
 			    .'specifying an insert or delete command.' );
 		}
 		if ( $maxURLLength == 0 ) {
-			$maxURLLength = $defaultMaxURLLength;
+			$maxURLLength = $this->defaultMaxURLLength;
 		}
 		$line = '';
 		foreach ( $pageArray as $page ) {

@@ -519,7 +519,7 @@ class Wiki {
 	 * @link http://compwhizii.net/peachy/wiki/Manual/Wiki::listHandler
 	 * @param array $tArray Parameters given to query with (default: array()). In addition to those recognised by the API, ['code'] is the first two characters of all the parameters in a list=XXX API call - for example, with allpages, the parameters start with 'ap', with recentchanges, the parameters start with 'rc' -  and is required; ['limit'] imposes a hard limit on the number of results returned (optional) and ['lhtitle'] simplififies a multidimendional result into a unidimensional result - lhtitle is the key of the sub-array to return. (optional)
 	 * @return array Returns an array with the API result
-	 * @todo Really document this...
+	 * @todo FIXME:: Really document this...
 	 */
 	public function listHandler( $tArray = array() ) {
 		
@@ -1189,7 +1189,7 @@ class Wiki {
 	 * @param array $namespace Which namespaces to search (default: null).
 	 * @param int limit How many results to retrieve (default: null i.e. all).
 	 * @return array A list of pages the title is transcluded in.
-	 * @todo Move this to the Page class
+	 * @todo FIXME:: Move this to the Page class
 	 */
 	public function embeddedin( $title, $namespace = null, $limit = null ) {
 		$eiArray = array(

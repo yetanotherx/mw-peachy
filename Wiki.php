@@ -1309,8 +1309,34 @@ class Wiki {
 		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
 	}
 	
-	public function siteinfo() {
-		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+	/**
+	 * Returns meta information about the wiki itself
+	 * 
+	 * @access public
+	 * @param array $prop Information to retrieve. Default: array( 'general', 'namespaces', 'namespacealiases', 'specialpagealiases', 'magicwords', 'interwikimap', 'dbrepllag', 'statistics', 'usergroups', 'extensions', 'fileextensions', 'rightsinfo', 'languages' )
+	 * @param bool $iwfilter When used with prop 'interwikimap', returns only local or only nonlocal entries of the interwiki map. True = local, false = nonlocal. Default null
+	 * @return array
+	 * @todo Use this in the constructors, etc. FIXME
+	 */
+	public function siteinfo( $prop = array( 'general', 'namespaces', 'namespacealiases', 'specialpagealiases', 'magicwords', 'interwikimap', 'dbrepllag', 'statistics', 'usergroups', 'extensions', 'fileextensions', 'rightsinfo', 'languages' ), $iwfilter = null ) {
+		
+		$siArray = array(
+			'action' => 'query',
+			'meta' => 'siteinfo',
+			'siprop' => implode( '|', $prop ),
+		);
+		
+		if( in_array( 'interwikimap', $prop ) && $iwfilter ) $siArray['sifilteriw'] = 'yes';
+		elseif( in_array( 'interwikimap', $prop ) && $iwfilter ) $siArray['sifilteriw'] = 'no';
+		
+		if( in_array( 'dbrepllag', $prop ) ) $siArray['sishowalldb'] = 'yes';
+		if( in_array( 'usergroups', $prop ) ) $siArray['sinumberingroup'] = 'yes';
+		
+		Hooks::runHook( 'PreQuerySiteInfo', array( &$siArray ) );
+		
+		pecho( "Getting site information...\n\n", PECHO_NORMAL );
+		
+		return $this->apiQuery($siArray);
 	}
 	
 	public function allmessages() {

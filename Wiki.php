@@ -1339,20 +1339,86 @@ class Wiki {
 		return $this->apiQuery($siArray);
 	}
 	
-	public function allmessages() {
-		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+	/**
+	 * Returns a list of system messages (MediaWiki:... pages)
+	 * 
+	 * @access public
+	 * @param string $filter Return only messages that contain this string. Default null
+	 * @param array $messages Which messages to output. Default array(), which means all.
+	 * @param bool $parse Set to true to enable parser, will preprocess the wikitext of message. (substitutes magic words, handle templates etc.) Default false
+	 * @param array $args Arguments to be substituted into message. Default array(). 
+	 * @param string $lang Return messages in this language. Default null
+	 * @return array
+	 */
+	public function allmessages( $filter = null, $messages = array(), $parse = false, $args = array(), $lang = null ) {
+		$amArray = array(
+			'action' => 'query',
+			'meta' => 'allmessages',
+		);
+		
+		if( !is_null( $filter ) ) $amArray['amfilter'] = $filter;
+		if( count( $messages ) ) $amArray['ammessages'] = implode( '|', $messages );
+		if( $parse ) $amArray['amenableparser'] = 'yes';
+		if( count( $args ) ) $amArray['amargs'] = implode( '|', $args );
+		if( !is_null( $lang ) ) $amArray['amlang'] = $lang;
+		
+		Hooks::runHook( 'PreQueryAllMessages', array( &$amArray ) );
+		
+		pecho( "Getting list of system messages...\n\n", PECHO_NORMAL );
+		
+		return $this->apiQuery($amArray);
 	}
 	
-	public function expandtemplates() {
-		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+	/**
+	 * Expand and parse all templates in wikitext
+	 * 
+	 * @access public
+	 * @param string $text Text to parse
+	 * @param string $title Title to use for expanding magic words, etc. (e.g. {{PAGENAME}}). Default 'API'.
+	 * @param bool $generatexml Generate XML parse tree. Default false
+	 * @return string
+	 */
+	public function expandtemplates( $text, $title = null, $generatexml = false ) {
+		$etArray = array(
+			'action' => 'expandtemplates',
+			'text' => $text
+		);
+		
+		if( $generatexml ) $etArray['generatexml'] = 'yes';
+		if( !is_null( $title ) ) $etArray['title'] = $title;
+		
+		Hooks::runHook( 'PreQueryExpandtemplates', array( &$etArray ) );
+		
+		pecho( "Parsing templates...\n\n", PECHO_NORMAL );
+		
+		$ret = $this->apiQuery($etArray);
+		return $ret['expandtemplates']['*'];
+		
 	}
 	
 	public function parse() {
 		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
 	}
 	
-	public function patrol() {
-		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+	/**
+	 * Patrols a page or revision
+	 * 
+	 * @access public
+	 * @param int $rcid Recent changes ID to patrol
+	 * @return array
+	 */
+	public function patrol( $rcid = 0 ) {
+		Hooks::runHook( 'PreQueryParse', array( &$rcid ) );
+		
+		pecho( "Patrolling $rcid...\n\n", PECHO_NORMAL );
+		
+		$this->get_tokens();
+		
+		return $this->apiQuery( array(
+			'action' => 'patrol',
+			'rcid' => $rcid,
+			'token' => $this->tokens['edit']
+		));
 	}
 	
 	public function import() {

@@ -23,6 +23,10 @@ if ( !isset ( $argv[1] ) ) {
     die ('Filename not specified.\n');
 }
 $fileName = $argv[1];
+$searching = false;
+if ( isset( $argv[2] ) && $argv[2]!='' ) {
+    $searching = true;
+}
 require_once( 'Init.php' );
 $wiki = Peachy::newWiki( "libertapedia" );
 Peachy::loadPlugin( 'rped' );
@@ -50,22 +54,34 @@ if ( isset( $daemonize ) && $daemonize ) {
 
 $maxCount = 1000;
 $count = 0;
+$rawCount = 0;
 $rpedArray = array();
 if ( $handle ) {
     while ( !feof( $handle ) ) {
         $buffer = fgets( $handle, 4096 );
         $buffer = str_replace( "\n", "", $buffer );
-        
-        $count++;
-        if ( $count > $maxCount ) {
-            $rped->insertArray( $rpedArray, 10000 );
-            $count = 0;
-            unset ( $rpedArray );
-            $rpedArray = array();
+        if ( $searching ) {
+            if ( $buffer == $argv[2] ) {
+                $searching = false;
+            }
         }
-        $rpedArray[] = $buffer;
+        if ( !$searching ) {
+            $count++;
+            if ( $count > $maxCount ) {
+                $rped->insertArray( $rpedArray, 2000 );
+                $count = 0;
+                unset ( $rpedArray );
+                $rpedArray = array();
+            }
+            $rpedArray[] = $buffer;
+        }
+        $rawCount++;
+        if ( $rawCount % 1000 == 0 && !$daemonize ) {
+            echo $buffer . '\n';
+            $rawCount = 0;
+        }
     }
-    $rped->insertArray( $rpedArray, 10000 );
+    $rped->insertArray( $rpedArray, 2000 );
     fclose( $handle );
 } else {
     echo "No handle!\n";

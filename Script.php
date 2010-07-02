@@ -26,10 +26,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Script class, contains methods that make writing scripts easier
  */
 class Script {
+	
+	/**
+	 * Wiki class
+	 * 
+	 * @var Wiki
+	 * @access protected
+	 */
 	protected $wiki;
+	
+	/**
+	 * Arguments passed to the CLI
+	 * 
+	 * @var array
+	 * @access protected
+	 */
 	protected $args;
+	
+	/**
+	 * List of pages specified by the -xml:, -file:, -list:, etc parameters
+	 * 
+	 * @var array
+	 * @access protected
+	 */
 	protected $list = array();
 	
+	/**
+	 * Initializes the Script class, creates the Wiki object with the parameters passed to the CLI
+	 * 
+	 * @param array $argfunctions List of callback functions to run when an argument is passed. Default array(). 
+	 * @return void
+	 */
 	function __construct( $argfunctions = array() ) {
 		global $argv;
 		$this->parseArgs( $argv, $argfunctions );
@@ -73,6 +100,13 @@ class Script {
 		}
 	}
 	
+	/**
+	 * Fills in the $this->args array
+	 * 
+	 * @access protected
+	 * @param array $args Arguments passed to the CLI
+	 * @return void
+	 */
 	protected function parseArgs( $args ) {
 		foreach( $args as $arg ) {
 			$tmp = explode( ':', $arg, 2 );
@@ -80,6 +114,13 @@ class Script {
 		}
 	}
 	
+	/**
+	 * Runs the argument callbacks specified in the constructor
+	 * 
+	 * @access protected
+	 * @param array $argfunctions List of callbacks
+	 * @return void
+	 */
 	protected function runArgs( $argfunctions ) {
 		foreach( $argfunctions as $arg => $callback ) {
 			if( is_callable( $callback ) ) {
@@ -88,6 +129,12 @@ class Script {
 		}
 	}
 	
+	/**
+	 * Parses the xml, file, list, etc arguments to fill in the $this->list variable
+	 * 
+	 * @access protected
+	 * @return void
+	 */
 	protected function makeList() {
 		if( isset( $this->args['xml'] ) ) {
 			Peachy::loadPlugin( 'xml' );
@@ -103,6 +150,13 @@ class Script {
 		
 	}
 	
+	/**
+	 * Returns the argument, or false if it was not specified
+	 * 
+	 * @access public
+	 * @param string $arg Argument to retrieve
+	 * @return string|bool
+	 */
 	public function getArg( $arg ) {
 		if( isset( $this->args[$arg] ) ) {
 			return $this->args[$arg];
@@ -110,6 +164,12 @@ class Script {
 		return false;
 	}
 	
+	/**
+	 * Returns the list created in the {@link makeList} function, or false if no list.
+	 * 
+	 * @access public
+	 * @return array|bool
+	 */
 	public function getList() {
 		if( count( $this->list ) ) {
 			return $this->list;
@@ -117,14 +177,13 @@ class Script {
 		return false;
 	}
 	
+	/**
+	 * Returns the wiki class specified in the constructor
+	 * 
+	 * @access public
+	 * @return Wiki Instance of the Wiki class
+	 */
 	public function &getWiki() {
 		return $this->wiki;
 	}
 }
-
-
-
-
-
-
-

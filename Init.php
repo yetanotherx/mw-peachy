@@ -80,7 +80,7 @@ require_once( $IP . 'Hooks.php' );
 require_once( $IP . 'Page.php' );
 require_once( $IP . 'User.php' );
 require_once( $IP . 'HTTP.php' );
-require_once( $IP . 'Update.php' );
+require_once( $IP . 'Script.php' );
 
 $pgProxy = array();
 $pgVerbose = array(0,1,2,3,4);

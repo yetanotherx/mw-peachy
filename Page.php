@@ -1502,8 +1502,6 @@ class Page {
 			$blocked = false;
 		}
 		
-		var_dump($runtext);
-		
 		//Perform nobots checks, login checks, /Run checks
 		if( checkExclusion( $this->wiki, $oldtext, $this->wiki->get_username(), $this->wiki->get_optout() ) && $this->wiki->get_nobots() ) {
 			throw new EditError("Nobots", "The page has a nobots template");

@@ -318,8 +318,7 @@ class Image {
 			);
 			
 			Hooks::runHook( 'APIUpload', array( &$uploadArray ) );
-			
-			var_dump( $this->wiki->apiQuery( $uploadArray, true ) );
+
 		} else {
 			##FIXME: test the non-api upload
 			

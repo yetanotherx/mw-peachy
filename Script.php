@@ -28,14 +28,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class Script {
 	protected $wiki;
 	protected $args;
-	protected $list;
+	protected $list = array();
 	
-	function __construct( $argv, $argfunctions = array() ) {
+	function __construct( $argfunctions = array() ) {
+		global $argv;
 		$this->parseArgs( $argv, $argfunctions );
-		
-		global $IP;
-		$IP = dirname(__FILE__) . '/';
-		require_once( $IP . 'Init.php' );
 
 		if( isset( $this->args['config'] ) ) {
 			$this->wiki = Peachy::newWiki( $this->args['config'] );
@@ -100,7 +97,28 @@ class Script {
 		elseif( isset( $this->args['file'] ) ) {
 			$this->list = explode( "\n", file_get_contents( $this->args['file'] ) );
 		}
+		elseif( isset( $this->args['list'] ) ) {
+			$this->list = explode( "|", $this->args['list'] );
+		}
 		
+	}
+	
+	public function getArg( $arg ) {
+		if( isset( $this->args[$arg] ) ) {
+			return $this->args[$arg];
+		}
+		return false;
+	}
+	
+	public function getList() {
+		if( count( $this->list ) ) {
+			return $this->list;
+		}
+		return false;
+	}
+	
+	public function &getWiki() {
+		return $this->wiki;
 	}
 }
 

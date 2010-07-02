@@ -19,28 +19,21 @@ This script deletes a bunch of pages using a list of page titles contained
 in a file. The filename is argument #1.
 */
 
-# TODO: Create a better argument parser
-# that lets you specify the wiki and
-# deletion reason
-if ( !isset ( $argv[1] ) ) {
-    die ('Filename not specified.\n');
-}
-$fileName = $argv[1];
-$reason = 'Deleting a batch of pages';
-require_once( 'Init.php' );
-$wiki = Peachy::newWiki( "libertapedia" );
-$handle = @fopen( $fileName, "r" );
+require_once( dirname( dirname(__FILE__) ) . '/Script.php' );
+require_once( dirname( dirname(__FILE__) ) . '/Init.php' );
 
-if ( $handle ) {
-    while ( !feof( $handle ) ) {
-        $buffer = fgets( $handle, 4096 );
-        $buffer = str_replace( "\n", "", $buffer );
-	if ( $buffer != '' ) {
-	    #echo 'Deleting ' . $buffer . "\n";
-	    $page = $wiki->initPage( $buffer );
-	    $page->delete ( $reason );
-	}
-    }
-} else {
-    echo "File I/O problem (maybe the file doesn't exist?), script aborted\n";
+$script = new Script();
+
+if( !$script->getList() ) {
+	die( "List not specified.\n\n" );
+}
+
+$reason = 'Deleting a batch of pages';
+if( $script->getArg( 'reason' ) ) {
+	$reason = $script->getArg( 'reason' );
+}
+
+foreach( $script->getList() as $buffer ) {
+	$page = $script->getWiki()->initPage( $buffer );
+	$page->delete( $reason );
 }

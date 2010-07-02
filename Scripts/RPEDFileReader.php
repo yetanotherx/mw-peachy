@@ -17,24 +17,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 error_reporting( E_ALL | E_STRICT );
-# TODO: Create a better argument parser that accepts, e.g.
-# -wiki=libertapedia -file=enwiki-20100622-all-titles-in-ns0
-if ( !isset ( $argv[1] ) ) {
-    die ('Filename not specified.\n');
+
+require_once( dirname( dirname(__FILE__) ) . '/Script.php' );
+require_once( dirname( dirname(__FILE__) ) . '/Init.php' );
+
+$script = new Script();
+Peachy::loadPlugin( 'rped' );
+
+if( !$script->getList() ) {
+	die( "List not specified.\n\n" );
 }
-$fileName = $argv[1];
+
+$rped = RPED::load( $script->getWiki() );
+
 $searching = false;
-if ( isset( $argv[2] ) && $argv[2]!='' ) {
+if( $script->getArg( 'searching' ) ) {
     $searching = true;
 }
-require_once( 'Init.php' );
-$wiki = Peachy::newWiki( "libertapedia" );
-Peachy::loadPlugin( 'rped' );
-$rped = RPED::load( $wiki );
-$handle = @fopen( $fileName, "r" );
-$lineNumber = 0;
-$line = "";
-$daemonize = true;
+
+
+if( $script->getArg( 'daemonize' ) ) $daemonize = true;
 
 if ( isset( $daemonize ) && $daemonize ) {
 
@@ -56,33 +58,28 @@ $maxCount = 1000;
 $count = 0;
 $rawCount = 0;
 $rpedArray = array();
-if ( $handle ) {
-    while ( !feof( $handle ) ) {
-        $buffer = fgets( $handle, 4096 );
-        $buffer = str_replace( "\n", "", $buffer );
-        if ( $searching ) {
-            if ( $buffer == $argv[2] ) {
-                $searching = false;
-            }
-        }
-        if ( !$searching ) {
-            $count++;
-            if ( $count > $maxCount ) {
-                $rped->insertArray( $rpedArray, 2000 );
-                $count = 0;
-                unset ( $rpedArray );
-                $rpedArray = array();
-            }
-            $rpedArray[] = $buffer;
-        }
-        $rawCount++;
-        if ( $rawCount % 1000 == 0 && !$daemonize ) {
-            echo $buffer . '\n';
-            $rawCount = 0;
+
+foreach( $script->getList() as $buffer ) {
+	if ( $searching ) {
+        if ( $buffer == $argv[2] ) {
+            $searching = false;
         }
     }
-    $rped->insertArray( $rpedArray, 2000 );
-    fclose( $handle );
-} else {
-    echo "No handle!\n";
+    
+    if ( !$searching ) {
+        $count++;
+        if ( $count > $maxCount ) {
+            $rped->insertArray( $rpedArray, 2000 );
+            $count = 0;
+            unset ( $rpedArray );
+            $rpedArray = array();
+        }
+        $rpedArray[] = $buffer;
+    }
+    $rawCount++;
+    if ( $rawCount % 1000 == 0 && !$daemonize ) {
+        echo $buffer . '\n';
+        $rawCount = 0;
+    }
 }
+$rped->insertArray( $rpedArray, 2000 );

@@ -97,6 +97,9 @@ class Script {
 			
 			$this->list = XML::load( file_get_contents( $this->args['xml'] ) );
 		}
+		elseif( isset( $this->args['file'] ) ) {
+			$this->list = explode( "\n", file_get_contents( $this->args['file'] ) );
+		}
 		
 	}
 }

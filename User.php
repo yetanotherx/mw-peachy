@@ -171,12 +171,125 @@ class User {
 		return false;
 	}
 	
-	public function block(  $reason = '', $expiry = 'indefinite', $params = array() ) {
-		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+	/**
+	 * Blocks the user
+	 * 
+	 * @access public
+	 * @param string $reason Reason for blocking. Default null
+	 * @param string $expiry Expiry. Can be a date, {@link http://www.gnu.org/software/tar/manual/html_node/Date-input-formats.html GNU formatted date}, indefinite, or anything else that MediaWiki accepts. Default indefinite. 
+	 * @param array $params Parameters to set. Options are anononly, nocreate, autoblock, noemail, hidename, noallowusertalk. Defdault array().
+	 * @return bool
+	 */
+	public function block( $reason = null, $expiry = 'indefinite', $params = array() ) {
+		
+		$token = $this->wiki->get_tokens();
+		
+		if( !array_key_exists( 'block', $token ) ) return false;
+		
+		$apiArr = array(
+			'action' => 'block',
+			'user' => $this->username,
+			'token' => $token['block'],
+			'expiry' => $expiry,
+			'reblock' => 'yes',
+			'allowusertalk' => 'yes'
+		);
+		
+		if( !is_null( $reason ) ) $apiArr['reason'] = $reason;
+		
+		foreach( $params as $param ) {
+			switch( $param ) {
+				case 'anononly':
+					$apiArr['anononly'] = 'yes';
+					break;
+				case 'nocreate':
+					$apiArr['nocreate'] = 'yes';
+					break;
+				case 'autoblock':
+					$apiArr['autoblock'] = 'yes';
+					break;
+				case 'noemail':
+					$apiArr['noemail'] = 'yes';
+					break;
+				case 'hidename':
+					$apiArr['hidename'] = 'yes';
+					break;
+				case 'noallowusertalk':
+					unset( $apiArr['allowusertalk'] );
+					break;
+				
+			}
+		}
+		
+		Hooks::runHook( 'StartBlock', array( &$apiArr ) );
+		
+		pecho( "Blocking {$this->username}...\n\n", PECHO_NOTICE );
+		
+		$result = $this->wiki->apiQuery( $apiArr, true);
+		
+		if( isset( $result['block'] ) ) {
+			if( isset( $result['block']['user'] ) ) {
+				$this->__construct( $this->wiki, $this->username );
+				return true;
+			}
+			else {
+				pecho( "Block error...\n\n" . print_r($result['block'], true) . "\n\n", PECHO_FATAL );
+				return false;
+			}
+		}
+		else {
+			pecho( "Block error...\n\n" . print_r($result, true), PECHO_FATAL );
+			return false;
+		}
+		
 	}
 	
-	public function unblock( $reason = '', $id = null ) {
-		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+	/**
+	 * Unblocks the user, or a block ID
+	 * 
+	 * @access public
+	 * @param string $reason Reason for unblocking. Default null
+	 * @param int $id Block ID to unblock. Default null
+	 * @return bool
+	 */
+	public function unblock( $reason = null, $id = null ) {
+		
+		$token = $this->wiki->get_tokens();
+		
+		if( !array_key_exists( 'block', $token ) ) return false;
+		
+		$apiArr = array(
+			'action' => 'unblock',
+			'user' => $this->username,
+			'token' => $token['block'],
+		);
+		
+		if( !is_null( $id ) ) {
+			$apiArr['id'] = $id;
+			unset( $apiArr['user'] );
+		}
+		if( !is_null( $reason ) ) $apiArr['reason'] = $reason;
+				
+		Hooks::runHook( 'StartUnblock', array( &$apiArr ) );
+		
+		pecho( "Unblocking {$this->username}...\n\n", PECHO_NOTICE );
+		
+		$result = $this->wiki->apiQuery( $apiArr, true);
+		
+		if( isset( $result['unblock'] ) ) {
+			if( isset( $result['unblock']['user'] ) ) {
+				$this->__construct( $this->wiki, $this->username );
+				return true;
+			}
+			else {
+				pecho( "Unblock error...\n\n" . print_r($result['unblock'], true) . "\n\n", PECHO_FATAL );
+				return false;
+			}
+		}
+		else {
+			pecho( "Unblock error...\n\n" . print_r($result, true), PECHO_FATAL );
+			return false;
+		}
 	}
 	
 	/**

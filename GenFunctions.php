@@ -128,7 +128,7 @@ function pecho( $text, $cat = 0 ) {
  * 
  * @return Wiki|bool
  */
-function getSiteObject() {
+function &getSiteObject() {
 	$vars = $GLOBALS;
 	
 	foreach( $vars as $var ) {
@@ -181,7 +181,7 @@ function &initUser( $username ) {
  * @param array $prop Informatation to set. Default array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' )
  * @return Image
  */
-public function &initImage( $filename = null, $pageid = null, $prop = array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' ) ) {
+function &initImage( $filename = null, $pageid = null, $prop = array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' ) ) {
 	
 	$wiki = getSiteObject();
 	if( !$wiki ) return false;

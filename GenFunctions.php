@@ -122,3 +122,71 @@ function outputText( $text, $cat = 0 ) {
 function pecho( $text, $cat = 0 ) {
 	outputText( $text, $cat );
 }
+
+/**
+ * Gets the first defined Wiki object
+ * 
+ * @return Wiki|bool
+ */
+function getSiteObject() {
+	$vars = $GLOBALS;
+	
+	foreach( $vars as $var ) {
+		if( is_object( $var ) ) {
+			if( get_class( $var ) == "Wiki" ) {
+				return $var;
+			}
+		}
+	}
+	
+	return false;
+}
+
+/**
+ * Returns an instance of the Page class as specified by $title or $pageid
+ * 
+ * @param mixed $title Title of the page (default: null)
+ * @param mixed $pageid ID of the page (default: null)
+ * @param bool $followRedir Should it follow a redirect when retrieving the page (default: true)
+ * @param bool $normalize Should the class automatically normalize the title (default: true)
+ * @return Page
+ */
+function &initPage( $title = null, $pageid = null, $followRedir = true, $normalize = true ) {
+	$wiki = getSiteObject();
+	if( !$wiki ) return false;
+	
+	$page = new Page( &$wiki, $title, $pageid, $followRedir, $normalize );
+	return $page;
+}
+
+/**
+ * Returns an instance of the User class as specified by $username
+ * 
+ * @param mixed $username Username
+ * @return User
+ */
+function &initUser( $username ) {
+	$wiki = getSiteObject();
+	if( !$wiki ) return false;
+	
+	$user = new User( &$wiki, $username );
+	return $user;
+}
+
+/**
+ * Returns an instance of the Image class as specified by $filename or $pageid
+ * 
+ * @param string $filename Filename
+ * @param int $pageid Page ID of image
+ * @param array $prop Informatation to set. Default array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' )
+ * @return Image
+ */
+public function &initImage( $filename = null, $pageid = null, $prop = array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' ) ) {
+	
+	$wiki = getSiteObject();
+	if( !$wiki ) return false;
+	
+	$image = new Image( &$wiki, $filename, $pageid, $prop );
+	return $image;
+}
+

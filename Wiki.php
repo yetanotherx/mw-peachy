@@ -759,6 +759,13 @@ class Wiki {
 		return $this->configuration;
 	}
 	
+	/**
+	 * Purges a list of pages
+	 * 
+	 * @access public
+	 * @param array|string $titles Title(s) to purge
+	 * @return void|bool
+	 */
 	public function purge( $titles ) {
 
 		Hooks::runHook( 'StartPurge', array( &$titles ) );
@@ -767,16 +774,29 @@ class Wiki {
 			$titles = implode( '|', $titles );
 		}
 		
-		pecho( "Purging " . implode( ',', explode( '|', $this->titles ) ) . "...\n\n", PECHO_NOTICE );
+		pecho( "Purging " . implode( ', ', explode( '|', $titles ) ) . "...\n\n", PECHO_NOTICE );
 		
-		$SMres = $this->apiQuery(array(
-				'action' => 'purge',
-				'titles' => $titles
-			),
-			true
+		$apiArr = array(
+			'action' => 'purge',
+			'titles' => $titles
 		);
 		
-		##FIXME: Make sure this works
+		Hooks::runHook( 'StartPurge', array( &$apiArr ) );
+		
+		$result = $this->apiQuery( $apiArr, true );
+		
+		if( isset( $result['purge'] ) ) {
+			foreach( $result['purge'] as $page ) {
+				if( !isset( $page['purged'] ) ) {
+					pecho( "Purge error on {$page['title']}...\n\n" . print_r($page, true) . "\n\n", PECHO_FATAL );
+				}
+			}
+
+		}
+		else {
+			pecho( "Purge error...\n\n" . print_r($result, true), PECHO_FATAL );
+			return false;
+		}
 	}
 	
 

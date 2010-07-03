@@ -1322,7 +1322,6 @@ class Wiki {
 	 * @param array $prop Information to retrieve. Default: array( 'general', 'namespaces', 'namespacealiases', 'specialpagealiases', 'magicwords', 'interwikimap', 'dbrepllag', 'statistics', 'usergroups', 'extensions', 'fileextensions', 'rightsinfo', 'languages' )
 	 * @param bool $iwfilter When used with prop 'interwikimap', returns only local or only nonlocal entries of the interwiki map. True = local, false = nonlocal. Default null
 	 * @return array
-	 * @todo Use this in the constructors, etc. FIXME
 	 */
 	public function siteinfo( $prop = array( 'general', 'namespaces', 'namespacealiases', 'specialpagealiases', 'magicwords', 'interwikimap', 'dbrepllag', 'statistics', 'usergroups', 'extensions', 'fileextensions', 'rightsinfo', 'languages' ), $iwfilter = null ) {
 		

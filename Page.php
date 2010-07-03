@@ -1124,7 +1124,6 @@ class Page {
 	 */
 	public function undelete( $reason = null, $timestamps = null ) {
 		
-		##FIXME: MAke this work for users who can't undelete but can view deleted
 		if( !in_array( 'undelete', $this->wiki->get_userrights() ) ) {
 			pecho( "User is not allowed to undelete pages", PECHO_FATAL );
 			return false;

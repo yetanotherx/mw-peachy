@@ -315,24 +315,74 @@ class Page {
 	 * 
 	 * @access public
 	 * @param bool $force Grab text from the API, don't use the cached copy (default: false)
+	 * @param string|int $section Section title or ID to retrieve
 	 * @return string Page content
 	 */
-	public function get_text( $force = false ) {
-		
-		##FIXME: Allow getting sections
+	public function get_text( $force = false, $section = null ) {
 		
 		pecho( "Getting page content for {$this->title}..\n\n", PECHO_NOTICE );
 		
-		if( !$force && !empty($this->content) ) {
+		if( !$this->exists ) return null;
+			
+		if( !is_null( $section ) ) {
+			if( empty($this->content) ) {
+				$this->content = $this->history( 1, "older", true );
+				$this->content = $this->content[0]['*'];
+			}
+			
+			$sections = $this->wiki->apiQuery(array(
+				'action' => 'parse',
+				'page' => $this->title,
+				'prop' => 'sections'
+			));
+			
+			if( !is_numeric( $section ) ) {
+				foreach( $sections['parse']['sections'] as $section3 ) {
+					if( $section3['line'] == $section ) {
+						$section = $section3['number'];
+					}
+				}
+			}
+			
+			$offsets = array( '0' => '0' );
+			
+			foreach( $sections['parse']['sections'] as $section2 ) {
+				$offsets[$section2['number']] = $section2['byteoffset'];
+			}
+			
+			if( intval( $section ) != count( $offsets ) - 1 ) {
+				$length = $offsets[$section + 1] - $offsets[$section];
+			}
+			
+			if( function_exists( 'mb_substr' ) ) {
+				if( isset( $length ) ) {
+					$substr = mb_substr( $this->content, $offsets[$section], $length );
+				}
+				else {
+					$substr = mb_substr( $this->content, $offsets[$section] );
+				}
+			}
+			else {
+				if( isset( $length ) ) {
+					$substr = substr( $this->content, $offsets[$section], $length );
+				}
+				else {
+					$substr = substr( $this->content, $offsets[$section] );
+				}
+			}
+			
+			return $substr;
+		}
+		else {
+			if( !$force && !empty($this->content) ) {
+				return $this->content;
+			}
+			
+			$this->content = $this->history( 1, "older", true );
+			$this->content = $this->content[0]['*'];
+			
 			return $this->content;
 		}
-		
-		if( !$this->exists ) return null;
-		
-		$this->content = $this->history( 1, "older", true );
-		$this->content = $this->content[0]['*'];
-		
-		return $this->content;
 	}
 	
 	/**

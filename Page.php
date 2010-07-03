@@ -1212,7 +1212,7 @@ class Page {
 	 * @see Page::embeddedin()
 	 */
 	public function get_transclusions( $namespace = null, $limit = null ) {	
-
+		pecho( "Warning: Page::get_transclusions() is deprecated. Please use Page::embeddedin() instead.\n\n", PECHO_WARN );
 		return $this->embeddedin($namespace, $limit);
 		
     }

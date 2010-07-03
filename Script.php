@@ -155,6 +155,14 @@ class Script {
 		elseif( isset( $this->args['list'] ) ) {
 			$this->list = explode( "|", $this->args['list'] );
 		}
+		elseif( isset( $this->args['cat'] ) ) {
+			if( isset( $this->args['recurse'] ) ) {
+				$this->list = $this->wiki->categorymembers( $this->args['cat'], true );
+			}
+			else {
+				$this->list = $this->wiki->categorymembers( $this->args['cat'] );
+			}
+		}
 		
 	}
 	

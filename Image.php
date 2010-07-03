@@ -309,7 +309,12 @@ class Image {
 		
 		$tokens = $this->wiki->get_tokens();
 		
-		$localfile = $IP . 'Images/' . str_replace( ' ', '_', $this->name );
+		if( is_file( $file ) ) {
+			$localfile = $file;
+		}
+		else {
+			$localfile = $IP . 'Images/' . str_replace( ' ', '_', $this->name );
+		}
 		
 		pecho( "Uploading $file to {$this->name}..\n\n", PECHO_NOTICE );
 		

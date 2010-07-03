@@ -100,6 +100,14 @@ class Image {
 	protected $bitdepth;
 	
 	/**
+	 * Size of image
+	 * 
+	 * @var int
+	 * @access protected
+	 */
+	protected $size;
+	
+	/**
 	 * Metadata stored in the image
 	 * 
 	 * @var array
@@ -180,6 +188,7 @@ class Image {
 				$this->hash = $x['imageinfo'][0]['sha1'];
 				$this->metadata = $x['imageinfo'][0]['metadata'];
 				$this->bitdepth = $x['imageinfo'][0]['bitdepth'];
+				$this->size = $x['imageinfo'][0]['size'];
 			}
 		}
 	}
@@ -480,10 +489,19 @@ class Image {
 	/**
 	 * Returns the bitdepth of the image
 	 * 
-	 * @return string
+	 * @return int
 	 */
 	public function getBitdepth() {
 		return $this->bitdepth;
+	}
+	
+	/**
+	 * Returns the size of the image
+	 * 
+	 * @return int
+	 */
+	public function getSize() {
+		return $this->size;
 	}
 	
 	/**

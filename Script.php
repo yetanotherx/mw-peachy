@@ -58,8 +58,10 @@ class Script {
 	 * @return void
 	 */
 	function __construct( $argfunctions = array() ) {
-		global $argv;
+		global $argv, $pgHooks;
 		$this->parseArgs( $argv, $argfunctions );
+		
+		$pgHooks['StartLogin'][] = array( $this, 'fixConfig' );
 
 		if( isset( $this->args['config'] ) ) {
 			$this->wiki = Peachy::newWiki( $this->args['config'] );
@@ -98,6 +100,7 @@ class Script {
 		if( count( $argfunctions ) ) {
 			$this->runArgs( $argfunctions );
 		}
+		
 	}
 	
 	/**
@@ -185,5 +188,23 @@ class Script {
 	 */
 	public function &getWiki() {
 		return $this->wiki;
+	}
+	
+	/**
+	 * Hook to specify config params specified in arguments
+	 * 
+	 * @access public
+	 * @param &$configs Config params
+	 * @return void
+	 */
+	public function fixConfig( &$configs ) {
+		if( $this->getArg( 'epm' ) ) $configs['editsperminute'] = $this->getArg( 'epm' );
+		if( $this->getArg( 'httpecho' ) ) $configs['httpecho'] = "true";
+		if( $this->getArg( 'runpage' ) ) $configs['runpage'] = $this->getArg( 'runpage' );
+		if( $this->getArg( 'optout' ) ) $configs['optout'] = $this->getArg( 'optout' );
+		if( $this->getArg( 'stoponnewmessages' ) ) $configs['stoponnewmessages'] = 'true';
+		if( $this->getArg( 'verbose' ) ) $configs['verbose'] = $this->getArg( 'verbose' );
+		if( $this->getArg( 'nobots' ) ) $configs['nobots'] = $this->getArg( 'nobots' );
+		if( $this->getArg( 'maxlag' ) ) $configs['maxlag'] = $this->getArg( 'maxlag' );
 	}
 }

@@ -1204,14 +1204,15 @@ class Wiki {
 	/**
 	 * Returns array of pages that embed (transclude) the page given.
 	 * 
+	 * @see Page::embeddedin()
 	 * @access public
 	 * @param string $title The title of the page being embedded.
 	 * @param array $namespace Which namespaces to search (default: null).
 	 * @param int limit How many results to retrieve (default: null i.e. all).
 	 * @return array A list of pages the title is transcluded in.
-	 * @todo FIXME:: Move this to the Page class
 	 */
 	public function embeddedin( $title, $namespace = null, $limit = null ) {
+		pecho( "Warning: Wiki::embeddedin() is deprecated. Please use Page::embeddedin() instead.\n\n", PECHO_WARN );
 		$page = $this->initPage( $title );
 		return $page->embeddedin( $namespace, $limit );
 	}

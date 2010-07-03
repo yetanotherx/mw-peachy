@@ -124,18 +124,7 @@ class Peachy {
 		
 		//throw new APIError( array( 'code' => "nopage", 'text' => "nopage exists" ) );
 		if( !is_null( $config_name ) ) {
-			if( !is_file( $config_name ) ) {
-				if( !is_file( $IP . 'Configs/' . $config_name . '.cfg' ) ) {
-					throw new BadEntryError( "BadConfig", "A non-existent configuration file was specified." );
-				}
-				else {
-					$config_name = $IP . 'Configs/' . $config_name . '.cfg';
-				}
-			}
-			
-			
-			
-			$config_params = parse_ini_file( $config_name );
+			$config_params = self::parse_config( $config_name );
 		
 		}
 		else {
@@ -252,6 +241,36 @@ class Peachy {
 		foreach( glob( $IP . 'Plugins/*.php' ) as $plugin ) {
 			require_once( $plugin );
 		}
+	}
+	
+	/**
+	 * Checks for config files, parses them. 
+	 * 
+	 * @access private
+	 * @static
+	 * @param string $config_name Name of config file
+	 * @return array Config params
+	 */
+	private static function parse_config( $config_name ) {
+		global $IP;
+		if( !is_file( $config_name ) ) {
+			if( !is_file( $IP . 'Configs/' . $config_name . '.cfg' ) ) {
+				throw new BadEntryError( "BadConfig", "A non-existent configuration file was specified." );
+			}
+			else {
+				$config_name = $IP . 'Configs/' . $config_name . '.cfg';
+			}
+		}
+		
+		
+		
+		$config_params = parse_ini_file( $config_name );
+		
+		if( isset( $config_params['useconfig'] ) ) {
+			$config_params = self::parse_config( $config_params['useconfig'] );
+		}
+		
+		return $config_params;
 	}
 	
 	

@@ -58,7 +58,7 @@ class Script {
 	 * @return void
 	 */
 	function __construct( $argfunctions = array() ) {
-		global $argv, $pgHooks;
+		global $argv, $pgHooks, $IP;
 		$this->parseArgs( $argv, $argfunctions );
 		
 		$pgHooks['StartLogin'][] = array( $this, 'fixConfig' );
@@ -90,7 +90,12 @@ class Script {
 					$this->wiki = Peachy::newWiki( null, null, null, $this->args['baseurl'] );
 				}
 				else {
-					$this->wiki = Peachy::newWiki();
+					if( is_file( $IP . 'Configs/scriptdefault.cfg' ) ) {
+						$this->wiki = Peachy::newWiki( 'scriptdefault' );
+					}
+					else {
+						$this->wiki = Peachy::newWiki();
+					}
 				}
 			}
 		}

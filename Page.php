@@ -1207,18 +1207,13 @@ class Page {
 	}
 	
 	/**
-	 * Returns all of titles on which the page is transcluded ("embedded in").
+	 * Alias of embeddedin
 	 * 
-	 * @param string $namespace A pipe '|' separated list of namespace numbers to check. Default null (all). 
-	 * @param int $limit A hard limit on the number of transclusions to fetch. Default null (all). 
-	 * @return array Titles of pages that transclude this page
+	 * @see Page::embeddedin()
 	 */
-	public function get_transclusions( $namespace = null, $limit = null ) {
-		
-		pecho( "Getting transclusions of {$this->title}...\n\n", PECHO_NORMAL );
-		
-		$result = $this->wiki->embeddedin($this->title, $namespace, $limit);
-		return $result;
+	public function get_transclusions( $namespace = null, $limit = null ) {	
+
+		return $this->embeddedin($namespace, $limit);
 		
     }
 
@@ -1441,7 +1436,7 @@ class Page {
 	 */
 	public function rollback($force = false, $summary = null, $markbot = null){
 		if( !in_array( 'rollback', $this->wiki->get_userrights() ) ) {
-			pecho( "User is not allowed to view deleted revisions", PECHO_FATAL );
+			pecho( "User is not allowed to rollback edits", PECHO_FATAL );
 			return false;
 		}
 		

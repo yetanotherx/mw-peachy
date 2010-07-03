@@ -1597,5 +1597,16 @@ class Page {
 		
 		return $this->wiki->listHandler( $eiArray );
 	}
+	
+	/**
+	 * Purges a list of pages. Shortcut for {@link Wiki::purge()}
+	 * 
+	 * @see Wiki::purge()
+	 * @access public
+	 * @return void|bool
+	 */
+	public function purge() {
+		return $this->wiki->purge( $this->title );
+	}
 
 }

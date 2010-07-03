@@ -1569,5 +1569,33 @@ class Page {
 			throw new EditError("Blocked", "User has been blocked");
 		}
 	}
+	
+	/**
+	 * Returns array of pages that embed (transclude) the page given.
+	 * 
+	 * @access public
+	 * @param array $namespace Which namespaces to search (default: null).
+	 * @param int limit How many results to retrieve (default: null i.e. all).
+	 * @return array A list of pages the title is transcluded in.
+	 */
+	public function embeddedin( $namespace = null, $limit = null ) {
+		$eiArray = array(
+			'list' => 'embeddedin',
+			'code' => 'ei',
+			'eititle' => $this->title,
+			'lhtitle' => 'title',
+			'limit' => $limit
+		);
+		
+		if(!is_null($namespace)){
+			$eiArray['einamespace'] = $namespace;
+		}
+		
+		Hooks::runHook( 'PreQueryEmbeddedin', array( &$eiArray ) );
+		
+		pecho( "Getting list of pages that include {$this->title}...\n\n", PECHO_NORMAL );
+		
+		return $this->wiki->listHandler( $eiArray );
+	}
 
 }

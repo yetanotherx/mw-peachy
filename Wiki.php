@@ -1212,23 +1212,8 @@ class Wiki {
 	 * @todo FIXME:: Move this to the Page class
 	 */
 	public function embeddedin( $title, $namespace = null, $limit = null ) {
-		$eiArray = array(
-			'list' => 'embeddedin',
-			'code' => 'ei',
-			'eititle' => $title,
-			'lhtitle' => 'title',
-			'limit' => $limit
-		);
-		
-		if(!is_null($namespace)){
-			$eiArray['einamespace'] = $namespace;
-		}
-		
-		Hooks::runHook( 'PreQueryEmbeddedin', array( &$eiArray ) );
-		
-		pecho( "Getting list of pages that include $title...\n\n", PECHO_NORMAL );
-		
-		return $this->listHandler( $eiArray );
+		$page = $this->initPage( $title );
+		return $page->embeddedin( $namespace, $limit );
 	}
 	
 	/**

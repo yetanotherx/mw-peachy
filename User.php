@@ -184,6 +184,11 @@ class User {
 		
 		$token = $this->wiki->get_tokens();
 		
+		if( !in_array( 'block', $this->wiki->get_userrights() ) ) {
+			pecho( "User is not allowed to block users", PECHO_FATAL );
+			return false;
+		}
+		
 		if( !array_key_exists( 'block', $token ) ) return false;
 		
 		$apiArr = array(
@@ -253,6 +258,10 @@ class User {
 	 * @return bool
 	 */
 	public function unblock( $reason = null, $id = null ) {
+		if( !in_array( 'block', $this->wiki->get_userrights() ) ) {
+			pecho( "User is not allowed to unblock users", PECHO_FATAL );
+			return false;
+		}
 		
 		$token = $this->wiki->get_tokens();
 		

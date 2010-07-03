@@ -495,7 +495,7 @@ class Wiki {
 			
 			Hooks::runHook( 'APIQueryCheckError', array( &$data['error'] ) );
 			if( isset( $data['error'] ) && $errorcheck ) {
-				pecho( "API Error...\n\nCode: {$data['error']['code']}\nText: {$data['error']['info']}", PECHO_FATAL );
+				pecho( "API Error...\n\nCode: {$data['error']['code']}\nText: {$data['error']['info']}\n\n", PECHO_FATAL );
 				return false;
 			}
 			

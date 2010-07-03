@@ -1440,6 +1440,11 @@ class Page {
 	 * @return array Details of the rollback perform. ['revid']: The revision ID of the rollback. ['old_revid']: The revision ID of the first (most recent) revision that was rolled back. ['last_revid']: The revision ID of the last (oldest) revision that was rolled back.
 	 */
 	public function rollback($force = false, $summary = null, $markbot = null){
+		if( !in_array( 'rollback', $this->wiki->get_userrights() ) ) {
+			pecho( "User is not allowed to view deleted revisions", PECHO_FATAL );
+			return false;
+		}
+		
 		if( !$force ) {
 			try {
 				$this->preEditChecks();
@@ -1487,6 +1492,7 @@ class Page {
 		
 		if( isset( $result['rollback'] ) ) {
 			if( isset( $result['rollback']['title'] ) ) {
+				$this->__construct( $this->wiki, $this->title );
 				return true;
 			}
 			else {

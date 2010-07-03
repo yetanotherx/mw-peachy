@@ -1413,7 +1413,7 @@ class Wiki {
 	 * @return array
 	 */
 	public function patrol( $rcid = 0 ) {
-		Hooks::runHook( 'PreQueryParse', array( &$rcid ) );
+		Hooks::runHook( 'PrePatrol', array( &$rcid ) );
 		
 		pecho( "Patrolling $rcid...\n\n", PECHO_NORMAL );
 		

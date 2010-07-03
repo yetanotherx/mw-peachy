@@ -411,14 +411,14 @@ class Image {
 			break;
 		}
 		
-		$localname = str_replace(' ','_',urlencode( $this->getName(false) ) );
+		$localname = $IP . 'Images/' . str_replace(' ','_',urlencode( $this->getName(false) ) );
 		if( $name ) $localname = $name;
 		
 		Hooks::runHook( 'DownloadImage', array( &$url, &$name, &$localname ) );
 		
 		pecho( "Downloading {$this->name} to $localname..\n\n", PECHO_NOTICE );
 		
-		$this->wiki->get_http()->download( $url, $IP . 'Images/' . $localname );
+		$this->wiki->get_http()->download( $url, $localname );
 	}
 	
 	/**

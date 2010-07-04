@@ -36,6 +36,10 @@ class DatabaseMySQL extends DatabaseBase {
 			throw new DependancyError( "MySQL", "http://us2.php.net/manual/en/book.mysql.php" );
 		}
 		
+		if( version_compare( mysql_get_client_info(), '5.0' ) < 0 ) {
+			throw new DependancyError( "MySQL 5.0", "http://us2.php.net/manual/en/book.mysql.php" );
+		}
+		
 		$this->close(); 
 		
 		$this->mOpened = false; 

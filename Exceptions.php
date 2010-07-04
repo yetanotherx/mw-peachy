@@ -230,9 +230,9 @@ class HookError extends Exception {
  * @package Peachy_Database
  */
 class DBError extends Exception {
-	public function __construct( $error ) {
+	public function __construct( $error, $errno, $sql = null ) {
 		parent::__construct( 
-			"Database Error: " . $error 
+			"Database Error: " . $error . " (code $errno) " . $sql
 		);
 	}
 }

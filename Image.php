@@ -322,7 +322,7 @@ class Image {
 		
 			$uploadArray = array(
 				'action' => 'upload',
-				'filename' => $file,
+				'filename' => str_replace( array( 'File:', 'Image:' ), '', $this->name ), ##FIXME: Make this work for non-english wikis
 				'comment' => $comment,
 				'text' => $text,
 				'token' => $tokens['edit'],
@@ -332,6 +332,8 @@ class Image {
 			);
 			
 			Hooks::runHook( 'APIUpload', array( &$uploadArray ) );
+			
+			$this->wiki->apiQuery( $uploadArray, true );
 
 		} else {
 			##FIXME: test the non-api upload
@@ -343,7 +345,7 @@ class Image {
 				array(
 					'wpUploadFile' => '@'.$localfile,
 		            'wpSourceType' => 'file',
-		            'wpDestFile' => $file,
+		            'wpDestFile' => $this->name,
 		            'wpUploadDescription' => $desc,
 		            'wpLicense' => '',
 		            'wpWatchthis' => '0',
@@ -355,7 +357,7 @@ class Image {
 		
 		##FIXME: Add error checking
 		
-		$this->__construct( $this->wiki, $file );
+		$this->__construct( $this->wiki, $this->name );
 	}
 	
 	public function history() {

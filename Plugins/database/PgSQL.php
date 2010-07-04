@@ -17,6 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/**
+ * DatabasePgSQL class, specifies the PostgreSQL-specific functions 
+ */
 class DatabasePgSQL extends DatabaseBase {
 
 	public function get_type() {

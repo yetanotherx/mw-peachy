@@ -17,6 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/**
+ * DatabaseBase class, specifies the general functions for the Database classes
+ * @abstract
+ */
 abstract class DatabaseBase {
 
 	protected $mLastQuery;
@@ -201,6 +205,9 @@ abstract class DatabaseBase {
 	
 }
 
+/**
+ * Database class, the actual class the user directly interfaces with.
+ */
 class Database {
 
 	private $type = 'mysqli';

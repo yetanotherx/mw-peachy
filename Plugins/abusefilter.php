@@ -19,22 +19,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class AbuseFilter {
 
-    function __construct() {
-    }
+	private $wiki;
 
-    public static function load( &$wikiclass, &$newclass = null ) {
-        
-        if( !array_key_exists( 'AbuseFilter', $wikiClass->get_extensions() ) ) {
-            throw new DependancyError( "AbuseFilter", "http://www.mediawiki.org/wiki/Extension:AbuseFilter" );
-        }
-        
-        $newclass = new AbuseFilter( $wikiclass );
-    }
-    
-    public function abuselog() {}
-    
-    public function abusefilters() {}
-    
-    
+	function __construct( &$wikiClass ) {
+		$this->wiki = $wikiClass;
+	}
+
+	public static function load( &$wikiclass, &$newclass = null ) {
+		
+		if( !array_key_exists( 'AbuseFilter', $wikiClass->get_extensions() ) ) {
+			throw new DependancyError( "AbuseFilter", "http://www.mediawiki.org/wiki/Extension:AbuseFilter" );
+		}
+		
+		$newclass = new AbuseFilter( $wikiclass );
+	}
+	
+	public function abuselog() {}
+	
+	public function abusefilters() {}
+	
+	
 
 }

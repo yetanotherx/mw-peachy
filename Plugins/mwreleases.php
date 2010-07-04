@@ -17,32 +17,29 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-class CodeReview {
+class SiteMatrix {
+	
+	/**
+	 * Loads list of all SiteMatrix wikis
+	 * 
+	 * @static
+	 * @access public
+	 * @param Wiki &$wikiClass The Wiki class object
+	 * @return array List of all wikis
+	 */
+	public static function load( &$wikiClass ) {
 
-	private $wiki;
-
-	function __construct( &$wikiClass ) {
-		$this->wiki = $wikiClass;
-	}
-
-	public static function &load( &$wikiclass, &$newclass = null ) {
-		
-		if( !array_key_exists( 'CodeReview', $wikiClass->get_extensions() ) ) {
-			throw new DependancyError( "CodeReview", "http://www.mediawiki.org/wiki/Extension:CodeReview" );
+		if( !array_key_exists( 'MWReleases', $wikiClass->get_extensions() ) ) {
+			throw new DependencyError( "MWReleases", "http://www.mediawiki.org/wiki/Extension:MWReleases" );
 		}
 		
-		$newclass = new CodeReview( $wikiclass );
-		return $newclass;
+		$SMres = $wikiClass->apiQuery(array(
+				'action' => 'mwreleases',
+			)
+		);
+		
+		return $SMres['mwreleases'];
+		
 	}
-	
-	public function update() {}
-	
-	public function diff() {}
-	
-	public function testupload() {}
-	
-	public function comments() {}
-	
-	
 
 }

@@ -18,12 +18,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
+ * @file
+ * Database plugin, contains functions that interact with a mysql/postgresql database
+ * Much of this is from {@link http://svn.wikimedia.org/svnroot/mediawiki/trunk/phase3/includes/db/} which is licenced under the GPL.
+ */
+
+/**
  * DatabaseBase class, specifies the general functions for the Database classes
  * @abstract
  */
 abstract class DatabaseBase {
 
 	protected $mLastQuery;
+	protected $mLastSelectParams;
 	
 	protected $mConn = false;
 	
@@ -57,9 +64,11 @@ abstract class DatabaseBase {
 	public function query( $sql ) {
 		$this->mLastQuery = $sql;
 		
+		$ret = $this->doQuery( $sql );
+		
 		$ret = $this->resultObject( $ret );
 		if( !$ret ) {
-			throw new DBError( $error, $errno, $sql ); 
+			throw new DBError( $this->lastError, $this->lastErrno, $sql ); 
 		}
 		
 		return $ret; 
@@ -67,7 +76,17 @@ abstract class DatabaseBase {
 	
 	abstract function doQuery( $sql );
 	
-	function resultObject( $res ) {
+	function resultObject( $result ) {
+		if( empty( $result ) ) {
+			return false;
+		} elseif ( $result instanceof ResultWrapper ) {
+			return $result;
+		} elseif ( $result === true ) {
+			// Successful write query
+			return $result;
+		} else {
+			return new ResultWrapper( $this, $result );
+		}
 	}
 	
 	abstract function fetchObject( $res ); 
@@ -79,6 +98,7 @@ abstract class DatabaseBase {
 	abstract function lastErrno(); 
 	abstract function lastError(); 
 	abstract function affectedRows(); 
+	abstract function dataSeek( $res, $row );
 	abstract function strencode( $s );
 	
 	/**
@@ -91,6 +111,8 @@ abstract class DatabaseBase {
 	 * @return object MySQL object
 	 */
 	function select( $table, $columns, $where = array(), $options = array(), $join_on = array() ) {
+		
+		$this->mLastSelectParams = array( $table, $columns, $where, $options, $join_on );
 		
 		if( is_array( $table ) ) {
 			if( $this->mPrefix != '' ) {
@@ -110,7 +132,7 @@ abstract class DatabaseBase {
 				
 				$on = array();
 				foreach( $join_on as $col => $val ) {
-					$on[] = "$col = $val"
+					$on[] = "$col = $val";
 				}
 				$on = 'ON ' . implode( ' AND ', $on );
 			}
@@ -137,11 +159,11 @@ abstract class DatabaseBase {
 						$opr = $val[0];
 						$val = $this->strencode( $val[1] );
 						
-						$where_tmp[] = "`$col` $opr '$val'"
+						$where_tmp[] = "`$col` $opr '$val'";
 					}
 					else {
 						$val = $this->strencode( $val );
-						$where_tmp[] = "`$col` = '$val'"
+						$where_tmp[] = "`$col` = '$val'";
 					}				
 				}
 				$where = implode( ' AND ', $where_tmp );
@@ -177,7 +199,7 @@ abstract class DatabaseBase {
 		
 		$sql = "$explain SELECT $columns $from $on $where $newoptions $limit";
 		
-		return $this->doQuery( $sql );
+		return $this->query( $sql );
 	}
 	
 	function insert() {
@@ -204,6 +226,111 @@ abstract class DatabaseBase {
 	}
 	
 }
+
+class ResultWrapper implements Iterator {
+	var $db, $result, $pos = 0, $currentRow = null;
+
+	/**
+	 * Create a new result object from a result resource and a Database object
+	 */
+	function __construct( $database, $result ) {
+		$this->db = $database;
+		
+		if ( $result instanceof ResultWrapper ) {
+			$this->result = $result->result;
+		} else {
+			$this->result = $result;
+		}
+	}
+
+	/**
+	 * Get the number of rows in a result object
+	 */
+	function numRows() {
+		return $this->db->numRows( $this->result );
+	}
+
+	/**
+	 * Fetch the next row from the given result object, in object form.
+	 * Fields can be retrieved with $row->fieldname, with fields acting like
+	 * member variables.
+	 *
+	 * @param $res SQL result object as returned from Database::query(), etc.
+	 * @return MySQL row object
+	 * @throws DBUnexpectedError Thrown if the database returns an error
+	 */
+	function fetchObject() {
+		return $this->db->fetchObject( $this->result );
+	}
+
+	/**
+	 * Fetch the next row from the given result object, in associative array
+	 * form.  Fields are retrieved with $row['fieldname'].
+	 *
+	 * @param $res SQL result object as returned from Database::query(), etc.
+	 * @return MySQL row object
+	 * @throws DBUnexpectedError Thrown if the database returns an error
+	 */
+	function fetchRow() {
+		return $this->db->fetchRow( $this->result );
+	}
+
+	/**
+	 * Free a result object
+	 */
+	function free() {
+		$this->db->freeResult( $this->result );
+		unset( $this->result );
+		unset( $this->db );
+	}
+
+	/**
+	 * Change the position of the cursor in a result object
+	 * See mysql_data_seek()
+	 */
+	function seek( $row ) {
+		$this->db->dataSeek( $this->result, $row );
+	}
+
+	/*********************
+	 * Iterator functions
+	 * Note that using these in combination with the non-iterator functions
+	 * above may cause rows to be skipped or repeated.
+	 */
+
+	function rewind() {
+		if ( $this->numRows() ) {
+			$this->db->dataSeek( $this->result, 0 );
+		}
+		$this->pos = 0;
+		$this->currentRow = null;
+	}
+
+	function current() {
+		if ( is_null( $this->currentRow ) ) {
+			$this->next();
+		}
+		return $this->currentRow;
+	}
+
+	function key() {
+		return $this->pos;
+	}
+
+	function next() {
+		$this->pos++;
+		
+		$this->currentRow = $this->fetchObject();
+		
+		return $this->currentRow;
+	}
+
+	function valid() {
+		return $this->current() !== false;
+	}
+}
+
+
 
 /**
  * Database class, the actual class the user directly interfaces with.

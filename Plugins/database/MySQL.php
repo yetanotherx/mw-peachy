@@ -180,7 +180,9 @@ class DatabaseMySQL extends DatabaseBase {
 		return true; 
 	}
 	
-	
+	public function dataSeek( $res, $row ) {
+		return mysql_data_seek( $res, $row );
+	}
 	
 	
 }

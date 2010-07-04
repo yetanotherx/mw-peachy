@@ -109,6 +109,7 @@ class DatabasePgSQL extends DatabaseBase {
 	
 	public function get_insert_id() { 
 		return null; 
+		##FIXME:: Run a SELECT query using the LastQuery params to get the ID
 	} 
 	
 	public function lastErrno() {
@@ -137,6 +138,8 @@ class DatabasePgSQL extends DatabaseBase {
 		return pg_escape_string( $s );
 	} 	
 	
-	
+	public function dataSeek( $res, $row ) {
+		return pg_result_seek( $res, $row );
+	}
 	
 }

@@ -35,5 +35,10 @@ if( $script->getArg( 'reason' ) ) {
 
 foreach( $script->getList() as $buffer ) {
 	$page = $script->getWiki()->initPage( $buffer );
-	$page->delete( $reason );
+	if( $script->getArg( 'undelete' ) ) {
+		$page->undelete( $reason );
+	}
+	else {
+		$page->delete( $reason );
+	}
 }

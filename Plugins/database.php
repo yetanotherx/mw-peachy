@@ -410,7 +410,7 @@ class Database {
 		
 		$sql = "INSERT " . implode( ' ', $options ) . " INTO {$this->mPrefix}$table ($cols) VALUES ($vals)";
 
-		return (bool)$this->doQuery( $sql );
+		return $this->doQuery( $sql );
 	}
 	
 	/**

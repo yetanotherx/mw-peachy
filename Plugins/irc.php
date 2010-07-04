@@ -77,7 +77,7 @@ class IRC {
 	 * @static
 	 */
 	public static function load( &$newclass, $User, $Nick, $Pass, $Server, $Port, $Gecos, $Channel ) {
-		$newclass = new IRC( $host, $port, $user, $pass, $db, $prefix, $readonly );
+		$newclass = new IRC( $User, $Nick, $Pass, $Server, $Port, $Gecos, $Channel );
 	}
 	
 	/**

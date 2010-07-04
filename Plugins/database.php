@@ -161,7 +161,7 @@ class Database {
 	 * Front-end for mysql_query. It's preferred to not use this function, 
 	 * and rather the other Database::select, update, insert, and delete functions.
 	 * @param string $sql Raw DB query
-	 * @return object|bool MySQL object, false if there's no result
+	 * @return array|bool Array of results, false if there's no result
 	 */
 	public function doQuery( $sql ) {
 		if( is_null( $this->mConn ) ) $this->connectToServer();
@@ -189,7 +189,7 @@ class Database {
 		}
 		
 		if( !$result ) return false;
-		return $result;
+		return $this->mysql2array( $result );
 	}
 	
 	/**
@@ -275,9 +275,8 @@ class Database {
 	 * Note: This is not compatible with results from preparedStmt()
 	 * @param object $data MySQL result
 	 * @return array Converted result
-	 * @static
 	 */
-	public static function mysql2array( $data ) {
+	public function mysql2array( $data ) {
 
 		$return = array();
 		

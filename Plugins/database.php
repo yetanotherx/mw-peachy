@@ -119,7 +119,7 @@ class Database {
 			$this->mConn = pg_connect("host={$this->mHost} port={$this->mPost} dbname={$this->mDb} user={$this->mUser} password={$this->mPass}");
 		}
 		else {
-			if( !class_exists( 'mysqli' ) || $this->mysqli = false ) {
+			if( !class_exists( 'mysqli' ) || $this->mysqli == false ) {
 				$this->mConn = mysql_connect( $this->mHost.':'.$this->mPort, $this->mUser, $this->mPass, $force );
 				mysql_select_db( $this->mDb, $this->mConn );
 				$this->mysqli = false;

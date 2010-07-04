@@ -53,11 +53,12 @@ abstract class DatabaseBase {
 	public function query( $sql ) {
 		$this->mLastQuery = $sql;
 		
+		$ret = $this->resultObject( $ret );
 		if( !$ret ) {
 			throw new DBError( $error, $errno, $sql ); 
 		}
 		
-		return $this->resultObject( $ret ); 
+		return $ret; 
 	}
 	
 	abstract function doQuery( $sql );
@@ -76,7 +77,94 @@ abstract class DatabaseBase {
 	abstract function affectedRows(); 
 	abstract function strencode( $s );
 	
-	function select() {
+	function select( $table, $columns, $conds = array(), $options = array(), $join_on = array() ) {
+		
+		if( is_array( $table ) ) {
+			if( $this->mPrefix != '' ) {
+				foreach( $table AS $id => $t ) {
+					$table[$id] = $this->mPrefix . $t;
+				}
+			}
+			
+			if( !count( $join_on ) ) {
+				$from = 'FROM ' . implode( ',', $table );
+				$on = null;
+			}
+			else {
+				$tmp = array_shift( $table );
+				$from = 'FROM ' . $tmp;
+				$from .= ' JOIN ' . implode( ' JOIN ', $table );
+				
+				$on = array();
+				foreach( $join_on as $col => $val ) {
+					$on[] = "$col = $val"
+				}
+				$on = 'ON ' . implode( ' AND ', $on );
+			}
+		}
+		else {
+			$from = 'FROM ' . $this->mPrefix . $table;
+			$on = null;
+		}
+		
+		
+		if( is_array( $columns ) ) {
+			$columns = implode( ',', $columns );
+		}
+		
+		
+		if( !is_null( $where ) ) {
+			if( is_array( $where ) ) {
+			
+				$where_tmp = array();
+				
+				foreach( $where as $col => $val ) {
+					
+					if( is_array( $val ) ) {
+						$opr = $val[0];
+						$val = $this->strencode( $val[1] );
+						
+						$where_tmp[] = "`$col` $opr '$val'"
+					}
+					else {
+						$val = $this->strencode( $val );
+						$where_tmp[] = "`$col` = '$val'"
+					}				
+				}
+				$where = implode( ' AND ', $where_tmp );
+			}
+			$where = "WHERE $where";
+		}
+		else {
+			$where = null;
+		}
+		
+		if( !is_array( $options ) ) {
+			$options = array( $options );
+		}
+		
+		$newoptions = array();
+		$limit = null;
+		$explain = null;
+		
+		foreach( $options as $option => $val ) {
+			switch( $option ) {
+				case 'LIMIT':
+					$limit = "LIMIT $val";
+					break;
+				case 'EXPLAIN':
+					$explain = "EXPLAIN $val";
+					break;
+				default:
+					$newoptions[] = "$option $val";
+			}
+		}
+		
+		$newoptions = implode( ' ', $newoptions );
+		
+		$sql = "$explain SELECT $columns $from $on $where $newoptions $limit";
+		
+		return $this->doQuery( $sql );
 	}
 	
 	function insert() {

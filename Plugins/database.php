@@ -124,6 +124,10 @@ class Database {
 	public function init() {
 		global $IP;
 		
+		if( !class_exists( 'mysqli' ) ) {
+			$this->type = 'mysql';
+		}
+		
 		switch( $this->type ) {
 			case 'mysqli':
 				require_once( $IP . 'Plugins/database/MySQLi.php' );

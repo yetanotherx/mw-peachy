@@ -58,7 +58,7 @@ class Database {
 	 * @param bool $readonly Read-only mode. Default false
 	 * @return void
 	 */
-	public function __construct( $host, $port, $user, $pass, $db, $prefix, $readonly ) {
+	public function __construct( $host, $port, $user, $pass, $db, $prefix, $readonly, $mysqli = true ) {
 		if( $this->mPG ) {
 			if( !function_exists( 'pg_connect' ) ) {
 				throw new DependancyError( "PostgreSQL", "http://us2.php.net/manual/en/book.pgsql.php" );
@@ -77,11 +77,12 @@ class Database {
 		$this->mDb = $db;
 		$this->mPrefix = $prefix;
 		$this->mReadonly = $readonly;
+		$this->mysqli = $mysqli;
 	}
 
 	/**
 	 * Load function, initializes Database class
-	 * @param Database &newclass Where to store the class once it's initialized
+	 * @param Database &$newclass Where to store the class once it's initialized
 	 * @param string $host Server to connect to
 	 * @param string $port Port
 	 * @param string $user Username
@@ -89,13 +90,14 @@ class Database {
 	 * @param string $db Database
 	 * @param string $prefix Prefix of the tables in the database. Default ''
 	 * @param bool $readonly Read-only mode. Default false
+	 * @param bool $mysqli Whether or not to use mysqli. Default true
 	 * @return void
 	 */
-	public static function load( &$newclass = null, $host, $port, $user, $pass, $db, $prefix = '', $readonly = false ) {
+	public static function load( &$newclass = null, $host, $port, $user, $pass, $db, $prefix = '', $readonly = false, $mysqli = true ) {
 		
-		Hooks::runHook( 'LoadDatabase', array( &$host, &$port, &$user, &$pass, &$db, &$prefix, &$readonly ) );
+		Hooks::runHook( 'LoadDatabase', array( &$host, &$port, &$user, &$pass, &$db, &$prefix, &$readonly, &$mysqli ) );
 		
-		$newclass = new Database( $host, $port, $user, $pass, $db, $prefix, $readonly );
+		$newclass = new Database( $host, $port, $user, $pass, $db, $prefix, $readonly, $mysqli );
 	}
 	
 	/**
@@ -117,7 +119,7 @@ class Database {
 			$this->mConn = pg_connect("host={$this->mHost} port={$this->mPost} dbname={$this->mDb} user={$this->mUser} password={$this->mPass}");
 		}
 		else {
-			if( !class_exists( 'mysqli' ) ) {
+			if( !class_exists( 'mysqli' ) || $this->mysqli = false ) {
 				$this->mConn = mysql_connect( $this->mHost.':'.$this->mPort, $this->mUser, $this->mPass, $force );
 				mysql_select_db( $this->mDb, $this->mConn );
 				$this->mysqli = false;

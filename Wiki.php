@@ -1551,6 +1551,28 @@ class Wiki {
 		}
 		return $this->namespaces;
 	}
+	
+	/**
+	 * Removes the namespace from a title
+	 * 
+	 * @access public
+	 * @param string $title Title to remove namespace from
+	 * @return string
+	 */
+	
+	public function removeNamespace( $title ) {
+		$this->get_namespaces();
+		
+		$exploded = explode( ':', $title, 2 );
+		
+		foreach( $this->namespaces as $namespace ) {
+			if( $namespace == $exploded[0] ) {
+				return $exploded[1];
+			}
+		}
+		
+		return $title;
+	}
 
 	/**
 	 * Returns an array of subpage-allowing namespaces.

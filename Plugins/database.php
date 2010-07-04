@@ -202,19 +202,95 @@ abstract class DatabaseBase {
 		return $this->query( $sql );
 	}
 	
-	function insert() {
+	function insert( $table, $values, $options = array(), $select = "INSERT" ) {
+		if ( !count( $values ) ) {
+			return true;
+		}
+		
+		if ( !is_array( $options ) ) {
+			$options = array( $options );
+		}
+		
+		$cols = array();
+		$vals = array();
+		foreach( $values as $col => $value ) {
+			$cols[] = "`$col`";
+			$vals[] = "'" . $this->strencode( $value ) . "'";
+		}
+		
+		$cols = implode( ',', $cols );
+		$vals = implode( ',', $vals );
+		
+		$sql = $select . " " . implode( ' ', $options ) . " INTO {$this->mPrefix}$table ($cols) VALUES ($vals)";
+
+		return $this->query( $sql );
 	}
 	
-	function update() {
+	function update( $table, $values, $conds = '*' ) { 
+		
+		$vals = array();
+		foreach( $values as $col => $val ) {
+			$vals[] = "`$col`" . "= '" . $this->strencode( $val ) . "'";
+		}
+		$vals = implode( ', ', $vals );
+		
+		
+		$sql = "UPDATE {$this->mPrefix}$table SET " . $vals;
+		
+		if ( $conds != '*' ) {
+		
+			$cnds = array();
+			
+			foreach( $conds as $col => $val ) {
+				$cnds[] = "`$col`" . "= '" . $this->strencode( $val ) . "'";
+			}
+			
+			$cnds = implode( ', ', $cnds );
+			
+			$sql .= " WHERE " . $cnds;
+		}
+		
+		return $this->query( $sql );
+	}
+		
+	function delete( $table, $conds = '*' ) {
+		$sql = "DELETE FROM {$this->mPrefix}$table";
+		
+		if ( $conds != '*' ) {
+		
+			$cnds = array();
+			foreach( $conds as $col => $val ) {
+				$cnds[] = "`$col`" . "= '" . $this->strencode( $val ) . "'";
+			}
+			$cnds = implode( ' AND ', $cnds );
+			
+			$sql .= " WHERE " . $cnds;
+		}
+		
+		return $this->query( $sql );
 	}
 	
-	function delete() {
+	function replace( $table, $values, $options = array() ) {
+		return $this->insert( $table, $values, $options, "REPLACE INTO" );
 	}
 	
-	function replace() {
-	}
-	
-	function tableExists( $tableName ) {
+	function tableExists( $table, $prefix = true ) {
+		if( $prefix ) {
+			$prefix = $this->mPrefix;
+		}
+		else {
+			$prefix = null;
+		}
+		
+		$res = $this->query( "SELECT 1 FROM {$prefix}{$table} LIMIT 1" );
+		
+		if( $res ) {
+			$this->freeResult( $res );
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 	
 	function set_prefix( $prefix ) {
@@ -227,6 +303,7 @@ abstract class DatabaseBase {
 	
 }
 
+//Iterator is the built-in PHP class that allows other classes to use foreach(), for(), etc
 class ResultWrapper implements Iterator {
 	var $db, $result, $pos = 0, $currentRow = null;
 

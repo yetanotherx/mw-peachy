@@ -20,5 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * DatabaseMySQLi class, specifies the MySQLi-specific functions 
  */
-class DatabaseMySQLi extends DatabaseBase {
+class DatabaseMySQLi extends DatabaseMySQL {
+	
 }

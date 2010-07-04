@@ -354,21 +354,11 @@ class Page {
 				$length = $offsets[$section + 1] - $offsets[$section];
 			}
 			
-			if( function_exists( 'mb_substr' ) ) {
-				if( isset( $length ) ) {
-					$substr = mb_substr( $this->content, $offsets[$section], $length );
-				}
-				else {
-					$substr = mb_substr( $this->content, $offsets[$section] );
-				}
+			if( isset( $length ) ) {
+				$substr = mb_substr( $this->content, $offsets[$section], $length );
 			}
 			else {
-				if( isset( $length ) ) {
-					$substr = substr( $this->content, $offsets[$section], $length );
-				}
-				else {
-					$substr = substr( $this->content, $offsets[$section] );
-				}
+				$substr = mb_substr( $this->content, $offsets[$section] );
 			}
 			
 			return $substr;
@@ -702,18 +692,9 @@ class Page {
 			return false;
 		}
 		
-		if( function_exists( 'mb_strlen' ) ) {
-			if( mb_strlen( $summary, '8bit' ) > 255 ) {
-				pecho( "Summary is over 255 bytes, the maximum allowed.\n\n", PECHO_FATAL );
-				return false;
-			}
-		}
-		else {
-			// If we don't have mb_strlen we compromise and use strlen
-			if( strlen( $summary) > 255 ) {
-				pecho( "Summary is over 255 characters, the maximum allowed.\n\n", PECHO_FATAL );
-				return false;
-			}
+		if( mb_strlen( $summary, '8bit' ) > 255 ) {
+			pecho( "Summary is over 255 bytes, the maximum allowed.\n\n", PECHO_FATAL );
+			return false;
 		}
 		
 		pecho( "Making edit to {$this->title}...\n\n", PECHO_NORMAL );
@@ -836,18 +817,9 @@ class Page {
 			'assert' => 'user',
 		);
 		if(!is_null($summary)){
-			if( function_exists( 'mb_strlen' ) ) {
-				if( mb_strlen( $summary, '8bit' ) > 255 ) {
-					pecho( "Summary is over 255 bytes, the maximum allowed.\n\n", PECHO_FATAL );
-					return false;
-				}
-			}
-			else {
-				// If we don't have mb_strlen we compromise and use strlen
-				if( strlen( $summary) > 255 ) {
-					pecho( "Summary is over 255 characters, the maximum allowed.\n\n", PECHO_FATAL );
-					return false;
-				}
+			if( mb_strlen( $summary, '8bit' ) > 255 ) {
+				pecho( "Summary is over 255 bytes, the maximum allowed.\n\n", PECHO_FATAL );
+				return false;
 			}
 			
 			$params['summary'] = $summary;
@@ -948,18 +920,9 @@ class Page {
 			return false;
 		}
 		
-		if( function_exists( 'mb_strlen' ) ) {
-			if( mb_strlen( $reason, '8bit' ) > 255 ) {
-				pecho( "Reason is over 255 bytes, the maximum allowed.\n\n", PECHO_FATAL );
-				return false;
-			}
-		}
-		else {
-			// If we don't have mb_strlen we compromise and use strlen
-			if( strlen( $reason ) > 255 ) {
-				pecho( "Reason is over 255 characters, the maximum allowed.\n\n", PECHO_FATAL );
-				return false;
-			}
+		if( mb_strlen( $reason, '8bit' ) > 255 ) {
+			pecho( "Reason is over 255 bytes, the maximum allowed.\n\n", PECHO_FATAL );
+			return false;
 		}
 		
 		pecho( "Moving {$this->title} to $newTitle...\n\n", PECHO_NOTICE );
@@ -1460,20 +1423,11 @@ class Page {
 		);
 		
 		if( !is_null( $summary ) ) {
-			if( function_exists( 'mb_strlen' ) ) {
-				if( mb_strlen( $summary, '8bit' ) > 255 ) {
-					pecho( "Summary is over 255 bytes, the maximum allowed.\n\n", PECHO_FATAL );
-					return false;
-				}
+			if( mb_strlen( $summary, '8bit' ) > 255 ) {
+				pecho( "Summary is over 255 bytes, the maximum allowed.\n\n", PECHO_FATAL );
+				return false;
 			}
-			else {
-				// If we don't have mb_strlen we compromise and use strlen
-				if( strlen( $summary) > 255 ) {
-					pecho( "Summary is over 255 characters, the maximum allowed.\n\n", PECHO_FATAL );
-					return false;
-				}
-			}
-
+			
 			$params['summary'] = $summary;
 		}
 		

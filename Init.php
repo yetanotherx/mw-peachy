@@ -100,6 +100,10 @@ elseif( version_compare( $PeachyInfo['nowversion'], PEACHYVERSION, '>' ) ) {
 	echo "New version of Peachy available: {$PeachyInfo['nowversion']}\n\n";
 }
 
+if( function_exists( 'mb_internal_encoding' ) ) {
+	mb_internal_encoding( "UTF-8" );
+}
+
 
 /**
  * Base Peachy class, used to generate all other classes

@@ -28,21 +28,87 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @abstract
  */
 abstract class DatabaseBase {
-
+	
+	/**
+	 * String of the last SQL query that was run
+	 * @var string
+	 * @access protected
+	 */
 	protected $mLastQuery;
+	
+	/**
+	 * Array of the most recent {@link DatabaseBase::select()} parameters
+	 * @var array
+	 * @access protected
+	 */
 	protected $mLastSelectParams;
 	
+	/**
+	 * MySQL/PostgreSQL/MySQLi connection object
+	 * @var object|resource
+	 * @access protected
+	 */
 	protected $mConn = false;
 	
+	/**
+	 * Server to connect to
+	 * @var string
+	 * @access protected
+	 */
 	protected $mServer;
+	
+	/**
+	 * Port to connect to, in format :XXXX
+	 * @var string
+	 * @access protected
+	 */
 	protected $mPort;
+	
+	/**
+	 * Username to connect with
+	 * @var string
+	 * @access protected
+	 */
 	protected $mUser;
+	
+	/**
+	 * Password to connect with
+	 * @var string
+	 * @access protected
+	 */
 	protected $mPassword;
+	
+	/**
+	 * Database to connect to
+	 * @var string
+	 * @access protected
+	 */
 	protected $mDB;
+	
+	/**
+	 * Prefix used for tables
+	 * @var string
+	 * @access protected
+	 */
 	protected $mPrefix;
 	
+	
+	/**
+	 * Whether or not the connection is open
+	 * @var bool
+	 * @access protected
+	 */
 	protected $mOpened = false;
 	
+	/**
+	 * Construct function, sets class variables and connects
+	 * @param string $server Server to connect to
+	 * @param string $port Port
+	 * @param string $user Username
+	 * @param string $pass Password
+	 * @param string $db Database
+	 * @return void
+	 */
 	function __construct( $server, $port, $user, $password, $dbname ) {
 		$this->mServer = $server;
 		$this->mPort = $port;
@@ -55,12 +121,23 @@ abstract class DatabaseBase {
 		}
 	}
 	
+	/**
+	 * Opens a MySQL connection
+	 */
 	abstract function open();
 	
+	/**
+	 * Closes a MySQL connection
+	 */
 	function close() {
 		return true;
 	} 
 	
+	/**
+	 * Run a MySQL query
+	 * @param string $sql Query to run
+	 * @return ResultWrapper|bool 
+	 */
 	public function query( $sql ) {
 		$this->mLastQuery = $sql;
 		
@@ -78,15 +155,20 @@ abstract class DatabaseBase {
 		return $ret; 
 	}
 	
+	/**
+	 * Actual query running
+	 */
 	abstract function doQuery( $sql );
 	
+	/**
+	 * Standardizes MySQL resource, converts to a {@link ResultWrapper} object
+	 * @param resource|ResultWrapper  $result
+	 * @return ResultWrapper|bool
+	 */
 	function resultObject( $result ) {
 		if( empty( $result ) ) {
 			return false;
 		} elseif ( $result instanceof ResultWrapper ) {
-			return $result;
-		} elseif ( $result === true ) {
-			// Successful write query
 			return $result;
 		} else {
 			return new ResultWrapper( $this, $result );
@@ -112,7 +194,7 @@ abstract class DatabaseBase {
 	 * @param string|array $where Conditions for the WHERE part of the query. Default null.
 	 * @param array $options Options to add, such as GROUP BY, HAVING, ORDER BY, LIMIT, EXPLAIN. Default an empty array.
 	 * @param array $join_on If selecting from more than one table, this adds an ON statement to the query. Defualt an empty array.
-	 * @return object MySQL object
+	 * @return resource|ResultWrapper MySQL object
 	 */
 	function select( $table, $columns, $where = array(), $options = array(), $join_on = array() ) {
 		
@@ -208,6 +290,14 @@ abstract class DatabaseBase {
 		return $this->query( $sql );
 	}
 	
+	/**
+	 * INSERT frontend
+	 * @param string $table Table to insert into.
+	 * @param array $values Values to set.
+	 * @param array $options Options
+	 * @param string $select What the operation is, either INSERT or REPLACE INTO. Default INSERT. 
+	 * @return resource|ResultWrapper
+	 */
 	function insert( $table, $values, $options = array(), $select = "INSERT" ) {
 	
 		##FIXME: Make doc for this, the bot won't find it
@@ -236,6 +326,13 @@ abstract class DatabaseBase {
 		return $this->query( $sql );
 	}
 	
+	/**
+	 * UPDATE frontend
+	 * @param string $table Table to update.
+	 * @param array $values Values to set.
+	 * @param array $conds Conditions to update. Default *, updates every entry.
+	 * @return resource|ResultWrapper
+	 */
 	function update( $table, $values, $conds = '*' ) { 
 		
 		Hooks::runHook( 'DatabaseRunUpdate', array( &$table, &$values, &$conds ) );
@@ -264,7 +361,13 @@ abstract class DatabaseBase {
 		
 		return $this->query( $sql );
 	}
-		
+	
+	/**
+	 * DELETE frontend
+	 * @param string $table Table to delete from.
+	 * @param array $conds Conditions to delete. Default *, deletes every entry.
+	 * @return resource|ResultWrapper
+	 */
 	function delete( $table, $conds = '*' ) {
 		
 		Hooks::runHook( 'DatabaseRunDelete', array( &$sql ) );
@@ -285,10 +388,23 @@ abstract class DatabaseBase {
 		return $this->query( $sql );
 	}
 	
+	/**
+	 * REPLACE frontend, shortcut for DatabaseBase::{@link insert}.
+	 * @param string $table Table to insert into.
+	 * @param array $values Values to set.
+	 * @param array $options Options 
+	 * @return resource|ResultWrapper
+	 */
 	function replace( $table, $values, $options = array() ) {
 		return $this->insert( $table, $values, $options, "REPLACE INTO" );
 	}
 	
+	/**
+	 * Checks if a table exists
+	 * @param string $table Table to search for.
+	 * @param bool $prefix Whether or not to use the stored mPrefix variable 
+	 * @return bool
+	 */
 	function tableExists( $table, $prefix = true ) {
 		if( $prefix ) {
 			$prefix = $this->mPrefix;
@@ -310,10 +426,19 @@ abstract class DatabaseBase {
 		}
 	}
 	
+	/**
+	 * Sets a table prefix
+	 * @param string $prefix Table prefix to set 
+	 * @return void
+	 */
 	function set_prefix( $prefix ) {
 		$this->mPrefix = $prefix;
 	}
 	
+	/**
+	 * Returns whether or not the connection was opened
+	 * @return bool
+	 */
 	function is_opened() {
 		return $this->mOpened;
 	}
@@ -322,10 +447,40 @@ abstract class DatabaseBase {
 
 //Iterator is the built-in PHP class that allows other classes to use foreach(), for(), etc
 class ResultWrapper implements Iterator {
-	var $db, $result, $pos = 0, $currentRow = null;
+	
+	/**
+	 * Database object (really the child of DatabaseBase)
+	 * @var object
+	 * @access public
+	 */
+	public $db;
+	
+	/**
+	 * MySQL result
+	 * @var resource
+	 * @access public
+	 */
+	public $result;
+	
+	/**
+	 * Iterator position
+	 * @var int
+	 * @access public
+	 */
+	public $pos = 0;
+	
+	/**
+	 * Current iterator row
+	 * @var resource
+	 * @access public
+	 */
+	public $currentRow = null;
 
 	/**
-	 * Create a new result object from a result resource and a Database object
+	 * Initiate the Iterator
+	 * @param object $database Database object
+	 * @param resource|ResultWrapper $result MySQL resource
+	 * @return void
 	 */
 	function __construct( $database, $result ) {
 		$this->db = $database;
@@ -338,7 +493,8 @@ class ResultWrapper implements Iterator {
 	}
 
 	/**
-	 * Get the number of rows in a result object
+	 * Get the number of rows in a MySQL object
+	 * @return int
 	 */
 	function numRows() {
 		return $this->db->numRows( $this->result );
@@ -349,9 +505,7 @@ class ResultWrapper implements Iterator {
 	 * Fields can be retrieved with $row->fieldname, with fields acting like
 	 * member variables.
 	 *
-	 * @param $res SQL result object as returned from Database::query(), etc.
-	 * @return MySQL row object
-	 * @throws DBUnexpectedError Thrown if the database returns an error
+	 * @return resource MySQL object
 	 */
 	function fetchObject() {
 		return $this->db->fetchObject( $this->result );
@@ -361,9 +515,7 @@ class ResultWrapper implements Iterator {
 	 * Fetch the next row from the given result object, in associative array
 	 * form.  Fields are retrieved with $row['fieldname'].
 	 *
-	 * @param $res SQL result object as returned from Database::query(), etc.
-	 * @return MySQL row object
-	 * @throws DBUnexpectedError Thrown if the database returns an error
+	 * @return array MySQL row object
 	 */
 	function fetchRow() {
 		return $this->db->fetchRow( $this->result );
@@ -371,6 +523,7 @@ class ResultWrapper implements Iterator {
 
 	/**
 	 * Free a result object
+	 * @return void
 	 */
 	function free() {
 		$this->db->freeResult( $this->result );
@@ -380,18 +533,19 @@ class ResultWrapper implements Iterator {
 
 	/**
 	 * Change the position of the cursor in a result object
-	 * See mysql_data_seek()
+	 *
+	 * @param $row Row to place cursor at
+	 * @return void
+	 * @see http://php.net/mysql_data_seek
 	 */
 	function seek( $row ) {
 		$this->db->dataSeek( $this->result, $row );
 	}
 
-	/*********************
-	 * Iterator functions
-	 * Note that using these in combination with the non-iterator functions
-	 * above may cause rows to be skipped or repeated.
+	/**
+	 * Set the cursor to the first object
+	 * @return void
 	 */
-
 	function rewind() {
 		if ( $this->numRows() ) {
 			$this->db->dataSeek( $this->result, 0 );
@@ -400,6 +554,10 @@ class ResultWrapper implements Iterator {
 		$this->currentRow = null;
 	}
 
+	/**
+	 * Return the current row
+	 * @return resource
+	 */
 	function current() {
 		if ( is_null( $this->currentRow ) ) {
 			$this->next();
@@ -407,10 +565,18 @@ class ResultWrapper implements Iterator {
 		return $this->currentRow;
 	}
 
+	/**
+	 * Return the current position
+	 * @return int
+	 */
 	function key() {
 		return $this->pos;
 	}
-
+	
+	/**
+	 * Set the cursor to the next object
+	 * @return resource
+	 */
 	function next() {
 		$this->pos++;
 		
@@ -418,7 +584,11 @@ class ResultWrapper implements Iterator {
 		
 		return $this->currentRow;
 	}
-
+	
+	/**
+	 * Return whether or not there is any current row
+	 * @return bool
+	 */
 	function valid() {
 		return $this->current() !== false;
 	}
@@ -430,10 +600,58 @@ class ResultWrapper implements Iterator {
  * Database class, the actual class the user directly interfaces with.
  */
 class Database {
-
+	
+	/**
+	 * Type of database to use. Default mysqli
+	 * @var string
+	 * @access private
+	 */
 	private $type = 'mysqli';
-	private $server, $port, $user, $password, $db;
+	
+	/**
+	 * Server to connect to
+	 * @var string
+	 * @access private
+	 */
+	private $server;
+	
+	/**
+	 * Port to use
+	 * @var string
+	 * @access private
+	 */
+	private $port;
+	 
+	/**
+	 * Username
+	 * @var string
+	 * @access private
+	 */
+	private $user;
+	 
+	/**
+	 * Password
+	 * @var string
+	 * @access private
+	 */
+	private $password;
+	 
+	/**
+	 * Database name
+	 * @var string
+	 * @access private
+	 */
+	private $db;
 
+	/**
+	 * Construct function, sets class variables
+	 * @param string $server Server to connect to
+	 * @param string $port Port
+	 * @param string $user Username
+	 * @param string $pass Password
+	 * @param string $db Database
+	 * @return void
+	 */
 	function __construct( $server, $port, $user, $password, $db ) {
 		$this->server = $server;
 		$this->port = $port;
@@ -442,10 +660,19 @@ class Database {
 		$this->db = $db;
 	}
 	
+	/**
+	 * Sets the database type
+	 * @param string $type Database type, either 'mysqli', 'mysql', or 'pgsql'
+	 * @return void
+	 */
 	public function setType( $type ) {
 		$this->type = $type;
 	}
 	
+	/**
+	 * Inclused and initiates the appropriate DatabaseBase child
+	 * @return object
+	 */
 	public function init() {
 		global $IP;
 		
@@ -475,6 +702,20 @@ class Database {
 		}	
 	}
 
+	/**
+	 * Load function, initiates the Database class
+	 * If passed as server, user, pass, dbname; the port is ignored. 
+	 * If passed as server, port, user, pass, dbname; the port is as given
+	 * Basically, the function will detect if a port was specified. 
+	 *
+	 * @static
+	 * @param string $server Server to connect to
+	 * @param int $port Port, default 3306
+	 * @param string $user Username
+	 * @param string $pass Password
+	 * @param string $dbname Database, default null
+	 * @return Database
+	 */
 	public static function load( $server, $port = 3306, $user, $pass, $dbname = null ) {
 		if( func_num_args() > 4 ) {
 			$Server = $server;

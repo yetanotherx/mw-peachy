@@ -77,7 +77,16 @@ abstract class DatabaseBase {
 	abstract function affectedRows(); 
 	abstract function strencode( $s );
 	
-	function select( $table, $columns, $conds = array(), $options = array(), $join_on = array() ) {
+	/**
+	 * SELECT frontend
+	 * @param array|string $table Table(s) to select from. If it is an array, the tables will be JOINed.
+	 * @param string|array $columns Columns to return
+	 * @param string|array $where Conditions for the WHERE part of the query. Default null.
+	 * @param array $options Options to add, such as GROUP BY, HAVING, ORDER BY, LIMIT, EXPLAIN. Default an empty array.
+	 * @param array $join_on If selecting from more than one table, this adds an ON statement to the query. Defualt an empty array.
+	 * @return object MySQL object
+	 */
+	function select( $table, $columns, $where = array(), $options = array(), $join_on = array() ) {
 		
 		if( is_array( $table ) ) {
 			if( $this->mPrefix != '' ) {

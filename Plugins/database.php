@@ -64,7 +64,11 @@ abstract class DatabaseBase {
 	public function query( $sql ) {
 		$this->mLastQuery = $sql;
 		
+		Hooks::runHook( 'DatabasePreRunQuery', array( &$sql ) );
+		
 		$ret = $this->doQuery( $sql );
+		
+		Hooks::runHook( 'DatabasePostRunQuery', array( &$ret ) );
 		
 		$ret = $this->resultObject( $ret );
 		if( !$ret ) {
@@ -113,6 +117,8 @@ abstract class DatabaseBase {
 	function select( $table, $columns, $where = array(), $options = array(), $join_on = array() ) {
 		
 		$this->mLastSelectParams = array( $table, $columns, $where, $options, $join_on );
+		
+		Hooks::runHook( 'DatabaseRunSelect', array( &$this->mLastSelectParams ) );
 		
 		if( is_array( $table ) ) {
 			if( $this->mPrefix != '' ) {
@@ -203,6 +209,10 @@ abstract class DatabaseBase {
 	}
 	
 	function insert( $table, $values, $options = array(), $select = "INSERT" ) {
+	
+		##FIXME: Make doc for this, the bot won't find it
+		Hooks::runHook( 'DatabaseRun' . ucfirst( strtolower( $select ) ), array( &$table, &$values, &$options, &$select ) );
+		
 		if ( !count( $values ) ) {
 			return true;
 		}
@@ -227,6 +237,8 @@ abstract class DatabaseBase {
 	}
 	
 	function update( $table, $values, $conds = '*' ) { 
+		
+		Hooks::runHook( 'DatabaseRunUpdate', array( &$table, &$values, &$conds ) );
 		
 		$vals = array();
 		foreach( $values as $col => $val ) {
@@ -254,6 +266,9 @@ abstract class DatabaseBase {
 	}
 		
 	function delete( $table, $conds = '*' ) {
+		
+		Hooks::runHook( 'DatabaseRunDelete', array( &$sql ) );
+		
 		$sql = "DELETE FROM {$this->mPrefix}$table";
 		
 		if ( $conds != '*' ) {
@@ -281,6 +296,8 @@ abstract class DatabaseBase {
 		else {
 			$prefix = null;
 		}
+		
+		Hooks::runHook( 'DatabaseRunTableExists', array( &$table, &$prefix ) );
 		
 		$res = $this->query( "SELECT 1 FROM {$prefix}{$table} LIMIT 1" );
 		
@@ -436,6 +453,8 @@ class Database {
 			$this->type = 'mysql';
 		}
 		
+		Hooks::runHook( 'InitDatabase', array( &$this->type ) );
+		
 		switch( $this->type ) {
 			case 'mysqli':
 				require_once( $IP . 'Plugins/database/MySQLi.php' );
@@ -471,6 +490,8 @@ class Database {
 			$Password = $user;
 			$DB = $pass;
 		}	
+		
+		Hooks::runHook( 'LoadDatabase', array( &$Server, &$Port, &$User, &$Password, &$DB ) );
 		
 		return new Database( $Server, $Port, $User, $Password, $DB );	
 	}

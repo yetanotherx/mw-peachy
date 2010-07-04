@@ -81,6 +81,9 @@ class DatabaseMySQL extends DatabaseBase {
 	}
 	
 	public function fetchObject( $res ) {
+	
+		Hooks::runHook( 'DatabaseFetchObject', array( &$res ) );
+		
 		$row = mysql_fetch_object( $res ); 
 		
 		if( $this->lastErrno() ) {
@@ -91,6 +94,9 @@ class DatabaseMySQL extends DatabaseBase {
 	}
 	
 	public function fetchRow( $res ) {
+	
+		Hooks::runHook( 'DatabaseFetchRow', array( &$res ) );
+		
 		$row = mysql_fetch_array( $res ); 
 		
 		if( $this->lastErrno() ) {
@@ -101,6 +107,9 @@ class DatabaseMySQL extends DatabaseBase {
 	}
 	
 	public function numRows( $res ) {
+	
+		Hooks::runHook( 'DatabaseNumRows', array( &$res ) );
+		
 		$row = mysql_num_rows( $res ); 
 		
 		if( $this->lastErrno() ) {
@@ -111,6 +120,9 @@ class DatabaseMySQL extends DatabaseBase {
 	}
 	
 	public function numFields( $res ) {
+		
+		Hooks::runHook( 'DatabaseNumFields', array( &$res ) );
+		
 		$row = mysql_num_fields( $res ); 
 		
 		if( $this->lastErrno() ) {
@@ -121,10 +133,15 @@ class DatabaseMySQL extends DatabaseBase {
 	}
 	
 	public function get_field_name( $res, $n ) {
+		
+		Hooks::runHook( 'DatabaseFieldName', array( &$res, &$n ) );
+		
 		return mysql_field_name( $res, $n ); 
 	}
 	
 	public function get_insert_id() { 
+		
+		Hooks::runHook( 'DatabaseGetInsertId', array() );
 		return mysql_insert_id( $this->mConn ); 
 	} 
 	
@@ -151,11 +168,17 @@ class DatabaseMySQL extends DatabaseBase {
 		return $error;
 	}
 
-	public function affectedRows() { 
+	public function affectedRows() {
+	
+		Hooks::runHook( 'DatabaseAffectedRows', array() );
+		 
 		return mysql_affected_rows( $this->mConn ); 
 	} 
 	
 	public function strencode( $s ) {
+	
+		Hooks::runHook( 'DatabaseEscape', array( &$s ) );
+		
 		$sQuoted = mysql_real_escape_string( $s, $this->mConn );
 
 		if( !$sQuoted ) {
@@ -167,6 +190,9 @@ class DatabaseMySQL extends DatabaseBase {
 	} 
 	
 	public function ping() {
+	
+		Hooks::runHook( 'DatabasePing', array() );
+		
 		$ping = mysql_ping( $this->mConn );
 		
 		if ( $ping ) {
@@ -185,6 +211,9 @@ class DatabaseMySQL extends DatabaseBase {
 	}
 	
 	public function dataSeek( $res, $row ) {
+		
+		Hooks::runHook( 'DatabaseDataSeek', array( &$res, &$row ) );
+		
 		return mysql_data_seek( $res, $row );
 	}
 	

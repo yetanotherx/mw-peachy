@@ -324,7 +324,9 @@ class Wiki {
 		
 		Hooks::runHook( 'PreLogin', array( &$lgarray ) );
 		
-		pecho( "Logging in to {$this->base_url}...\n\n", PECHO_NOTICE );
+		if(!$recursed){
+			pecho( "Logging in to {$this->base_url}...\n\n", PECHO_NOTICE );
+		}
 		
 		$loginRes = $this->apiQuery( $lgarray, true );
 		
@@ -517,20 +519,28 @@ class Wiki {
 	 * 
 	 * @access public
 	 * @link http://compwhizii.net/peachy/wiki/Manual/Wiki::listHandler
-	 * @param array $tArray Parameters given to query with (default: array()). In addition to those recognised by the API, ['code'] is the first two characters of all the parameters in a list=XXX API call - for example, with allpages, the parameters start with 'ap', with recentchanges, the parameters start with 'rc' -  and is required; ['limit'] imposes a hard limit on the number of results returned (optional) and ['lhtitle'] simplififies a multidimendional result into a unidimensional result - lhtitle is the key of the sub-array to return. (optional)
+	 * @param array $tArray Parameters given to query with (default: array()). In addition to those recognised by the API, ['_code'] should be set to the first two characters of all the parameters in a list=XXX API call - for example, with allpages, the parameters start with 'ap', with recentchanges, the parameters start with 'rc' -  and is required; ['_limit'] imposes a hard limit on the number of results returned (optional) and ['_lhtitle'] simplifies a multidimensional result into a unidimensional result - lhtitle is the key of the sub-array to return. (optional)
 	 * @return array Returns an array with the API result
-	 * @todo FIXME:: Really document this...
 	 */
 	public function listHandler( $tArray = array() ) {
 		
-		$code = $tArray['code'];
-		unset( $tArray['code'] );
-		
-		if( isset($tArray['limit']) ) {
-			$limit = $tArray['limit'];
-			unset( $tArray['limit'] );
+		if( isset( $tArray['_code'] ) ){
+			$code = $tArray['_code'];
+			unset( $tArray['_code'] );
+		} else {		
+			throw new BadEntryError( "listHandler", "Parameter _code is required." );
+		}
+		if( isset( $tArray['_limit'] ) ) {
+			$limit = $tArray['_limit'];
+			unset( $tArray['_limit'] );
 		} else {
 			$limit = null;
+		}
+		if( isset( $tArray['_lhtitle'] ) ) {
+			$lhtitle = $tArray['_lhtitle'];
+			unset( $tArray['_lhtitle'] );
+		} else {
+			$lhtitle = null;
 		}
 		
 		$tArray['action'] = 'query';
@@ -584,9 +594,9 @@ class Wiki {
 						
 			foreach( $tRes['query'] as $x ) {
 				foreach( $x as $y ) {
-					if( isset( $tArray['lhtitle'] ) ) {
-						if( isset( $y[$tArray['lhtitle']] ) ) {
-							$y = $y[$tArray['lhtitle']];
+					if( !is_null( $lhtitle ) ) {
+						if( isset( $y[ $lhtitle ] ) ) {
+							$y = $y[ $lhtitle ];
 						}
 						else {
 							continue;
@@ -828,11 +838,11 @@ class Wiki {
 		
 		$rcArray = array(
 			'list' => 'recentchanges',
-			'code' => 'rc',
+			'_code' => 'rc',
 			'rcnamespace' => $namespace,
 			'rcdir' => $dir,
 			'rcprop' => implode( '|', $prop ),
-			'limit' => $limit
+			'_limit' => $limit
 		);
 		
 		if( $tag ) $rcArray['rctag'] = $tag;
@@ -914,9 +924,9 @@ class Wiki {
 	public function search($search, $fulltext = true, $namespaces = array(0), $prop = array('size', 'wordcount', 'timestamp', 'snippet'), $includeredirects = true, $limit = null) {
 	
 		$srArray = array(
-			'code' => 'sr',
+			'_code' => 'sr',
 			'list' => 'search',
-			'limit' => $limit,
+			'_limit' => $limit,
 			'srsearch' => $search,
 			'srnamespace' => $namespaces,
 			'srwhat' => ($fulltext) ? "text" : "title",
@@ -950,10 +960,10 @@ class Wiki {
 		
 		$leArray = array(
 			'list' => 'logevents',
-			'code' => 'le',
+			'_code' => 'le',
 			'ledir' => $dir,
 			'leprop' => implode( '|', $prop ),
-			'limit' => $limit
+			'_limit' => $limit
 		);
 		
 		if( is_array( $type ) ) $leArray['letype'] = implode( '|', $type );
@@ -990,10 +1000,10 @@ class Wiki {
 	public function allimages( $prefix = null, $sha1 = null, $base36 = null, $from = null, $minsize = null, $maxsize = null, $dir = 'ascending', $prop = array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' ), $limit = null ) {
 		$leArray = array(
 			'list' => 'allimages',
-			'code' => 'ai',
+			'_code' => 'ai',
 			'aidir' => $dir,
 			'aiprop' => implode( '|', $prop ),
-			'limit' => $limit
+			'_limit' => $limit
 		);
 		
 		if( !is_null( $from ) ) $leArray['aifrom'] = $from;
@@ -1032,12 +1042,12 @@ class Wiki {
 	public function allpages( $namespace = array( 0 ), $prefix = null, $from = null, $redirects = 'all', $minsize = null, $maxsize = null, $protectiontypes = array(), $protectionlevels = array(), $dir = 'ascending', $interwiki = 'all', $limit = null ) {
 		$leArray = array(
 			'list' => 'allpages',
-			'code' => 'ap',
+			'_code' => 'ap',
 			'apdir' => $dir,
 			'apnamespace' => $namespace,
 			'apfilterredir' => $redirects,
 			'apfilterlanglinks' => $interwiki,
-			'limit' => $limit
+			'_limit' => $limit
 		);
 		
 		if( count( $protectiontypes ) && count( $protectionlevels ) ) {
@@ -1080,10 +1090,10 @@ class Wiki {
 	public function alllinks( $namespace = array( 0 ), $prefix = null, $from = null, $continue = null, $unique = false, $prop = array( 'ids', 'title' ), $limit = null ) {
 		$leArray = array(
 			'list' => 'alllinks',
-			'code' => 'al',
+			'_code' => 'al',
 			'alnamespace' => $namespace,
 			'alprop' => implode( '|', $prop ),
-			'limit' => $limit
+			'_limit' => $limit
 		);
 		
 		if( !is_null( $from ) ) $leArray['alfrom'] = $from;
@@ -1115,9 +1125,9 @@ class Wiki {
 	public function allusers( $prefix = null, $groups = array(), $from = null, $editsonly = false, $prop = array( 'blockinfo', 'groups', 'editcount', 'registration' ), $limit = null ) {
 		$leArray = array(
 			'list' => 'allusers',
-			'code' => 'au',
+			'_code' => 'au',
 			'auprop' => implode( '|', $prop ),
-			'limit' => $limit
+			'_limit' => $limit
 		);
 		
 		if( !is_null( $from ) ) $leArray['aufrom'] = $from;
@@ -1149,10 +1159,10 @@ class Wiki {
 	public function categorymembers( $category, $subcat = false, $namespace = null, $limit = null) {
 		$cmArray = array(
 			'list' => 'categorymembers',
-			'code' => 'cm',
+			'_code' => 'cm',
 			'cmtitle' => $category,
 			'cmprop' => 'title',
-			'limit' => $limit
+			'_limit' => $limit
 		);
 		
 		$strip_categories = false;
@@ -1228,9 +1238,9 @@ class Wiki {
 	public function tags( $prop = array( 'name', 'displayname', 'description', 'hitcount' ), $limit = null ) {
 		$tgArray = array(
 			'list' => 'tags',
-			'code' => 'tg',
+			'_code' => 'tg',
 			'tgprop' => implode( '|', $prop ),
-			'limit' => $limit
+			'_limit' => $limit
 		);
 		
 		Hooks::runHook( 'PreQueryTags', array( &$tgArray ) );
@@ -1262,10 +1272,10 @@ class Wiki {
 	public function exturlusage( $url, $protocol = 'http', $prop = array( 'title' ), $namespace = null, $limit = null ) {
 		$tArray = array(
 			'list' => 'exturlusage',
-			'code' => 'eu',
+			'_code' => 'eu',
 			'euquery' => $url,
 			'euprotocol' => $protocol,
-			'limit' => $limit,
+			'_limit' => $limit,
 			'euprop' => implode( '|', $prop )
 		);
 		
@@ -1296,12 +1306,12 @@ class Wiki {
 	 */
 	public function random( $namespaces = array( 0 ), $limit = 1, $onlyredirects = false) {
 		$rnArray = array(
-			'code' => 'rn',
+			'_code' => 'rn',
 			'list' => 'random',
 			'rnnamespace' => $namespaces,
-			'limit' => $limit,
+			'_limit' => $limit,
 			'rnredirect' => (is_null($onlyredirects) || !$onlyredirects) ? null : "true",
-			'lhtitle' => 'title'
+			'_lhtitle' => 'title'
 		);
 		
 		Hooks::runHook( 'PreQueryRandom', array( &$rnArray ) );

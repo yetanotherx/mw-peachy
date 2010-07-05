@@ -413,8 +413,8 @@ class Page {
 		$tArray = array(
 			'prop' => 'links',
 			'titles' => $this->title,
-			'code' => 'pl',
-			'lhtitle' => 'links'
+			'_code' => 'pl',
+			'_lhtitle' => 'links'
 		);
 		
 		$this->links = array();
@@ -451,8 +451,8 @@ class Page {
 		$tArray = array(
 			'prop' => 'templates',
 			'titles' => $this->title,
-			'code' => 'tl',
-			'lhtitle' => 'templates'
+			'_code' => 'tl',
+			'_lhtitle' => 'templates'
 		);
 		
 		$this->templates = array();
@@ -489,8 +489,8 @@ class Page {
 		$tArray = array(
 			'prop' => 'categories',
 			'titles' => $this->title,
-			'code' => 'cl',
-			'lhtitle' => 'categories'
+			'_code' => 'cl',
+			'_lhtitle' => 'categories'
 		);
 		
 		$this->categories = array();
@@ -528,8 +528,8 @@ class Page {
 		$tArray = array(
 			'prop' => 'images',
 			'titles' => $this->title,
-			'code' => 'im',
-			'lhtitle' => 'images'
+			'_code' => 'im',
+			'_lhtitle' => 'images'
 		);
 		
 		$this->images = array();
@@ -568,8 +568,8 @@ class Page {
 		$tArray = array(
 			'prop' => 'extlinks',
 			'titles' => $this->title,
-			'code' => 'el',
-			'lhtitle' => 'extlinks'
+			'_code' => 'el',
+			'_lhtitle' => 'extlinks'
 		);
 		
 		$this->extlinks = array();
@@ -605,8 +605,8 @@ class Page {
 		$tArray = array(
 			'prop' => 'langlinks',
 			'titles' => $this->title,
-			'code' => 'll',
-			'lhtitle' => 'langlinks'
+			'_code' => 'll',
+			'_lhtitle' => 'langlinks'
 		);
 		
 		$this->langlinks = array();
@@ -669,7 +669,7 @@ class Page {
 	 * @param bool $force Override nobots check (default: false)
 	 * @param string $pend Set to 'pre' or 'ap' to prepend or append, respectively (default: null)
 	 * @param bool $create Set to 'never' or 'only' to never create a new page or only create a new page, respectively (default: false) 
-	 * @return int The revision id of the successful edit
+	 * @return int|bool The revision id of the successful edit, false on failure.
 	 */
 	public function edit( 
 		$text, 
@@ -1152,7 +1152,7 @@ class Page {
 		if( $content ) $prop[] = 'content';
 		
 		$drArray = array(
-			'code' => 'dr',
+			'_code' => 'dr',
 			'list' => 'deletedrevs',
 			'titles' => $this->title,
 			'drprop' => implode( '|', $prop ),
@@ -1372,7 +1372,7 @@ class Page {
 	public function get_backlinks( $namespaces = array( 0 ), $redirects = 'all', $followredir = true ) {
 		$leArray = array(
 			'list' => 'backlinks',
-			'code' => 'bl',
+			'_code' => 'bl',
 			'blnamespace' => $namespaces,
 			'blfilterredir' => $redirects,
 			'bltitle' => $this->title
@@ -1535,10 +1535,10 @@ class Page {
 	public function embeddedin( $namespace = null, $limit = null ) {
 		$eiArray = array(
 			'list' => 'embeddedin',
-			'code' => 'ei',
+			'_code' => 'ei',
 			'eititle' => $this->title,
-			'lhtitle' => 'title',
-			'limit' => $limit
+			'_lhtitle' => 'title',
+			'_limit' => $limit
 		);
 		
 		if(!is_null($namespace)){

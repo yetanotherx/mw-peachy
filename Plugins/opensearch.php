@@ -29,7 +29,7 @@ class OpenSearch {
 			array(
 				'search' => $text,
 				'action' => 'opensearch',
-				'limit' => $limit,
+				'_limit' => $limit,
 				'namespace' => implode( '|', $namespaces )
 			)
 		);

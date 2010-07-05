@@ -375,11 +375,11 @@ class User {
 	 */
 	public function get_contribs( $mostrecentfirst = true, $limit = null ) {
 		$ucArray = array(
-			'code' => 'uc',
+			'_code' => 'uc',
 			'ucuser' => $this->username,
 			'action' => 'query',
 			'list' => 'usercontribs',
-			'limit' => $limit,
+			'_limit' => $limit,
 		);
 		
 		if( $mostrecentfirst ){
@@ -491,7 +491,7 @@ class User {
 		if( $content ) $prop[] = 'content';
 		
 		$drArray = array(
-			'code' => 'dr',
+			'_code' => 'dr',
 			'list' => 'deletedrevs',
 			'druser' => $this->username,
 			'drprop' => implode( '|', $prop ),

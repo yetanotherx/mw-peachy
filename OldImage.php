@@ -216,8 +216,8 @@ class OldImage {
 		elseif( $force || !is_array( $this->usage ) ) {
 			$iuArray = array(
 				'list' => 'imageusage',
-				'code' => 'iu',
-				'lhtitle' => 'title',
+				'_code' => 'iu',
+				'_lhtitle' => 'title',
 				'iutitle' => $this->name,
 				'iufilterredir' => $redirects,
 			);

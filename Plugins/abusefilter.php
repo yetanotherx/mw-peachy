@@ -60,9 +60,9 @@ class AbuseFilter {
 
 		$tArray = array(
 			'prop' => $prop,
-			'code' => 'afl',
+			'_code' => 'afl',
 			'afldir' => $dir,
-			'limit' => $limit,
+			'_limit' => $limit,
 			'list' => 'abuselog',
 		);
 		
@@ -95,9 +95,9 @@ class AbuseFilter {
 		
 		$tArray = array(
 			'prop' => $prop,
-			'code' => 'abf',
+			'_code' => 'abf',
 			'abfdir' => $dir,
-			'limit' => $limit,
+			'_limit' => $limit,
 			'abfshow' => array(),
 			'list' => 'abusefilters'
 		);

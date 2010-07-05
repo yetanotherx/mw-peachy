@@ -18,25 +18,139 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 class AbuseFilter {
-
+	
+	/**
+	 * Wiki class
+	 * 
+	 * @var Wiki
+	 * @access private
+	 */
 	private $wiki;
-
+	
+	/**
+	 * Construction method for the AbuseFilter class
+	 * 
+	 * @access public
+	 * @param Wiki &$wikiClass The Wiki class object
+	 * @return void
+	 */
 	function __construct( &$wikiClass ) {
 		$this->wiki = $wikiClass;
 	}
-
+	
+	/**
+	 * Loads and constructs AbuseFilter class
+	 * 
+	 * @static
+	 * @access public
+	 * @param Wiki &$wikiClass The Wiki class object
+	 * @return AbuseFilter
+	 */
 	public static function load( &$wikiclass, &$newclass = null ) {
-		
-		if( !array_key_exists( 'AbuseFilter', $wikiClass->get_extensions() ) ) {
+		if( !array_key_exists( 'Abuse Filter', $wikiclass->get_extensions() ) ) {
 			throw new DependancyError( "AbuseFilter", "http://www.mediawiki.org/wiki/Extension:AbuseFilter" );
 		}
 		
 		$newclass = new AbuseFilter( $wikiclass );
+		return $newclass;
 	}
 	
-	public function abuselog() {}
+	/**
+	 * Returns the abuse filter log
+	 * 
+	 * @access public
+	 * @param int $filter Filter ID. Default null
+	 * @param string $user Show entries by this user. Default null
+	 * @param string $title Show entries to this title. Default null
+	 * @param int $limit Number of entries to retrieve. Defautl null
+	 * @param string $start Timestamp to start at. Default null
+	 * @param string $end Timestamp to end at. Default null
+	 * @param string $dir Direction to list. Default older
+	 * @param array $prop Properties to retrieve. Default array( 'ids', 'filter', 'user', 'ip', 'title', 'action', 'details', 'result', 'timestamp' )
+	 * @return array
+	 */
+	public function abuselog( $filter = null, $user = null, $title = null, $limit = null, $start = null, $end = null, $dir = 'older', $prop = array( 'ids', 'filter', 'user', 'ip', 'title', 'action', 'details', 'result', 'timestamp' ) ) {
+
+		$tArray = array(
+			'prop' => $prop,
+			'code' => 'afl',
+			'afldir' => $dir,
+			'limit' => $limit,
+			'list' => 'abuselog',
+		);
+		
+		if( !is_null( $filter ) ) $tArray['aflfilter'] = $filter;
+		if( !is_null( $user ) ) $tArray['afluser'] = $user;
+		if( !is_null( $title ) ) $tArray['afltitle'] = $title;
+		if( !is_null( $start ) ) $tArray['aflstart'] = $start;
+		if( !is_null( $end ) ) $tArray['aflend'] = $end;
+		
+		pecho( "Getting abuse log...\n\n", PECHO_NORMAL );
+		
+		return $this->wiki->listHandler($tArray);
+	}
 	
-	public function abusefilters() {}
+	/**
+	 * Returns a list of all filters
+	 * 
+	 * @access public
+	 * @param int $start Filter ID to start at. Default null
+	 * @param int $end Filter ID to end at. Default null
+	 * @param string $dir Direction to list. Default newer
+	 * @param bool $enabled Only list enabled filters. true => only enabled, false => only disabled, null => all
+	 * @param bool $deleted Only list deleted filters. true => only deleted, false => only non-deleted, null => all
+	 * @param bool $private Only list private filters. true => only private, false => only non-private, null => all
+	 * @param int $limit Number of filters to get. Default null
+	 * @param array $prop Properties to retrieve. Default array( 'id', 'description', 'pattern', 'actions', 'hits', 'comments', 'lasteditor', 'lastedittime', 'status', 'private' )
+	 * @return array
+	 */
+	public function abusefilters( $start = null, $end = null, $dir = 'newer', $enabled = null, $deleted = false, $private = null, $limit = null, $prop = array( 'id', 'description', 'pattern', 'actions', 'hits', 'comments', 'lasteditor', 'lastedittime', 'status', 'private' ) ) {
+		
+		$tArray = array(
+			'prop' => $prop,
+			'code' => 'abf',
+			'abfdir' => $dir,
+			'limit' => $limit,
+			'abfshow' => array(),
+			'list' => 'abusefilters'
+		);
+		
+		if( !is_null( $enabled ) ) {
+			if( $enabled ) {
+				$tArray['abfshow'][] = 'enabled';
+			}
+			else {
+				$tArray['abfshow'][] = '!enabled';
+			}
+		}
+		
+		if( !is_null( $deleted ) ) {
+			if( $deleted ) {
+				$tArray['abfshow'][] = 'deleted';
+			}
+			else {
+				$tArray['abfshow'][] = '!deleted';
+			}
+		}
+		
+		if( !is_null( $private ) ) {
+			if( $private ) {
+				$tArray['abfshow'][] = 'private';
+			}
+			else {
+				$tArray['abfshow'][] = '!private';
+			}
+		}
+		
+		$tArray['abfshow'] = implode( '|', $tArray['abfshow'] );
+		
+		if( !is_null( $start ) ) $tArray['abfstartid'] = $start;
+		if( !is_null( $end ) ) $tArray['abfendid'] = $end;
+		
+		pecho( "Getting abuse filter list...\n\n", PECHO_NORMAL );
+		
+		return $this->wiki->listHandler($tArray);
+	}
 	
 	
 

@@ -199,11 +199,11 @@ class Wiki {
 	 * @see Peachy::newWiki()
 	 * @param array $configuration Array with configuration data. At least needs username, password, and base_url.
 	 * @param array $extensions Array of names of extensions installed on the wiki and their versions (default: array())
-	 * @param bool $recursed Is the function recursing itself? Used internally, don't use (default: false)
+	 * @param int $recursed Is the function recursing itself? Used internally, don't use (default: 0)
 	 * @param mixed $token Token if the wiki needs a token. Used internally, don't use (default: null)
 	 * @return void
 	 */
-	function __construct( $configuration, $extensions = array(), $recursed = false, $token = null ) {
+	function __construct( $configuration, $extensions = array(), $recursed = 0, $token = null ) {
 		global $pgProxy, $pgVerbose, $pgUA;
 		
 		$this->base_url = $configuration['baseurl'];
@@ -361,13 +361,13 @@ class Wiki {
 					return false;
 					break;
 				case 'Throttled':
-					if( $recursed ) throw new LoginError( array( 'Throttled', 'Login attempts have been throttled' ) );
+					if( $recursed > 2 ) throw new LoginError( array( 'Throttled', 'Login attempts have been throttled' ) );
 					
 					$wait = $loginRes['login']['wait'];
 					pecho( "Login throttled, waiting $wait seconds.\n\n", PECHO_NOTICE );
 					sleep($wait);
 					
-					$recres = $this->__construct( $configuration, $this->extensions, true );
+					$recres = $this->__construct( $configuration, $this->extensions, $recursed + 1 );
 					return $recres;
 					break;
 				case 'Blocked':
@@ -375,11 +375,11 @@ class Wiki {
 					return false;
 					break;
 				case 'NeedToken':
-					if( $recursed ) throw new LoginError( array( 'NeedToken', 'Token was not specified' ) );
+					if( $recursed > 2 ) throw new LoginError( array( 'NeedToken', 'Token was not specified' ) );
 					
 					$token = $loginRes['login']['token'];
 
-					$recres = $this->__construct( $configuration, $this->extensions, true, $token );
+					$recres = $this->__construct( $configuration, $this->extensions, $recursed + 1, $token );
 					return $recres;
 					break;
 				case 'Success':

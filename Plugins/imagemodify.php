@@ -24,12 +24,14 @@ class ImageModify extends Image {
 	}
 
 	/**
-	 * Converts an XML url or string to a PHP array format
+	 * Initiates the ImageModify class
 	 * 
 	 * @static
 	 * @access public
-	 * @param string $data Either an url to an xml file, or a raw XML string. Peachy will autodetect which is which.
-	 * @return array Parsed XML
+	 * @param string $imagename Name of image
+	 * @param Wiki &$wikiClass Wiki class
+	 * @param ImageModify &$newclass Class gets stored here
+	 * @return ImageModify
 	 */
 	public static function load( $imagename, &$wikiClass, &$newclass = null ) {
 
@@ -38,10 +40,11 @@ class ImageModify extends Image {
 		}
 		
 		$newclass = new ImageModify( $wikiClass, $imagename );
+		return $newclass;
 	}
 	
 	/**
-	 * Converts an XML url or string to a PHP array format
+	 * Resize an image
 	 * 
 	 * @access public
 	 * @param int $width Width of resized image. Default null
@@ -56,8 +59,6 @@ class ImageModify extends Image {
 	 */
 	public function resize( $width = null, $height = null, $reupload = false, $newname = null, $text = '', $comment = '', $watch = false, $ignorewarnings = true ) {
 		global $IP;
-		
-		$localname = $IP . 'Images/' . str_replace(' ','_',$this->name);
 		
 		if( !is_null( $width ) && !is_null( $height ) ) {	
 			$this->download();
@@ -109,13 +110,13 @@ class ImageModify extends Image {
 
 			$image = imagecreatetruecolor( $width, $height );
 
-			$new_image = $image_create_func( $localname );
+			$new_image = $image_create_func( $IP . 'Images/' . $this->localname );
 			
-			$info = getimagesize( $localname );
+			$info = getimagesize( $IP . 'Images/' . $this->localname );
 
 			imagecopyresampled( $image, $new_image, 0, 0, 0, 0, $width, $height, $info[0], $info[1] );
 
-        	$image_save_func( $image, $localname );
+        	$image_save_func( $image, $IP . 'Images/' . $this->localname );
 
 		}
 		elseif( !is_null( $width ) ) {
@@ -132,7 +133,7 @@ class ImageModify extends Image {
 			if( !is_null( $newname ) ) {
 				$localname = $newname;
 			}
-			$this->upload( $localname, $text, $comment, $watch, $ignorewarnings );
+			return $this->upload( null, $text, $comment, $watch, $ignorewarnings );
 		}
 		
 	}

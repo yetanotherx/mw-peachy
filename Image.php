@@ -6,98 +6,98 @@ class Image {
 	 * Wiki class
 	 * 
 	 * @var Wiki
-	 * @access private
+	 * @access protected
 	 */
-	private $wiki;
+	protected $wiki;
 	
 	/**
 	 * Page class
 	 * 
 	 * @var Page
-	 * @access private
+	 * @access protected
 	 */
-	private $page;
+	protected $page;
 	
 	
 	/**
 	 * MIME type of image
 	 * 
 	 * @var string
-	 * @access private
+	 * @access protected
 	 */
-	private $mime;
+	protected $mime;
 	
 	/**
 	 * Bitdepth of image
 	 * 
 	 * @var int
-	 * @access private
+	 * @access protected
 	 */
-	private $bitdepth;
+	protected $bitdepth;
 	
 	/**
 	 * SHA1 hash of image
 	 * 
 	 * @var string
-	 * @access private
+	 * @access protected
 	 */
-	private $hash;
+	protected $hash;
 	
 	/**
 	 * Size of image
 	 * 
 	 * @var int
-	 * @access private
+	 * @access protected
 	 */
-	private $size;
+	protected $size;
 	
 	/**
 	 * Metadata stored in the image
 	 * 
 	 * @var array
-	 * @access private
+	 * @access protected
 	 */
-	private $metadata = array();
+	protected $metadata = array();
 	
 	/**
 	 * URL to direct image
 	 * 
 	 * @var string
-	 * @access private
+	 * @access protected
 	 */
-	private $url;
+	protected $url;
 	
 	/**
 	 * Timestamp that of the most recent upload
 	 * 
 	 * @var string
-	 * @access private
+	 * @access protected
 	 */
-	private $timestamp;
+	protected $timestamp;
 	
 	/**
 	 * Username of the most recent uploader
 	 * 
 	 * @var string
-	 * @access private
+	 * @access protected
 	 */
-	private $user;
+	protected $user;
 	
 	/**
 	 * Width of image
 	 * 
 	 * @var int
-	 * @access private
+	 * @access protected
 	 */
-	private $width;
+	protected $width;
 	
 	/**
 	 * Height of image
 	 * 
 	 * @var int
-	 * @access private
+	 * @access protected
 	 */
-	private $height;
+	protected $height;
 	
 	
 	/**
@@ -105,59 +105,59 @@ class Image {
 	 * This is not whether or not the page exists, use Image::get_exists() for that
 	 * 
 	 * @var bool 
-	 * @access private
+	 * @access protected
 	 */
-	private $local = true;
+	protected $local = true;
 	
 	
 	/**
 	 * Sanitized name for local storage (namespace, colons, etc all removed)
 	 * 
 	 * @var string
-	 * @access private
+	 * @access protected
 	 */
-	private $localname;
+	protected $localname;
 	
 	/**
 	 * Image name, with namespace
 	 * 
 	 * @var string
-	 * @access private
+	 * @access protected
 	 */
-	private $title;
+	protected $title;
 	
 	/**
 	 * Image name, without namespace
 	 * 
 	 * @var string
-	 * @access private
+	 * @access protected
 	 */
-	private $rawtitle;
+	protected $rawtitle;
 	
 	
 	/**
 	 * List of pages where the image is used
 	 * 
 	 * @var array
-	 * @access private
+	 * @access protected
 	 */
-	private $usage = array();
+	protected $usage = array();
 	
 	/**
 	 * List of previous uploads
 	 * 
 	 * @var array
-	 * @access private
+	 * @access protected
 	 */
-	private $history = array();
+	protected $history = array();
 	
 	/**
 	 * Other images with identical SHA1 hashes
 	 * 
 	 * @var array
-	 * @access private
+	 * @access protected
 	 */
-	private $duplicates = array();
+	protected $duplicates = array();
 	
 	
 	/**

@@ -1,32 +1,7 @@
 <?php
 
-/*
-This file is part of Peachy MediaWiki Bot API
-
-Peachy is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-/**
- * @file
- * Image object
- */
-
-/**
- * Image class, contains methods that get info about/modify images
- */
 class Image {
-
+	
 	/**
 	 * Wiki class
 	 * 
@@ -36,12 +11,13 @@ class Image {
 	protected $wiki;
 	
 	/**
-	 * Image name, with namespace
+	 * Page class
 	 * 
-	 * @var string
+	 * @var Page
 	 * @access protected
 	 */
-	protected $name; //including "Image"
+	protected $page;
+	
 	
 	/**
 	 * MIME type of image
@@ -52,36 +28,12 @@ class Image {
 	protected $mime;
 	
 	/**
-	 * Page ID of image page
+	 * Bitdepth of image
 	 * 
 	 * @var int
 	 * @access protected
 	 */
-	protected $pageid;
-	
-	/**
-	 * Whether or not image exists
-	 * 
-	 * @var bool
-	 * @access protected
-	 */
-	protected $exists = true;
-	
-	/**
-	 * URL to direct image
-	 * 
-	 * @var string
-	 * @access protected
-	 */
-	protected $url;
-	
-	/**
-	 * Whether or not image is hosted on a shared repository
-	 * 
-	 * @var bool
-	 * @access protected
-	 */
-	protected $commons = false;
+	protected $bitdepth;
 	
 	/**
 	 * SHA1 hash of image
@@ -92,12 +44,12 @@ class Image {
 	protected $hash;
 	
 	/**
-	 * Bitdepth of image
+	 * Size of image
 	 * 
 	 * @var int
 	 * @access protected
 	 */
-	protected $bitdepth;
+	protected $size;
 	
 	/**
 	 * Metadata stored in the image
@@ -108,15 +60,91 @@ class Image {
 	protected $metadata = array();
 	
 	/**
+	 * URL to direct image
+	 * 
+	 * @var string
+	 * @access protected
+	 */
+	protected $url;
+	
+	/**
+	 * Timestamp that of the most recent upload
+	 * 
+	 * @var string
+	 * @access protected
+	 */
+	protected $timestamp;
+	
+	/**
+	 * Username of the most recent uploader
+	 * 
+	 * @var string
+	 * @access protected
+	 */
+	protected $user;
+	
+	/**
+	 * Width of image
+	 * 
+	 * @var int
+	 * @access protected
+	 */
+	protected $width;
+	
+	/**
+	 * Height of image
+	 * 
+	 * @var int
+	 * @access protected
+	 */
+	protected $height;
+	
+	
+	/**
+	 * Whether or not the image is hosted locally
+	 * This is not whether or not the page exists, use Image::get_exists() for that
+	 * 
+	 * @var bool 
+	 * @access protected
+	 */
+	protected $local = true;
+	
+	
+	/**
+	 * Sanitized name for local storage (namespace, colons, etc all removed)
+	 * 
+	 * @var string
+	 * @access protected
+	 */
+	protected $localname;
+	
+	/**
+	 * Image name, with namespace
+	 * 
+	 * @var string
+	 * @access protected
+	 */
+	protected $title;
+	
+	/**
+	 * Image name, without namespace
+	 * 
+	 * @var string
+	 * @access protected
+	 */
+	protected $rawtitle;
+	
+	
+	/**
 	 * List of pages where the image is used
 	 * 
 	 * @var array
 	 * @access protected
 	 */
-	protected $usage;
+	protected $usage = array();
 	
 	/**
-	 * History of image page
+	 * List of previous uploads
 	 * 
 	 * @var array
 	 * @access protected
@@ -124,68 +152,127 @@ class Image {
 	protected $history = array();
 	
 	/**
+	 * Other images with identical SHA1 hashes
+	 * 
+	 * @var array
+	 * @access protected
+	 */
+	protected $duplicates = array();
+	
+	
+	/**
 	 * Construction method for the Image class
 	 * 
 	 * @access public
 	 * @param Wiki &$wikiClass The Wiki class object
 	 * @param string $filename Filename
-	 * @param int $pageid Page ID of image
-	 * @param array $prop Informatation to set. Default array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' )
 	 * @return void
 	 */
-	function __construct( &$wikiClass, $filename = null, $pageid = null, $prop = array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' ) ) {
-		$this->wiki =& $wikiClass;
+	function __construct( &$wikiClass, $title = null ) {
 		
+		$this->wiki = &$wikiClass;
+		
+		$this->title = $title;
+		
+		if( $this->wiki->removeNamespace( $title ) == $title ) {
+			$namespaces = $this->wiki->get_namespaces();
+			$this->title = $namespaces[6] . $title;
+		}
+		
+		$ii = $this->imageinfo();
+		
+		foreach( $ii as $x ) {
+			
+			$this->title = $x['title'];
+			$this->rawtitle = $this->wiki->removeNamespace( $x['title'] );
+			$this->localname = str_replace( array( ' ', '+' ), array( '_', '_' ), urlencode( $this->rawtitle ) );
+			
+			$this->page = &$this->wiki->initPage( $this->title );
+			
+			if( $x['imagerepository'] == "shared" ) $this->local = false;
+			
+			if( isset( $x['imageinfo'] ) ) {
+				
+				$this->mime = $x['imageinfo'][0]['mime'];
+				$this->bitdepth = $x['imageinfo'][0]['bitdepth'];
+				$this->hash = $x['imageinfo'][0]['sha1'];
+				$this->size = $x['imageinfo'][0]['size'];
+				$this->width = $x['imageinfo'][0]['width'];
+				$this->height = $x['imageinfo'][0]['height'];
+				$this->url = $x['imageinfo'][0]['url'];
+				$this->timestamp = $x['imageinfo'][0]['timestamp'];
+				$this->user = $x['imageinfo'][0]['user'];
+				
+				if( is_array( $x['imageinfo'][0]['metadata'] ) ) {
+					foreach( $x['imageinfo'][0]['metadata'] as $metadata ) {
+						$this->metadata[$metadata['name']] = $metadata['value'];
+					}
+				}
+				
+			}
+		}
+		
+	}
+	
+	/**
+	 * Returns various information about the image
+	 * 
+	 * @access public
+	 * @param int $limit Number of revisions to get info about. Default 1
+	 * @param int $width Width of image. Default -1 (no width)
+	 * @param int $height Height of image. Default -1 (no height)
+	 * @param string $start Timestamp to start at. Default null
+	 * @param string $end Timestamp to end at. Default null
+	 * @param array $prop Properties to retrieve. Default array( 'timestamp', 'user', 'comment', 'url', 'size', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' )
+	 * @return array
+	 */
+	public function imageinfo( $limit = 1, $width = -1, $height = -1, $start = null, $end = null, $prop = array( 'timestamp', 'user', 'comment', 'url', 'size', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' ) ) {
+	
 		$imageInfoArray = array(
 			'action' => 'query',
 			'prop' => 'imageinfo',
-			'iilimit' => '1',
-			'iiprop' => implode('|',$prop)
+			'iilimit' => $limit,
+			'iiprop' => implode('|',$prop),
+			'iiurlwidth' => $width,
+			'iiurlheight' => $height,
+			'titles' => $this->title
 		);
 		
-		if( is_null( $filename ) && is_null( $pageid ) ) {
-			throw new BadEntryError( 'MissingParams', 'Either $filename or $pageid must be set when initializing Image' );
-		}
-		elseif( !is_null( $pageid ) && !is_null( $filename ) ) {
-			throw new BadEntryError( 'TooManyParams', '$filename and $pageid cannot be used in conjunction.' );
-		}
-		else {
-			if( is_null( $pageid ) ) {
-				##FIXME: This is incredibly hacky, and doesn't work for non-english-wikis
-				if( !preg_match( '/^(File|Image)/i', $filename ) ) $filename = "Image:" . $filename;
-				$imageInfoArray['titles'] = $filename;
-				$peachout = $filename;
-			}
-			else {
-				$imageInfoArray['pageids'] = $pageid;
-				$peachout = "page ID $pageid";
-			}
-		}
+		if( !is_null( $start ) ) $imageInfoArray['iistart'] = $start;
+		if( !is_null( $end ) ) $imageInfoArray['iiend'] = $end;
 		
-		pecho( "Getting image info for $peachout..\n\n", PECHO_NORMAL );
+		
+		pecho( "Getting image info for {$this->title}...\n\n", PECHO_NORMAL );
 		
 		$ii = $this->wiki->apiQuery( $imageInfoArray );
 		
-		foreach( $ii['query']['pages'] as $x ) {
-			$this->pageid = $x['pageid'];
-			$this->name = $x['title'];
-			
-			if( isset( $x['missing'] ) ) $this->exists = false;
-			
-			if( $x['imagerepository'] == "shared" ) $this->commons = true;
-			
-			if( isset( $x['imageinfo'] ) ) {
-				$this->mime = $x['imageinfo'][0]['mime'];
-				$this->url = $x['imageinfo'][0]['url'];
-				$this->hash = $x['imageinfo'][0]['sha1'];
-				$this->metadata = $x['imageinfo'][0]['metadata'];
-				$this->bitdepth = $x['imageinfo'][0]['bitdepth'];
-			}
-		}
+		return $ii['query']['pages'];
 	}
 	
-	public function getHistory() {
-		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+	/**
+	 * Returns the upload history of the image. If function was already called earlier in the script, it will return the local cache unless $force is set to true. 
+	 * 
+	 * @access public
+	 * @param bool $force Whether or not to always refresh. Default false
+	 * @param string $start Timestamp to start enumerating at. Default null
+	 * @param string $end Timestamp to end at. Default null
+	 * @param int $limit Number of revisions to get. Default null (all revisions)
+	 * @return void
+	 */
+	public function get_history( $force = false, $start = null, $end = null, $limit = null ) {
+		
+		if( $force || !count( $this->history ) ) { 
+			
+			if( is_null( $limit ) ) $limit = $this->wiki->get_api_limit();
+			
+			$ii = $this->imageinfo( $limit, -1, -1, $start, $end );
+			
+			if( isset( $ii[ $this->page->get_id() ]['imageinfo'] ) ) {
+				$this->history = $ii[ $this->page->get_id() ]['imageinfo'];
+			}
+		}
+		
+		return $this->history;
 	}
 	
 	/**
@@ -198,18 +285,15 @@ class Image {
 	 * @param bool $followRedir If linking page is a redirect, find all pages that link to that redirect as well. Default false.
 	 * @return array
 	 */
-	##FIXME: Make this work for images on a shared repository
-	public function getUsage( $force = false, $namespace = null, $redirects = "all", $followRedir = false ) {
+	public function get_usage( $namespace = null, $redirects = "all", $followRedir = false, $limit = null ) {
 		
-		if( !$this->exists ) {
-			$this->usage = array();
-		}
-		elseif( $force || !is_array( $this->usage ) ) {
+		if( $force || !count( $this->usage ) ) {
+		
 			$iuArray = array(
 				'list' => 'imageusage',
-				'_code' => 'iu',
-				'_lhtitle' => 'title',
-				'iutitle' => $this->name,
+				'code' => 'iu',
+				'lhtitle' => 'title',
+				'iutitle' => $this->title,
 				'iufilterredir' => $redirects,
 			);
 			
@@ -221,196 +305,239 @@ class Image {
 				$iuArray['iunamespace'] = $namespace;
 			}
 			
+			if( !is_null( $limit ) ) $iuArray['iulimit'] = $limit;
+			
 			if( $followRedir ) $iuArray['iuredirect'] = 'yes';
 			
-			pecho( "Getting image usage for {$this->name}..\n\n", PECHO_NORMAL );
+			pecho( "Getting image usage for {$this->title}..\n\n", PECHO_NORMAL );
+			
 			$this->usage = $this->wiki->listHandler( $iuArray );
+			
 		}
 		
 		return $this->usage;
-		
 	}
 	
 	/**
 	 * Returns an array of all files with identical sha1 hashes
-	 * 
+	 *
+	 * @param int $limit Number of duplicates to get. Default null (all)
 	 * @return array Duplicate files
 	 */
-	public function getDuplicates() {
+	public function get_duplicates( $limit = null ) {
 		
-		if( !$this->exists ) {
-			return array();
-		}
-		
-		$dArray = array(
-			'action' => 'query',
-			'prop' => 'duplicatefiles',
-			'dflimit' => ($this->wiki->get_api_limit() + 1),
-			'titles' => $this->name
-		);
-		
-		$dupes = array();
-		
-		$continue = null;
-		
-		pecho( "Getting duplicate images of {$this->name}..\n\n", PECHO_NORMAL );
-		
-		while( 1 ) {
-			if( !is_null( $continue ) ) $tArray['dfcontinue'] = $continue;
+		if( $force || !count( $this->duplicates ) ) {
 			
-			$dRes = $this->wiki->apiQuery( $dArray );
+			if( !$this->page->exists() ) {
+				return $this->duplicates;
+			}
+		
+			$dArray = array(
+				'action' => 'query',
+				'prop' => 'duplicatefiles',
+				'dflimit' => ( $this->wiki->get_api_limit() + 1 ),
+				'titles' => $this->title
+			);
 			
-			foreach( $dRes['query']['pages'] as $x ) {
-				if( isset( $x['duplicatefiles'] ) ) {
-					foreach( $x['duplicatefiles'] as $y ) {
-						$dupes[] = $y['name'];
+			$continue = null;
+			
+			pecho( "Getting duplicate images of {$this->title}..\n\n", PECHO_NORMAL );
+			
+			while( 1 ) {
+				if( !is_null( $continue ) ) $tArray['dfcontinue'] = $continue;
+				
+				$dRes = $this->wiki->apiQuery( $dArray );
+				
+				foreach( $dRes['query']['pages'] as $x ) {
+					if( isset( $x['duplicatefiles'] ) ) {
+						foreach( $x['duplicatefiles'] as $y ) {
+							$this->duplicates[] = $y['name'];
+						}
 					}
 				}
-			}
-			
-			if( isset( $dRes['query-continue'] ) ) {
-				foreach( $dRes['query-continue'] as $z ) {
-					$continue = $z['dfcontinue'];
+				
+				if( isset( $dRes['query-continue'] ) ) {
+					foreach( $dRes['query-continue'] as $z ) {
+						$continue = $z['dfcontinue'];
+					}
 				}
+				else {
+					break;
+				}
+				
+				
 			}
-			else {
-				break;
-			}
-			
 			
 		}
 		
-		return $dupes;
-		
-	}
+		return $this->duplicates;
+	}	
 	
 	/**
 	 * Upload an image to the wiki
 	 * 
 	 * @access public
-	 * @param mixed $file Location of the file to upload in the Images directory
+	 * @param mixed $localname Location of the file to upload. Either an absolute path, or the name of an image in the Images/ directory will work. Default null (/path/to/peachy/Images/<$this->localname>)
+	 * @param string $text Text on the image file page (default: '')
+	 * @param string $comment Comment for inthe upload in logs (default: '')
+	 * @param bool $watch Should the upload be added to the watchlist (default: false)
+	 * @param bool $ignorewarnings Ignore warnings about the upload (default: true)
+	 * @return bool|void
+	 */
+	public function upload( $localname = null, $text = '', $comment = '', $watch = false, $ignorewarnings = true ) {
+		global $IP, $mwVersion;
+		
+		if( !is_file( $localname ) ) {
+		
+			if( is_file( $IP . 'Images/' . $localname ) ) {
+				$localname = $IP . 'Images/' . $localname;
+			}
+			else {
+				$localname = $IP . 'Images/' . $this->localname;
+			}
+
+			if( !is_file( $localname ) ) {
+				throw new BadEntryError( "FileNotFound", "The given file was not found" );
+			}
+		}
+		
+		pecho( "Uploading $localname to {$this->title}..\n\n", PECHO_NOTICE );
+
+		if( version_compare( $mwVersion, '1.16' ) >= 0 ) {
+			return $this->api_upload( $localname, $text, $comment, $watch, $ignorewarnings );
+		}
+		else {
+			return $this->index_upload( $localname, $text, $comment, $watch, $ignorewarnings );
+		}
+		
+	}
+	
+	/**
+	 * Upload an image to the wiki using api.php
+	 * 
+	 * @access public
+	 * @param mixed $localname Absolute path to the image
+	 * @param string $text Text on the image file page (default: '')
+	 * @param string $comment Comment for inthe upload in logs (default: '')
+	 * @param bool $watch Should the upload be added to the watchlist (default: false)
+	 * @param bool $ignorewarnings Ignore warnings about the upload (default: true)
+	 * @return bool
+	 */
+	public function api_upload( $localname, $text = '', $comment = '', $watch = false, $ignorewarnings = true ) {
+		
+		$tokens = $this->wiki->get_tokens();
+		
+		$apiArr = array(
+			'action' => 'upload',
+			'filename' => $this->rawtitle,
+			'comment' => $comment,
+			'text' => $text,
+			'token' => $tokens['edit'],
+			'watch' => intval( $watch ),
+			'ignorewarnings' => intval( $ignorewarnings ),
+			'file' => "@$localname"
+		);
+		
+		Hooks::runHook( 'APIUpload', array( &$apiArr ) );
+		
+		$result = $this->wiki->apiQuery( $apiArr, true);
+		
+		if( isset( $result['upload'] ) ) {
+			if( isset( $result['upload']['result'] ) && $result['upload']['result'] == "Success" ) {
+				$this->__construct( $this->wiki, $this->title );
+				return true;
+			}
+			else {
+				pecho( "Upload error...\n\n" . print_r($result['upload'], true) . "\n\n", PECHO_FATAL );
+				return false;
+			}
+		}
+		else {
+			pecho( "Upload error...\n\n" . print_r($result, true), PECHO_FATAL );
+			return false;
+		}
+		
+	}
+	
+	/**
+	 * Upload an image to the wiki using the old index.php
+	 * 
+	 * @access public
+	 * @param mixed $localname Absolute path to the image
 	 * @param string $text Text on the image file page (default: '')
 	 * @param string $comment Comment for inthe upload in logs (default: '')
 	 * @param bool $watch Should the upload be added to the watchlist (default: false)
 	 * @param bool $ignorewarnings Ignore warnings about the upload (default: true)
 	 * @return void
+	 * @deprecated
 	 */
-	public function upload( $file, $text = '', $comment = '', $watch = false, $ignorewarnings = true ) {
-		global $mwVersion, $IP;
-		
+	public function index_upload( $localname, $text = '', $comment = '', $watch = false, $ignorewarnings = true ) {
 		$tokens = $this->wiki->get_tokens();
 		
-		$localfile = $IP . 'Images/' . str_replace( ' ', '_', $this->name );
+		$indexArr = array(
+			'wpUploadFile' => '@'.$localname,
+            'wpSourceType' => 'file',
+            'wpDestFile' => $this->rawtitle,
+            'wpUploadDescription' => $text,
+            'wpLicense' => '',
+            'wpWatchthis' => '0',
+            'wpIgnoreWarning' => '1',
+            'wpUpload' => 'Upload file',
+		);
 		
-		pecho( "Uploading $file to {$this->name}..\n\n", PECHO_NOTICE );
-		
-		if( version_compare( $mwVersion, '1.16' ) >= 0 ) {
-		
-			$uploadArray = array(
-				'action' => 'upload',
-				'filename' => $file,
-				'comment' => $comment,
-				'text' => $text,
-				'token' => $tokens['edit'],
-				'watch' => intval( $watch ),
-				'ignorewarnings' => intval( $ignorewarnings ),
-				'file' => "@$localfile"
-			);
+		Hooks::runHook( 'IndexUpload', array( &$indexArr ) );
 			
-			Hooks::runHook( 'APIUpload', array( &$uploadArray ) );
-
-		} else {
-			##FIXME: test the non-api upload
-			
-			Hooks::runHook( 'IndexUpload' );
-			
-			$this->wiki->get_http()->post(
-				str_replace( 'api.php', 'index.php', $this->wiki->base_url ),
-				array(
-					'wpUploadFile' => '@'.$localfile,
-		            'wpSourceType' => 'file',
-		            'wpDestFile' => $file,
-		            'wpUploadDescription' => $desc,
-		            'wpLicense' => '',
-		            'wpWatchthis' => '0',
-		            'wpIgnoreWarning' => '1',
-		            'wpUpload' => 'Upload file',
-				)
-			);
-		}
-		
-		##FIXME: Add error checking
-		
-		$this->__construct( $this->wiki, $file );
-	}
-	
-	public function history() {
-		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+		$this->wiki->get_http()->post(
+			str_replace( 'api.php', 'index.php', $this->wiki->get_base_url() ) . "?title=Special:Upload&action=submit",
+			$indexArr
+		);
 	}
 	
 	/**
 	 * Downloads an image to the local disk
 	 * 
-	 * @param string $name Filename to store image as. Default null.
-	 * @param int $width Width of image to download. Cannot be used together with $height. Default null.
-	 * @param int $height Height of image to download. Cannot be used together with $width. Default null.
+	 * @param string $localname Filename to store image as. Default null.
+	 * @param int $width Width of image to download. Default -1.
+	 * @param int $height Height of image to download. Default -1.
 	 * @return void
 	 */
-	public function download( $name = null, $width = null, $height = null ) {
+	public function download( $localname = null, $width = -1, $height = -1 ) {
 		global $IP;
 		
-		if( $this->commons ) {
-			throw new ImageError( "Attempted to download a file on a shared respository instead of a local one" );
+		if( !$this->local ) {
+			pecho( "Attempted to download a file on a shared respository instead of a local one", PECHO_NOTICE );
 		}
 		
-		if( !$this->exists ) {
-			throw new ImageError( "Attempted to download a non-existant file." );
+		if( !$this->page->exists() ) {
+			pecho( "Attempted to download a non-existant file.", PECHO_NOTICE );
 		}
 		
-		$iiParams = array(
-			'action' => 'query',
-			'prop' => 'imageinfo',
-			'iiprop' => 'url',
-			'titles' => $this->name
-		);
+		$ii = $this->imageinfo( 1, $width, $height );
 		
-		if( !is_null( $height ) && is_null( $width ) ) {
-			throw new BadEntryError( "HeightWOWidth", "Height cannot be used without sending Width as well" );
-		}
-		elseif( is_null( $height ) && !is_null( $width ) ) {
-			$iiParams['iiurlwidth'] = $width;
-		}
-		elseif( !is_null( $height ) && !is_null( $width ) ) {
-			$iiParams['iiurlwidth'] = $width;
-			$iiParams['iiurlheight'] = $height;
-		}	
+		if( isset( $ii[ $this->page->get_id() ]['imageinfo'] ) ) {
+			$ii = $ii[ $this->page->get_id() ]['imageinfo'][0];
 			
-		$iiRes = $this->wiki->apiQuery( $iiParams );
-		
-		if( !isset( $iiRes['query']['pages'] ) ) {
-			pecho( "Unknown API Error...\n\n" . print_r($iiRes,true) . "\n\n", PECHO_ERROR );
-			return false;
-		}
-		
-		foreach( $iiRes['query']['pages'] as $x ) {
-			if( !is_null( $width ) ) {
-				$url = $x['imageinfo'][0]['thumburl'];
+			if( $width != -1 ) {
+				$url = $ii['thumburl'];
 			}
 			else {
-				$url = $x['imageinfo'][0]['url'];
+				$url = $ii['url'];
 			}
-			break;
+			
+			if( is_null( $localname ) ) {
+				$localname = $IP . 'Images/' . $this->localname;
+			}
+			
+			Hooks::runHook( 'DownloadImage', array( &$url, &$localname ) );
+			
+			pecho( "Downloading {$this->title} to $localname..\n\n", PECHO_NOTICE );
+			
+			$this->wiki->get_http()->download( $url, $localname );
 		}
-		
-		$localname = str_replace(' ','_',urlencode( $this->getName(false) ) );
-		if( $name ) $localname = $name;
-		
-		Hooks::runHook( 'DownloadImage', array( &$url, &$name, &$localname ) );
-		
-		pecho( "Downloading {$this->name} to $localname..\n\n", PECHO_NOTICE );
-		
-		$this->wiki->get_http()->download( $url, $IP . 'Images/' . $localname );
-	}
+		else {
+			pecho( "Error in getting image URL.\n\n" . print_r($ii) . "\n\n", PECHO_FATAL );
+		}
+	}	
 	
 	/**
 	 * Returns the normalized image name
@@ -418,41 +545,22 @@ class Image {
 	 * @param bool $namespace Whether or not to include the File: part of the name. Default true.
 	 * @return string
 	 */
-	public function getName( $namespace = true ) {
+	public function get_title( $namespace = true ) {
 		if( $namespace ) {
-			return $this->name;
+			return $this->title;
 		}
 		else {
-			$tmp = explode( ':', $this->name, 2 );
-			return $tmp[1];
+			return $this->rawtitle;
 		}
 	}
 	
 	/**
-	 * Returns the MIME type of the image
+	 * Returns the sanitized local disk name
 	 * 
 	 * @return string
 	 */
-	public function getMime() {
-		return $this->mime;
-	}
-	
-	/**
-	 * Whether or not the image exists
-	 * 
-	 * @return bool
-	 */
-	public function getExists() {
-		return $this->exists;
-	}
-	
-	/**
-	 * Returns the direct URL of the image
-	 * 
-	 * @return string
-	 */
-	public function getUrl() {
-		return $this->url;
+	public function get_localname() {
+		return $this->localname;
 	}
 	
 	/**
@@ -460,39 +568,17 @@ class Image {
 	 * 
 	 * @return bool
 	 */
-	public function getLocal() {
-		if( $this->commons ) {
-			return false;
-		}
-		return true;
-		
+	public function is_local() {
+		return $this->local;
 	}
 	
 	/**
-	 * Returns the SHA1 hash of the image
+	 * Whether or not the image exists
 	 * 
-	 * @return string
+	 * @return bool
 	 */
-	public function getHash() {
-		return $this->hash;
-	}
-	
-	/**
-	 * Returns the bitdepth of the image
-	 * 
-	 * @return string
-	 */
-	public function getBitdepth() {
-		return $this->bitdepth;
-	}
-	
-	/**
-	 * Returns the metadata of the image
-	 * 
-	 * @return array
-	 */
-	public function getMetadata() {
-		return $this->metadata;
+	public function get_exists() {
+		return $this->page->exists();
 	}
 	
 	/**
@@ -500,8 +586,98 @@ class Image {
 	 * 
 	 * @return Page
 	 */
-	public function &getPageclass() {
-		$image_page = new Page( $this->wiki, $this->name );
-		return $image_page;
+	public function &get_page() {
+		return $this->page;
 	}
+	
+	/**
+	 * Returns the MIME type of the image
+	 * 
+	 * @return string
+	 */
+	public function get_mime() {
+		return $this->mime;
+	}
+	
+	/**
+	 * Returns the bitdepth of the image
+	 * 
+	 * @return int
+	 */
+	public function get_bitdepth() {
+		return $this->bitdepth;
+	}
+	
+	/**
+	 * Returns the SHA1 hash of the image
+	 * 
+	 * @return string
+	 */
+	public function get_hash() {
+		return $this->hash;
+	}
+	
+	/**
+	 * Returns the size of the image, in bytes
+	 * 
+	 * @return int
+	 */
+	public function get_size() {
+		return $this->size;
+	}
+	
+	/**
+	 * Returns the metadata of the image
+	 * 
+	 * @return array
+	 */
+	public function get_metadata() {
+		return $this->metadata;
+	}
+	
+	/**
+	 * Returns the direct URL of the image
+	 * 
+	 * @return string
+	 */
+	public function get_url() {
+		return $this->url;
+	}
+	
+	/**
+	 * Returns the timestamp that of the most recent upload
+	 * 
+	 * @return string
+	 */
+	public function get_timestamp() {
+		return $this->timestamp;
+	}
+	
+	/**
+	 * Returns the username of the most recent uploader
+	 * 
+	 * @return string
+	 */
+	public function get_user() {
+		return $this->user;
+	}
+	
+	/**
+	 * Returns the width of the image
+	 * 
+	 * @return int
+	 */
+	public function get_width() {
+		return $this->width;
+	}
+	
+	/**
+	 * Returns the height of the image
+	 * 
+	 * @return int
+	 */
+	public function get_height() {
+		return $this->height;
+	}
+
 }

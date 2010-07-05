@@ -114,7 +114,7 @@ class GlobalUserInfo {
 				throw new APIError( $guiRes['error'] );
 			}
 			elseif( @$guiRes['error']['code'] != 'guinosuchuser' ) {
-				throw new APIError( array( '_code' => 'UnknownError', 'info' => 'Unknown API Error' ) );
+				throw new APIError( array( 'code' => 'UnknownError', 'info' => 'Unknown API Error' ) );
 			}
 		}
 		else {

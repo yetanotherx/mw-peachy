@@ -49,17 +49,6 @@ class RPED {
 	}
  
 	/**
-	 * Loads and constructs the RPED class
-	 * 
-	 * @access public
-	 * @param Wiki &$wikiClass The Wiki class object
-	 * @return RPED
-	 */
-	public static function load( &$wikiClass ) {
-		return new RPED( $wikiClass );
-	}
- 
-	/**
 	 * Insert a page title into the rped_page table
 	 * 
 	 * @static

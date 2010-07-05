@@ -22,17 +22,12 @@ class FlaggedRevs {
 	private $wiki;
 
 	function __construct( &$wikiClass ) {
-		$this->wiki = $wikiClass;
-	}
-
-	public static function &load( &$wikiclass, &$newclass = null ) {
-		
+	
 		if( !array_key_exists( 'FlaggedRevs', $wikiClass->get_extensions() ) ) {
 			throw new DependancyError( "FlaggedRevs", "http://www.mediawiki.org/wiki/Extension:FlaggedRevs" );
 		}
 		
-		$newclass = new FlaggedRevs( $wikiclass );
-		return $newclass;
+		$this->wiki = $wikiClass;
 	}
 	
 	public function review( $revid, $reason = null, $status = 1 ) {

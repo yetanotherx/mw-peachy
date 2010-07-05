@@ -64,23 +64,6 @@ class IRC {
 	}
 	
 	/**
-	 * Plugin initalization function
-	 * @param object &$newclass Location to store IRC class in memory
-	 * @param string $User Username to send to IRC
-	 * @param string $Nick Nick to use
-	 * @param string $Pass Password to send
-	 * @param string $Server Server to connect to
-	 * @param string $Port Port to use
-	 * @param string $Gecos AKA Real Name, Information field, etc. 
-	 * @param string|array Channel(s) to connect to
-	 * @return void
-	 * @static
-	 */
-	public static function load( &$newclass, $User, $Nick, $Pass, $Server, $Port, $Gecos, $Channel ) {
-		$newclass = new IRC( $User, $Nick, $Pass, $Server, $Port, $Gecos, $Channel );
-	}
-	
-	/**
 	 * Destruct function, quits from IRC
 	 * @return void
 	 */

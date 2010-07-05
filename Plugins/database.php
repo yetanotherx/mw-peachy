@@ -642,22 +642,39 @@ class Database {
 	 * @access private
 	 */
 	private $db;
-
+	
 	/**
-	 * Construct function, sets class variables
+	 * Constructor.
+	 * If passed as server, user, pass, dbname; the port is ignored. 
+	 * If passed as server, port, user, pass, dbname; the port is as given
+	 * Basically, the function will detect if a port was specified. 
+	 *
+	 * @static
 	 * @param string $server Server to connect to
-	 * @param string $port Port
+	 * @param int $port Port, default 3306
 	 * @param string $user Username
 	 * @param string $pass Password
-	 * @param string $db Database
-	 * @return void
+	 * @param string $dbname Database, default null
+	 * @return Database
 	 */
-	function __construct( $server, $port, $user, $password, $db ) {
-		$this->server = $server;
-		$this->port = $port;
-		$this->user = $user;
-		$this->password = $password;
-		$this->db = $db;
+	function __server( $server, $port = 3306, $user, $pass, $dbname = null ) {
+		if( func_num_args() > 4 ) {
+			$this->server = $server;
+			$this->port = ':' . $port;
+			$this->user = $user;
+			$this->password = $pass;
+			$this->db = $dbname;
+		}
+		else {
+			$this->server = $server;
+			$this->port = '';
+			$this->user = $port;
+			$this->password = $user;
+			$this->db = $pass;
+		}	
+		
+		Hooks::runHook( 'LoadDatabase', array( &$this->server, &$this->port, &$this->user, &$this->password, &$this->db ) );
+
 	}
 	
 	/**
@@ -700,41 +717,6 @@ class Database {
 				return new DatabaseMySQLi( $this->server, $this->port, $this->user, $this->password, $this->db );
 				break;
 		}	
-	}
-
-	/**
-	 * Load function, initiates the Database class
-	 * If passed as server, user, pass, dbname; the port is ignored. 
-	 * If passed as server, port, user, pass, dbname; the port is as given
-	 * Basically, the function will detect if a port was specified. 
-	 *
-	 * @static
-	 * @param string $server Server to connect to
-	 * @param int $port Port, default 3306
-	 * @param string $user Username
-	 * @param string $pass Password
-	 * @param string $dbname Database, default null
-	 * @return Database
-	 */
-	public static function load( $server, $port = 3306, $user, $pass, $dbname = null ) {
-		if( func_num_args() > 4 ) {
-			$Server = $server;
-			$Port = ':' . $port;
-			$User = $user;
-			$Password = $pass;
-			$DB = $dbname;
-		}
-		else {
-			$Server = $server;
-			$Port = '';
-			$User = $port;
-			$Password = $user;
-			$DB = $pass;
-		}	
-		
-		Hooks::runHook( 'LoadDatabase', array( &$Server, &$Port, &$User, &$Password, &$DB ) );
-		
-		return new Database( $Server, $Port, $User, $Password, $DB );	
 	}
 	
 	

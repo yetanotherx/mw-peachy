@@ -36,23 +36,10 @@ class AbuseFilter {
 	 */
 	function __construct( &$wikiClass ) {
 		$this->wiki = $wikiClass;
-	}
-	
-	/**
-	 * Loads and constructs AbuseFilter class
-	 * 
-	 * @static
-	 * @access public
-	 * @param Wiki &$wikiClass The Wiki class object
-	 * @return AbuseFilter
-	 */
-	public static function load( &$wikiclass, &$newclass = null ) {
-		if( !array_key_exists( 'Abuse Filter', $wikiclass->get_extensions() ) ) {
+		
+		if( !array_key_exists( 'Abuse Filter', $wikiClass->get_extensions() ) ) {
 			throw new DependancyError( "AbuseFilter", "http://www.mediawiki.org/wiki/Extension:AbuseFilter" );
 		}
-		
-		$newclass = new AbuseFilter( $wikiclass );
-		return $newclass;
 	}
 	
 	/**

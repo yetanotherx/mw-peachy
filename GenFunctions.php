@@ -55,6 +55,7 @@ function in_string( $needle, $haystack, $insensitive = false ) {
  * Detects the presence of a nobots template or one that denies editing by ours
  * 
  * @access public
+ * @param Wiki &$wiki Wiki class
  * @param string $text Text of the page to check (default: '')
  * @param string $username Username to search for in the template (default: null)
  * @param string $optout Text to search for in the optout= parameter. (default: null)
@@ -129,9 +130,8 @@ function pecho( $text, $cat = 0 ) {
  * @return Wiki|bool
  */
 function &getSiteObject() {
-	$vars = $GLOBALS;
-	
-	foreach( $vars as $var ) {
+
+	foreach( $GLOBALS as $var ) {
 		if( is_object( $var ) ) {
 			if( get_class( $var ) == "Wiki" ) {
 				return $var;
@@ -177,16 +177,14 @@ function &initUser( $username ) {
  * Returns an instance of the Image class as specified by $filename or $pageid
  * 
  * @param string $filename Filename
- * @param int $pageid Page ID of image
- * @param array $prop Informatation to set. Default array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' )
  * @return Image
  */
-function &initImage( $filename = null, $pageid = null, $prop = array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' ) ) {
+function &initImage( $filename = null ) {
 	
 	$wiki = getSiteObject();
 	if( !$wiki ) return false;
 	
-	$image = new Image( &$wiki, $filename, $pageid, $prop );
+	$image = new Image( &$wiki, $filename );
 	return $image;
 }
 
@@ -222,7 +220,7 @@ if ( !function_exists( 'mb_substr' ) ) {
 	 * Fallback implementation for mb_substr. This is VERY slow, from 5x to 100x slower. Use only if necessary.
 	 * @link http://svn.wikimedia.org/svnroot/mediawiki/trunk/phase3/includes/GlobalFunctions.php
 	 */
-	function mb_substr( $str, $start, $count='end' ) {
+	function mb_substr( $str, $start, $count = 'end' ) {
 		if( $start != 0 ) {
 			$split = mb_substr_split_unicode( $str, intval( $start ) );
 			$str = substr( $str, $split );

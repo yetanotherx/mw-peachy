@@ -20,27 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class ImageModify extends Image {
 
 	function __construct( &$wikiClass, $imagename ) {
-		parent::__construct( $wikiClass, $imagename );
-	}
-
-	/**
-	 * Initiates the ImageModify class
-	 * 
-	 * @static
-	 * @access public
-	 * @param string $imagename Name of image
-	 * @param Wiki &$wikiClass Wiki class
-	 * @param ImageModify &$newclass Class gets stored here
-	 * @return ImageModify
-	 */
-	public static function load( $imagename, &$wikiClass, &$newclass = null ) {
-
 		if( !function_exists( 'ImageCreateTrueColor' ) ) {
 			throw new DependancyError( "GD", "http://us2.php.net/manual/en/book.image.php" );
 		}
 		
-		$newclass = new ImageModify( $wikiClass, $imagename );
-		return $newclass;
+		parent::__construct( $wikiClass, $imagename );
 	}
 	
 	/**

@@ -92,6 +92,11 @@ class GlobalUserInfo {
 	 * @return void
 	 */
 	function __construct( &$wikiClass, $username ) {
+	
+		if( !array_key_exists( 'Central Auth', $wikiClass->get_extensions() ) ) {
+			throw new DependancyError( "CentralAuth", "http://www.mediawiki.org/wiki/Extension:CentralAuth" );
+		}
+		
 		$this->username = ucfirst( $username );
 		$this->wiki = $wikiClass;
 		
@@ -119,25 +124,6 @@ class GlobalUserInfo {
 			$this->id = $guiRes['query']['globaluserinfo']['id'];
 			$this->registration = $guiRes['query']['globaluserinfo']['registration'];
 		}
-		
-	}
-	
-	/**
-	 * Loads and constructs GlobalUserInfo class
-	 * 
-	 * @static
-	 * @access public
-	 * @param Wiki &$wikiClass The Wiki class object
-	 * @param string $username Username
-	 * @return GlobalUserInfo
-	 */
-	public static function load( &$wikiClass, $username ) {
-	
-		if( !array_key_exists( 'Central Auth', $wikiClass->get_extensions() ) ) {
-			throw new DependancyError( "CentralAuth", "http://www.mediawiki.org/wiki/Extension:CentralAuth" );
-		}
-		
-		return new GlobalUserInfo( $wikiClass, $username );
 		
 	}
 	

@@ -23,16 +23,10 @@ class CodeReview {
 
 	function __construct( &$wikiClass ) {
 		$this->wiki = $wikiClass;
-	}
-
-	public static function &load( &$wikiclass, &$newclass = null ) {
 		
 		if( !array_key_exists( 'CodeReview', $wikiClass->get_extensions() ) ) {
 			throw new DependancyError( "CodeReview", "http://www.mediawiki.org/wiki/Extension:CodeReview" );
 		}
-		
-		$newclass = new CodeReview( $wikiclass );
-		return $newclass;
 	}
 	
 	public function update() {}

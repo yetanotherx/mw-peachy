@@ -21,10 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class CheckUser {
 
-    function __construct() {
-    }
-
-    public static function load( &$wikiclass = null, &$newclass = null ) {
+    function __construct( &$wikiclass = null ) {
+    
         $extensions = $wikiClass->get_extensions();
         if( !array_key_exists( 'CheckUser', $extensions ) ) {
             throw new DependancyError( "CheckUser", "http://www.mediawiki.org/wiki/Extension:CheckUser" );
@@ -32,7 +30,5 @@ class CheckUser {
         elseif( $extensions['CheckUser'] < 3 ) {
             throw new DependancyError( "CheckUser version 3.0 or up", "http://www.mediawiki.org/wiki/Extension:CheckUser" );
         }
-        
-        $newclass = new CheckUser( $wikiclass );
     }
 }

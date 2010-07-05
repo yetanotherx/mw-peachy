@@ -87,6 +87,7 @@ $pgVerbose = array(0,1,2,3,4);
 $pgUA = 'Peachy MediaWiki Bot API Version ' . PEACHYVERSION;
 $pgUseIntro = true;
 $mwVersion = null;
+$pgIRCTrigger = array( '!', '.' );
 
 $pgHTTP = new HTTP;
 

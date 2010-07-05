@@ -281,4 +281,93 @@ class IRC {
 			return $return;
 		}
 	}
+	
+	public static function get_error( $errno ) {
+		switch( $errno ) {
+			case 401:
+				return "Nickname/Channel is currently unused";
+			case 402:
+				return "Server not found";
+			case 403:
+				return "Channel not found";
+			case 404:
+				return "Cannot send to channel";
+			case 405:
+				return "Too many channels joined";
+			case 406:
+				return "There was no such nickname";
+			
+		}
+	}
 }
+
+class SimpleIRC {
+	
+	private $server;
+	private $port;
+	private $user;
+	private $pass;
+	private $nick;
+	private $channel;
+	private $callback;
+	
+	function __construct( $server, $port = 6667, $user, $pass, $nick, $channel, $callback = null ) {
+		global $pgIRCTrigger, $pgHooks;
+		
+		if( func_num_args() > 6 ) {
+			$this->server = $server;
+			$this->port = $port;
+			$this->user = $user;
+			$this->pass = $pass;
+			$this->nick = $nick;
+			$this->channel = $channel;
+			$this->callback = $callback;
+		}
+		else {
+			$this->server = $server;
+			$this->port = 6667;
+			$this->user = $port;
+			$this->pass = $user;
+			$this->nick = $pass;
+			$this->channel = $nick;
+			$this->callback = $channel;
+		}
+		
+		$pgHooks['SimpleIRCPrivMSG'][] = $callback;
+
+		$irc = new IRC( $this->user, $this->nick, $this->pass, $this->server, $this->port, "Peachy IRC Bot Version " . PEACHYVERSION, $this->channel );
+	
+		while( !feof( $irc->f ) ) {
+		
+			$parsed = IRC::parseLine( fgets( $irc->f, 1024 ), $pgIRCTrigger, true ); 
+			
+			if( @$parsed['n!u@h'] == 'PING' ) {
+				$irc->sendPong( $parsed['payload'] );
+			}
+			
+			if( @$parsed['type'] == '376' || @$parser['type'] == '422' ) {
+				$feed->joinChan();
+				sleep(5);
+			}
+			
+			if( @$parsed['type'] == 'PRIVMSG' ) {
+				Hooks::runHook( 'SimpleIRCPrivMSG', array( &$parsed, &$irc, &$this ) );
+			}
+	
+	
+		}
+	}
+	
+	
+}
+
+
+
+
+
+
+
+
+
+
+

@@ -116,9 +116,7 @@ abstract class DatabaseBase {
 		$this->mPassword = $password;
 		$this->mDB = $dbname;
 		
-		if( !is_null( $server ) ) {
-			$this->open();
-		}
+		$this->open();
 	}
 	
 	/**
@@ -149,7 +147,7 @@ abstract class DatabaseBase {
 		
 		$ret = $this->resultObject( $ret );
 		if( !$ret ) {
-			throw new DBError( $this->lastError, $this->lastErrno, $sql ); 
+			throw new DBError( $this->lastError(), $this->lastErrno(), $sql ); 
 		}
 		
 		return $ret; 
@@ -446,7 +444,7 @@ abstract class DatabaseBase {
 }
 
 //Iterator is the built-in PHP class that allows other classes to use foreach(), for(), etc
-class ResultWrapper implements Iterator {
+class ResultWrapper implements Iterator, Countable {
 	
 	/**
 	 * Database object (really the child of DatabaseBase)
@@ -498,6 +496,14 @@ class ResultWrapper implements Iterator {
 	 */
 	function numRows() {
 		return $this->db->numRows( $this->result );
+	}
+	
+	/**
+	 * Shortcut for $this->numRows, used to allow count()ing the ResultWrapper class
+	 * @return int
+	 */
+	function count() {
+		return $this->numRows();
 	}
 
 	/**
@@ -657,7 +663,7 @@ class Database {
 	 * @param string $dbname Database, default null
 	 * @return Database
 	 */
-	function __server( $server, $port = 3306, $user, $pass, $dbname = null ) {
+	function __construct( $server, $port = 3306, $user, $pass, $dbname = null ) {
 		if( func_num_args() > 4 ) {
 			$this->server = $server;
 			$this->port = ':' . $port;
@@ -682,7 +688,7 @@ class Database {
 	 * @param string $type Database type, either 'mysqli', 'mysql', or 'pgsql'
 	 * @return void
 	 */
-	public function setType( $type ) {
+	public function set_type( $type ) {
 		$this->type = $type;
 	}
 	
@@ -690,7 +696,7 @@ class Database {
 	 * Inclused and initiates the appropriate DatabaseBase child
 	 * @return object
 	 */
-	public function init() {
+	public function &init() {
 		global $IP;
 		
 		if( !class_exists( 'mysqli' ) ) {

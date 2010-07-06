@@ -108,7 +108,7 @@ class DatabaseMySQL extends DatabaseBase {
 	}
 	
 	/**
-	 * Returns a MySQL array using mysql_fetch_array()
+	 * Returns a MySQL array using mysql_fetch_assoc()
 	 * @param resource $res MySQL result from mysql_query()
 	 * @return array
 	 */
@@ -116,7 +116,7 @@ class DatabaseMySQL extends DatabaseBase {
 	
 		Hooks::runHook( 'DatabaseFetchRow', array( &$res ) );
 		
-		$row = mysql_fetch_array( $res ); 
+		$row = mysql_fetch_assoc( $res ); 
 		
 		if( $this->lastErrno() ) {
 			throw new DBError( $this->lastErrno(), $this->lastError() );

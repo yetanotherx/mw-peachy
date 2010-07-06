@@ -444,7 +444,7 @@ abstract class DatabaseBase {
 }
 
 //Iterator is the built-in PHP class that allows other classes to use foreach(), for(), etc
-class ResultWrapper implements Iterator, Countable {
+class ResultWrapper implements Iterator, Countable, ArrayAccess {
 	
 	/**
 	 * Database object (really the child of DatabaseBase)
@@ -468,11 +468,11 @@ class ResultWrapper implements Iterator, Countable {
 	public $pos = 0;
 	
 	/**
-	 * Current iterator row
-	 * @var resource
+	 * Where the database result is stored
+	 * @var array
 	 * @access public
 	 */
-	public $currentRow = null;
+	public $endArray = array();
 
 	/**
 	 * Initiate the Iterator
@@ -487,6 +487,10 @@ class ResultWrapper implements Iterator, Countable {
 			$this->result = $result->result;
 		} else {
 			$this->result = $result;
+		}
+		
+		while( $row = $this->fetchRow() ) {
+			$this->endArray[] = $row;
 		}
 	}
 
@@ -526,7 +530,7 @@ class ResultWrapper implements Iterator, Countable {
 	function fetchRow() {
 		return $this->db->fetchRow( $this->result );
 	}
-
+	
 	/**
 	 * Free a result object
 	 * @return void
@@ -553,11 +557,7 @@ class ResultWrapper implements Iterator, Countable {
 	 * @return void
 	 */
 	function rewind() {
-		if ( $this->numRows() ) {
-			$this->db->dataSeek( $this->result, 0 );
-		}
 		$this->pos = 0;
-		$this->currentRow = null;
 	}
 
 	/**
@@ -565,10 +565,7 @@ class ResultWrapper implements Iterator, Countable {
 	 * @return resource
 	 */
 	function current() {
-		if ( is_null( $this->currentRow ) ) {
-			$this->next();
-		}
-		return $this->currentRow;
+		return $this->endArray[ $this->pos ];
 	}
 
 	/**
@@ -585,10 +582,6 @@ class ResultWrapper implements Iterator, Countable {
 	 */
 	function next() {
 		$this->pos++;
-		
-		$this->currentRow = $this->fetchObject();
-		
-		return $this->currentRow;
 	}
 	
 	/**
@@ -596,8 +589,49 @@ class ResultWrapper implements Iterator, Countable {
 	 * @return bool
 	 */
 	function valid() {
-		return $this->current() !== false;
+		return isset( $this->endArray[ $this->pos ] );
 	}
+	
+	/** 
+	 * Called when a key is being set
+	 * 
+	 * @param string $key Key to set
+	 * @param mixed $value Value to set
+	 * @return void
+	 */
+	function offsetSet( $key, $value ) {
+        $this->endArray[$key] = $value;
+    }
+    
+    /** 
+	 * Called when isset() is called on a key
+	 * 
+	 * @param string $key Key to check
+	 * @return bool
+	 */
+    function offsetExists( $key ) {
+        return isset( $this->endArray[$key] );
+    }
+    
+    /** 
+	 * Called when unset() is called on a key
+	 * 
+	 * @param string $key Key to unset
+	 * @return void
+	 */
+    function offsetUnset( $key ) {
+        unset( $this->endArray[$key] );
+    }
+    
+    /** 
+	 * Gets the value stored in the key, or false if it doesn't exist
+	 * 
+	 * @param string $key Key to get
+	 * @return mixed|bool
+	 */
+    function offsetGet( $key ) {
+        return isset( $this->endArray[$key] ) ? $this->endArray[$key] : false;
+    }
 }
 
 

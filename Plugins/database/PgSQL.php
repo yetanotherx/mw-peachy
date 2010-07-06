@@ -86,7 +86,7 @@ class DatabasePgSQL extends DatabaseBase {
 	}
 	
 	public function fetchRow( $res ) {
-		$row = @pg_fetch_array( $res ); 
+		$row = @pg_fetch_assoc( $res ); 
 		
 		if( $this->lastErrno() ) {
 			throw new DBError( $this->lastErrno(), $this->lastError() );

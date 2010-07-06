@@ -389,8 +389,19 @@ class Page {
 	 * 
 	 * @access public
 	 * @return bool Exists
+	 * @deprecated
 	 */
 	public function exists() {
+		return $this->exists;
+	}
+	
+	/**
+	 * Returns if the page exists
+	 * 
+	 * @access public
+	 * @return bool Exists
+	 */
+	public function get_exists() {
 		return $this->exists;
 	}
 	

@@ -1207,10 +1207,6 @@ class Wiki {
 		return $final_titles;
 	}
 	
-	public function deletedrevs( $namespace = array( 0 ), $user = null, $excludeuser = null, $start = null, $end = null, $dir = 'older', $prop = array( 'revid', 'user', 'comment', 'parsedcomment', 'minor', 'len', 'content', 'token' ), $limit = null ) {
-		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
-	}
-	
 	/**
 	 * Returns array of pages that embed (transclude) the page given.
 	 * 

@@ -312,18 +312,14 @@ class User {
 	public function get_editcount( $force = false, &$database = null ) {
 	
 		//First check if $database exists, because that returns a more accurate count
-		if( !is_null( $database ) && $database instanceOf Database ) {
-			$count = Database::mysql2array( $database->select(
+		if( !is_null( $database ) && $database instanceOf DatabaseBase ) {
+			$count = $database->select(
 				'archive',
 				'COUNT(*) as count',
 				array( 
-					array(
-						'ar_user_text',
-						'=',
-						$this->username
-					)
+					'ar_user_text' => $this->username
 				)
-			));
+			);
 		
 			if( isset( $count[0]['count'] ) ) {
 				$del_count = $count[0]['count'];
@@ -336,17 +332,13 @@ class User {
 			
 			pecho( "Getting edit count for {$this->username} using the Database class...\n\n", PECHO_NORMAL );
 			
-			$count = Database::mysql2array( $database->select(
+			$count = $database->select(
 				'revision',
 				'COUNT(*) as count',
 				array( 
-					array(
-						'rev_user_text',
-						'=',
-						$this->username
-					)
+					'rev_user_text' => $this->username
 				)
-			));
+			);
 		
 			if( isset( $count[0]['count'] ) ) {
 				$live_count = $count[0]['count'];

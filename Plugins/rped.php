@@ -44,7 +44,7 @@ class RPED {
 	 */
 	function __construct( &$wikiClass ) {
 		$this->wiki = $wikiClass;
-		$defaultMaxURLLength = 10000;
+		$defaultMaxURLLength = 2000;
 		return;
 	}
  

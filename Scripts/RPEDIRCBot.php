@@ -21,12 +21,19 @@ pages from #en.wikipedia and add/delete them from the rped_table.
 
 error_reporting( E_ALL | E_STRICT );
 
-# TODO: Get this script to use the IRC class.
-require_once( 'Init.php' );
-$wiki = Peachy::newWiki( "libertapedia" );
+require_once( dirname( dirname(__FILE__) ) . '/Script.php' );
+require_once( dirname( dirname(__FILE__) ) . '/Init.php' );
+
+$script = new Script();
 Peachy::loadPlugin( 'rped' );
-Peachy::loadPlugin( 'IRC' );
-$rped = RPED::load( $wiki );
+
+if( $script->getArg( 'daemonize' ) ) {
+    $daemonize = true;
+}
+$wiki = $script->getWiki();
+$rped = new RPED( $wiki );
+
+# TODO: Get this script to use the IRC class.
 
 $config = $wiki->get_configuration();
 $host = $config['host'];
@@ -39,7 +46,6 @@ $deleteLine = $config['deleteline'];
 $moveLine = $config['moveline'];
 $deletedWord = $config['deletedword'];
 $newCharacter = $config['newcharacter'];
-$daemonize = true;
 
 $readbuffer = "";
 $startSep = "[[";
@@ -60,7 +66,7 @@ fwrite( $fp, "USER " . $ident . " " . $host . " bla :" . $realname . "\r\n" );
 fwrite( $fp, "JOIN :" . $chan . "\r\n" );
 
 # Launch daemon!
-if ( isset( $daemonize ) ) {
+if ( isset( $daemonize ) && $daemonize ) {
 
     $pid = pcntl_fork(); // fork
     if ( $pid < 0 ) {

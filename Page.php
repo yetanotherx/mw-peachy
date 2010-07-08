@@ -31,25 +31,25 @@ class Page {
 	 * Wiki class
 	 * 
 	 * @var Wiki
-	 * @access private
+	 * @access protected
 	 */
-	private $wiki;
+	protected $wiki;
 	
 	/**
 	 * Title of the page
 	 * 
 	 * @var string
-	 * @access private
+	 * @access protected
 	 */
-	private $title;
+	protected $title;
 	
 	/**
 	 * The ID of the page
 	 * 
 	 * @var int
-	 * @access private
+	 * @access protected
 	 */
-	private $pageid;
+	protected $pageid;
 	
 	/**
 	 * If the page exists or not
@@ -57,9 +57,9 @@ class Page {
 	 * (default value: true)
 	 * 
 	 * @var bool
-	 * @access private
+	 * @access protected
 	 */
-	private $exists = true;
+	protected $exists = true;
 	
 	/**
 	 * When retriving the page information was a redirect followed
@@ -67,33 +67,33 @@ class Page {
 	 * (default value: false)
 	 * 
 	 * @var bool
-	 * @access private
+	 * @access protected
 	 */
-	private $redirectFollowed = false;
+	protected $redirectFollowed = false;
 	
 	/**
 	 * The page title without the namespace bit
 	 * 
 	 * @var string
-	 * @access private
+	 * @access protected
 	 */
-	private $title_wo_namespace;
+	protected $title_wo_namespace;
 	
 	/**
 	 * The ID of the namespace
 	 * 
 	 * @var int
-	 * @access private
+	 * @access protected
 	 */
-	private $namespace_id;
+	protected $namespace_id;
 	
 	/**
 	 * Page text
 	 * 
 	 * @var string
-	 * @access private
+	 * @access protected
 	 */
-	private $content;
+	protected $content;
 	
 	/**
 	 * Templates used in the page
@@ -101,9 +101,9 @@ class Page {
 	 * (default value: array())
 	 * 
 	 * @var array
-	 * @access private
+	 * @access protected
 	 */
-	private $templates = array();
+	protected $templates = array();
 	
 	/**
 	 * Protection information for the page
@@ -111,9 +111,9 @@ class Page {
 	 * (default value: array())
 	 * 
 	 * @var array
-	 * @access private
+	 * @access protected
 	 */
-	private $protection = array();
+	protected $protection = array();
 	
 	/**
 	 * Cateogories that the page is in
@@ -121,9 +121,9 @@ class Page {
 	 * (default value: array())
 	 * 
 	 * @var array
-	 * @access private
+	 * @access protected
 	 */
-	private $categories = array();
+	protected $categories = array();
 	
 	/**
 	 * Images used in the page
@@ -131,9 +131,9 @@ class Page {
 	 * (default value: array())
 	 * 
 	 * @var array
-	 * @access private
+	 * @access protected
 	 */
-	private $images = array();
+	protected $images = array();
 	
 	/**
 	 * Internal links in the page
@@ -141,33 +141,33 @@ class Page {
 	 * (default value: array())
 	 * 
 	 * @var array
-	 * @access private
+	 * @access protected
 	 */
-	private $links = array();
+	protected $links = array();
 	
 	/**
 	 * Timestamp of the last edit
 	 * 
 	 * @var string
-	 * @access private
+	 * @access protected
 	 */
-	private $lastedit;
+	protected $lastedit;
 	
 	/**
 	 * Length of the page in bytes
 	 * 
 	 * @var int
-	 * @access private
+	 * @access protected
 	 */
-	private $length;
+	protected $length;
 	
 	/**
 	 * Amount of hits (views) the page has
 	 * 
 	 * @var int
-	 * @access private
+	 * @access protected
 	 */
-	private $hits;
+	protected $hits;
 	
 	/**
 	 * Language links on the page
@@ -175,9 +175,9 @@ class Page {
 	 * (default value: array())
 	 * 
 	 * @var array
-	 * @access private
+	 * @access protected
 	 */
-	private $langlinks = array();
+	protected $langlinks = array();
 	
 	/**
 	 * External links on the page
@@ -185,17 +185,17 @@ class Page {
 	 * (default value: array())
 	 * 
 	 * @var array
-	 * @access private
+	 * @access protected
 	 */
-	private $extlinks = array();
+	protected $extlinks = array();
 	
 	/**
 	 * starttimestamp(?)
 	 * 
 	 * @var mixed
-	 * @access private
+	 * @access protected
 	 */
-	private $starttimestamp;
+	protected $starttimestamp;
 	
 	
 	/**
@@ -1332,9 +1332,9 @@ class Page {
 	 * 
 	 * @param array $pageInfoArray2 Array of values to merge with defaults (default: null)
 	 * @return array Information gathered
-	 * @access private
+	 * @access protected
 	 */
-	private function get_metadata( $pageInfoArray2 = null ) {
+	protected function get_metadata( $pageInfoArray2 = null ) {
 		$pageInfoArray = array(
 			'action' => 'query',
 			'prop' => "info"
@@ -1472,7 +1472,7 @@ class Page {
 	 * @access public
 	 * @return void
 	 */
-	private function preEditChecks(){
+	protected function preEditChecks(){
 		$preeditinfo = array(
 			'action' => 'query',
 			'meta' => 'userinfo',

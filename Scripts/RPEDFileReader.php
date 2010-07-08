@@ -69,7 +69,14 @@ foreach( $script->getList() as $buffer ) {
     if ( !$searching ) {
         $count++;
         if ( $count > $maxCount ) {
-            $rped->insertArray( $rpedArray, 2000 );
+            try {
+            	$rped->insertArray( $rpedArray, 2000 );
+            }
+            catch( Exception $e ) {
+            	pecho( "Peachy Error: " . $e->getMessage(), PECHO_FATAL );
+            	continue;
+            }
+            
             $count = 0;
             unset ( $rpedArray );
             $rpedArray = array();

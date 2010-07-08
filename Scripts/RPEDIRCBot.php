@@ -102,9 +102,21 @@ while ( !feof( $fp ) ) {
         $delLine = substr( $line, $delstartPos + 5, $delendPos -$delstartPos -8 );
         $action = substr( $line, $delstartPos -9, 7 );
         if ( $action == $deletedWord ) {
-            $rped->delete( $delLine );
+            try {
+            	$rped->delete( $delLine );
+            }
+            catch( Exception $e ) {
+            	pecho( "Peachy Error: " . $e->getMessage(), PECHO_FATAL );
+            	continue;
+            }
         } else {
-            $rped->insert( $delLine );
+            try {
+            	$rped->insert( $delLine );
+            }
+            catch( Exception $e ) {
+            	pecho( "Peachy Error: " . $e->getMessage(), PECHO_FATAL );
+            	continue;
+            }
         }
     }
     if ( $subLine == $moveLine ) {
@@ -116,7 +128,14 @@ while ( !feof( $fp ) ) {
         $rped->insert( $delLine );
     }
     if ( substr( $line, $endPos + 5, 1 ) == $newCharacter || substr( $line, $endPos + 6, 1 ) == $newCharacter ) {
-        $rped->insert( $subLine );
+        
+        try {
+        	$rped->insert( $subLine );
+        }
+        catch( Exception $e ) {
+        	pecho( "Peachy Error: " . $e->getMessage(), PECHO_FATAL );
+        	continue;
+        }
     }
 }
 

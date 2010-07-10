@@ -97,7 +97,7 @@ class User {
 	 * @var string
 	 * @access private
 	 */
-	private $hasemail;
+	private $registration;
 	
 	/**
 	 * Construction method for the User class

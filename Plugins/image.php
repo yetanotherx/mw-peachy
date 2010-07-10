@@ -291,8 +291,8 @@ class Image {
 		
 			$iuArray = array(
 				'list' => 'imageusage',
-				'code' => 'iu',
-				'lhtitle' => 'title',
+				'_code' => 'iu',
+				'_lhtitle' => 'title',
 				'iutitle' => $this->title,
 				'iufilterredir' => $redirects,
 			);

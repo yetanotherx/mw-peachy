@@ -85,7 +85,7 @@ foreach( $script->getList() as $buffer ) {
     }
     $rawCount++;
     if ( $rawCount % 1000 == 0 && !$daemonize ) {
-        echo $buffer . '\n';
+        pecho( $buffer . '\n', PECHO_NORMAL );
         $rawCount = 0;
     }
 }

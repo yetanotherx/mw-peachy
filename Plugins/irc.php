@@ -87,7 +87,7 @@ class IRC {
 	 * @return void
 	 */
 	public function sendPrivmsg( $msg, $chan ) {
-		echo "Sending $msg to $chan...\n\n";
+		pecho( "Sending $msg to $chan...\n\n", PECHO_VERBOSE );
 		fwrite( $this->f, "PRIVMSG " . $chan . " :$msg\n" );
 	}
 	
@@ -107,13 +107,13 @@ class IRC {
 	 */
 	public function joinChan( $chan = null ) {
 		if( !is_null( $chan ) ) {
-			echo "Joining $chan...\n";
+			pecho( "Joining $chan...\n", PECHO_VERBOSE );
 			fwrite( $this->f, 'JOIN ' . $chan . "\n" );
 			usleep(5000);
 		}
 		else {
 			foreach( $this->chan as $chan ) {
-				echo "Joining $chan...\n";
+				pecho( "Joining $chan...\n", PECHO_VERBOSE );
 				fwrite( $this->f, 'JOIN ' . $chan . "\n" );
 				usleep(5000);
 			}
@@ -127,13 +127,13 @@ class IRC {
 	 */
 	public function partChan( $chan = null ) {
 		if( !is_null( $chan ) ) {
-			echo "Parting $chan...\n";
+			pecho( "Parting $chan...\n", PECHO_VERBOSE );
 			fwrite( $this->f, 'PART ' . $chan . "\n" );
 			usleep(5000);
 		}
 		else {
 			foreach( $this->chan as $chan ) {
-				echo "Parting $chan...\n";
+				pecho( "Parting $chan...\n", PECHO_VERBOSE );
 				fwrite( $this->f, 'PART ' . $chan . "\n" );
 				usleep(5000);
 			}

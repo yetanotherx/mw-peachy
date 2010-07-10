@@ -92,10 +92,10 @@ $pgHTTP = new HTTP;
 $PeachyInfo = unserialize( $pgHTTP->get( 'http://compwhizii.net/peachy/wiki/Template:Autoupdate/Check?action=raw' ) );
 
 if( version_compare( $PeachyInfo['minversion'], PEACHYVERSION, '>' ) ) {
-	echo "Peachy version is below minimum version {$PeachyInfo['minversion']}\n\n";
+	pecho( "Peachy version is below minimum version {$PeachyInfo['minversion']}\n\n", PECHO_ERROR );
 }
 elseif( version_compare( $PeachyInfo['nowversion'], PEACHYVERSION, '>' ) ) {
-	echo "New version of Peachy available: {$PeachyInfo['nowversion']}\n\n";
+	pecho( "New version of Peachy available: {$PeachyInfo['nowversion']}\n\n", PECHO_WARN );
 }
 
 if( function_exists( 'mb_internal_encoding' ) ) {
@@ -122,7 +122,7 @@ class Peachy {
 	public static function newWiki( $config_name = null, $username = null, $password = null, $base_url = 'http://en.wikipedia.org/w/api.php' ) {
 		global $IP, $pgUseIntro;
 		
-		echo "Loading Peachy (version " . PEACHYVERSION . ")...\n\n";
+		pecho( "Loading Peachy (version " . PEACHYVERSION . ")...\n\n", PECHO_NORMAL );
 		
 		//throw new APIError( array( 'code' => "nopage", 'text' => "nopage exists" ) );
 		if( !is_null( $config_name ) ) {

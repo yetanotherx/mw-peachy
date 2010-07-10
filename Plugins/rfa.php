@@ -31,6 +31,34 @@ class RFA {
 	protected $neutral  = array();
 	protected $duplicates = array();
 	protected $lasterror = '';
+	
+	public function get_username() {
+		return $this->username;
+	}
+	
+	public function get_enddate() {
+		return $this->enddate;
+	}
+	
+	public function get_support() {
+		return $this->support;
+	}
+	
+	public function get_oppose() {
+		return $this->oppose;
+	}
+	
+	public function get_neutral() {
+		return $this->neutral;
+	}
+	
+	public function get_duplicates() {
+		return $this->duplicates;
+	}
+	
+	public function get_lasterror() {
+		return $this->lasterror;
+	}
 
 	protected function reset() {
 		$username = False;
@@ -194,7 +222,9 @@ class RFA {
 	/*
  	* Analyzes an RFA. Returns TRUE on success, FALSE on failure
  	*/
-	function __construct($rawwikitext) {
+	function __construct($wiki, $page) {
+		$rawwikitext = $wiki->initPage( $page )->get_text();
+		
 		$split  = preg_split("/^(?:(?:'''|(?:<includeonly><noin<\/includeonly><includeonly>clude><\/includeonly>)?={4,5}(?:<includeonly><\/noin<\/includeonly><includeonly>clude><\/includeonly>''')?)"
 		."\s*?(Support|Oppose|Neutral|Comments)\s*?(?:'''|(?:'''<includeonly><noin<\/includeonly><includeonly>clude><\/includeonly>)?={4,5}(?:<includeonly><\/noin<\/includeonly><includeonly>clude><\/includeonly>)?)|;\s*(Support|Oppose|Neutral|Comments))\s*(?:<br>|<br \/>)?\s*$/im"
  		,$rawwikitext, -1, PREG_SPLIT_DELIM_CAPTURE);

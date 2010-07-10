@@ -92,6 +92,14 @@ class User {
 	private $hasemail = false;
 	
 	/**
+	 * Date the user registered
+	 * 
+	 * @var string
+	 * @access private
+	 */
+	private $hasemail;
+	
+	/**
 	 * Construction method for the User class
 	 * 
 	 * @access public
@@ -112,7 +120,7 @@ class User {
 				'letype' => 'block',
 				'letitle' => $username,
 				'lelimit' => 1,
-				'usprop' => 'editcount|groups|blockinfo|emailable'
+				'usprop' => 'editcount|groups|blockinfo|emailable|registration'
 		));
 		
 		$this->username = $uiRes['query']['users'][0]['name'];
@@ -140,6 +148,9 @@ class User {
 			
 			if( isset( $uiRes['query']['users'][0]['emailable'] ) ) 
 				$this->hasemail = true;
+			
+			if( isset( $uiRes['query']['users'][0]['registration'] ) ) 
+				$this->registration = $uiRes['query']['users'][0]['registration'];
 		}
 	}
 	
@@ -397,6 +408,16 @@ class User {
 	 */
 	public function has_email() {
 		return $this->hasemail;
+	}
+	
+	/**
+	 * Returns date the user registered
+	 * 
+	 * @access public
+	 * @return date
+	 */
+	public function get_registration() {
+		return $this->registration;
 	}
 	
 	/**

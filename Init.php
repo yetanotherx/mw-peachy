@@ -82,7 +82,6 @@ require_once( $IP . 'Script.php' );
 $pgProxy = array();
 $pgVerbose = array(0,1,2,3,4);
 $pgUA = 'Peachy MediaWiki Bot API Version ' . PEACHYVERSION;
-$pgUseIntro = true;
 $mwVersion = null;
 $pgIRCTrigger = array( '!', '.' );
 
@@ -120,7 +119,7 @@ class Peachy {
 	 * @return Wiki Instance of the Wiki class, where most functions are stored
 	 */
 	public static function newWiki( $config_name = null, $username = null, $password = null, $base_url = 'http://en.wikipedia.org/w/api.php' ) {
-		global $IP, $pgUseIntro;
+		global $IP;
 		
 		pecho( "Loading Peachy (version " . PEACHYVERSION . ")...\n\n", PECHO_NORMAL );
 		

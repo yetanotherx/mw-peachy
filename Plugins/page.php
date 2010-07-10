@@ -1573,5 +1573,18 @@ class Page {
 	public function purge() {
 		return $this->wiki->purge( $this->title );
 	}
+	
+	/**
+	 * Parses wikitext and returns parser output. Shortcut for Wiki::parse
+	 * 
+	 * @access public
+	 * @param string $summary Summary to parse. Default null.
+	 * @param string $id Parse the content of this revision
+	 * @param array $prop Properties to retrieve. Default array( 'text', 'langlinks', 'categories', 'links', 'templates', 'images', 'externallinks', 'sections', 'revid', 'displaytitle', 'headitems', 'headhtml' )
+	 * @return array
+	 */
+	public function parse( $summary = null, $id = null, $prop = array( 'text', 'langlinks', 'categories', 'links', 'templates', 'images', 'externallinks', 'sections', 'revid', 'displaytitle', 'headitems', 'headhtml' ), $uselang = 'en' ) {
+		return $this->wiki->parse( null, null, $summary, false, false, $prop, $uselang, $this->title, $id );
+	}
 
 }

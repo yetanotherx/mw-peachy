@@ -1407,8 +1407,43 @@ class Wiki {
 		
 	}
 	
-	public function parse() {
-		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+	/**
+	 * Parses wikitext and returns parser output
+	 * 
+	 * @access public
+	 * @param string $text Wikitext to parse. Default null.
+	 * @param string $title Title of page the text belongs to, used for {{PAGENAME}}. Default null.
+	 * @param string $summary Summary to parse. Default null.
+	 * @param bool $pst Run a pre-save transform, expanding {{subst:}} and ~~~~. Default false.
+	 * @param bool $onlypst Run a pre-save transform, but don't parse it. Default false.
+	 * @param string $uselang Language to parse in. Default 'en'.
+	 * @param array $prop Properties to retrieve. Default array( 'text', 'langlinks', 'categories', 'links', 'templates', 'images', 'externallinks', 'sections', 'revid', 'displaytitle', 'headitems', 'headhtml' )
+	 * @param string $page Parse the content of this page. Cannot be used together with $text and $title
+	 * @param string $oldid Parse the content of this revision. Overrides $page
+	 * @return array
+	 */
+	public function parse( $text = null, $title = null, $summary = null, $pst = false, $onlypst = false, $prop = array( 'text', 'langlinks', 'categories', 'links', 'templates', 'images', 'externallinks', 'sections', 'revid', 'displaytitle', 'headitems', 'headhtml' ), $uselang = 'en', $page = null, $oldid = null ) {
+		
+		$apiArray = array(
+			'action' => 'parse',
+			'uselang' => $uselang,
+			'prop' => implode( '|', $prop ),
+		);
+		
+		if( !is_null( $text ) ) $apiArray['text'] = $text;
+		if( !is_null( $title ) ) $apiArray['title'] = $title;
+		if( !is_null( $summary ) ) $apiArray['summary'] = $summary;
+		if( !is_null( $page ) ) $apiArray['page'] = $page;
+		if( !is_null( $oldid ) ) $apiArray['oldid'] = $oldid;
+		
+		if( $pst ) $apiArray['pst'] = 'yes';
+		if( $onlypst ) $apiArray['onlypst'] = 'yes';
+		
+		Hooks::runHook( 'PreParse', array( &$etArray ) );
+		
+		pecho( "Parsing...\n\n", PECHO_NORMAL );
+		
+		return $this->apiQuery($apiArray);
 	}
 	
 	/**

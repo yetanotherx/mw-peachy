@@ -1,14 +1,14 @@
 <?php
 /**
- * Class used internally by Diff to actually compute the diffs.  This class is
- * implemented using native PHP code.
+ * Class used internally by Text_Diff to actually compute the diffs.
+ *
+ * This class is implemented using native PHP code.
  *
  * The algorithm used here is mostly lifted from the perl module
  * Algorithm::Diff (version 1.06) by Ned Konz, which is available at:
  * http://www.perl.com/CPAN/authors/id/N/NE/NEDKONZ/Algorithm-Diff-1.06.zip
  *
- * More ideas are taken from:
- * http://www.ics.uci.edu/~eppstein/161/960229.html
+ * More ideas are taken from: http://www.ics.uci.edu/~eppstein/161/960229.html
  *
  * Some ideas (and a bit of code) are taken from analyze.c, of GNU
  * diffutils-2.7, which can be found at:
@@ -18,12 +18,15 @@
  * Geoffrey T. Dairiki <dairiki@dairiki.org>. The original PHP version of this
  * code was written by him, and is used/adapted with his permission.
  *
- * $Horde: framework/Text_Diff/Diff/Engine/native.php,v 1.3 2006/01/06 15:56:52 jan Exp $
+ * $Horde: framework/Text_Diff/Diff/Engine/native.php,v 1.7.2.5 2009/01/06 15:23:41 jan Exp $
+ *
+ * Copyright 2004-2009 The Horde Project (http://www.horde.org/)
+ *
+ * See the enclosed file COPYING for license information (LGPL). If you did
+ * not receive this file, see http://opensource.org/licenses/lgpl-license.php.
  *
  * @author  Geoffrey T. Dairiki <dairiki@dairiki.org>
  * @package Text_Diff
- *
- * @access private
  */
 class Text_Diff_Engine_native {
 
@@ -181,14 +184,15 @@ class Text_Diff_Engine_native {
                 }
             }
 
-            $x1 = $xoff + (int)(($numer + ($xlim-$xoff)*$chunk) / $nchunks);
+            $x1 = $xoff + (int)(($numer + ($xlim - $xoff) * $chunk) / $nchunks);
             for (; $x < $x1; $x++) {
                 $line = $flip ? $this->yv[$x] : $this->xv[$x];
                 if (empty($ymatches[$line])) {
                     continue;
                 }
                 $matches = $ymatches[$line];
-                foreach ($matches as $y) {
+                reset($matches);
+                while (list(, $y) = each($matches)) {
                     if (empty($this->in_seq[$y])) {
                         $k = $this->_lcsPos($y);
                         assert($k > 0);
@@ -196,10 +200,9 @@ class Text_Diff_Engine_native {
                         break;
                     }
                 }
-
-                while (list($junk, $y) = each($matches)) {
+                while (list(, $y) = each($matches)) {
                     if ($y > $this->seq[$k - 1]) {
-                        assert($y < $this->seq[$k]);
+                        assert($y <= $this->seq[$k]);
                         /* Optimization: this is a common case: next match is
                          * just replacing previous match. */
                         $this->in_seq[$this->seq[$k]] = false;

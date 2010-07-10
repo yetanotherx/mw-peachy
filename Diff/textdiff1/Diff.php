@@ -1,14 +1,18 @@
 <?php
 /**
- * Text_Diff
- *
  * General API for generating and formatting diffs - the differences between
  * two sequences of strings.
  *
- * The PHP diff code used in this package was originally written by Geoffrey
- * T. Dairiki and is used with his permission.
+ * The original PHP version of this code was written by Geoffrey T. Dairiki
+ * <dairiki@dairiki.org>, and is used/adapted with his permission.
  *
- * $Horde: framework/Text_Diff/Diff.php,v 1.17 2006/02/06 00:16:09 jan Exp $
+ * $Horde: framework/Text_Diff/Diff.php,v 1.11.2.12 2009/01/06 15:23:41 jan Exp $
+ *
+ * Copyright 2004 Geoffrey T. Dairiki <dairiki@dairiki.org>
+ * Copyright 2004-2009 The Horde Project (http://www.horde.org/)
+ *
+ * See the enclosed file COPYING for license information (LGPL). If you did
+ * not receive this file, see http://opensource.org/licenses/lgpl-license.php.
  *
  * @package Text_Diff
  * @author  Geoffrey T. Dairiki <dairiki@dairiki.org>
@@ -25,9 +29,11 @@ class Text_Diff {
     /**
      * Computes diffs between sequences of strings.
      *
-     * @param array $from_lines  An array of strings.  Typically these are
-     *                           lines from a file.
-     * @param array $to_lines    An array of strings.
+     * @param string $engine     Name of the diffing engine to use.  'auto'
+     *                           will automatically select the best.
+     * @param array $params      Parameters to pass to the diffing engine.
+     *                           Normally an array of two arrays, each
+     *                           containing the lines from a file.
      */
     function Text_Diff($engine, $params)
     {
@@ -39,12 +45,13 @@ class Text_Diff {
 
         if ($engine == 'auto') {
             $engine = extension_loaded('xdiff') ? 'xdiff' : 'native';
+        } else {
+            $engine = basename($engine);
         }
-        $engine = basename($engine);
 
-        require_once 'Diff/Engine/' . $engine . '.php';
+        require_once 'Text/Diff/Engine/' . $engine . '.php';
         $class = 'Text_Diff_Engine_' . $engine;
-        $diff_engine = &new $class();
+        $diff_engine = new $class();
 
         $this->_edits = call_user_func_array(array($diff_engine, 'diff'), $params);
     }
@@ -56,13 +63,53 @@ class Text_Diff {
     {
         return $this->_edits;
     }
+    
+    /**
+     * returns the number of new (added) lines in a given diff.
+     *
+     * @since Text_Diff 1.1.0
+     * @since Horde 3.2
+     *
+     * @return integer The number of new lines
+     */
+    function countAddedLines()
+    {
+        $count = 0;
+        foreach ($this->_edits as $edit) {
+            if (is_a($edit, 'Text_Diff_Op_add') ||
+                is_a($edit, 'Text_Diff_Op_change')) {
+                $count += $edit->nfinal();
+            }
+        }
+        return $count;
+    }
+    
+    /**
+     * Returns the number of deleted (removed) lines in a given diff.
+     *
+     * @since Text_Diff 1.1.0
+     * @since Horde 3.2
+     *
+     * @return integer The number of deleted lines
+     */
+    function countDeletedLines()
+    {
+        $count = 0;
+        foreach ($this->_edits as $edit) {
+            if (is_a($edit, 'Text_Diff_Op_delete') ||
+                is_a($edit, 'Text_Diff_Op_change')) {
+                $count += $edit->norig();
+            }
+        }
+        return $count;
+    }
 
     /**
      * Computes a reversed diff.
      *
      * Example:
      * <code>
-     * $diff = &new Text_Diff($lines1, $lines2);
+     * $diff = new Text_Diff($lines1, $lines2);
      * $rev = $diff->reverse();
      * </code>
      *
@@ -167,6 +214,43 @@ class Text_Diff {
     }
 
     /**
+     * Determines the location of the system temporary directory.
+     *
+     * @static
+     *
+     * @access protected
+     *
+     * @return string  A directory name which can be used for temp files.
+     *                 Returns false if one could not be found.
+     */
+    function _getTempDir()
+    {
+        $tmp_locations = array('/tmp', '/var/tmp', 'c:\WUTemp', 'c:\temp',
+                               'c:\windows\temp', 'c:\winnt\temp');
+
+        /* Try PHP's upload_tmp_dir directive. */
+        $tmp = ini_get('upload_tmp_dir');
+
+        /* Otherwise, try to determine the TMPDIR environment variable. */
+        if (!strlen($tmp)) {
+            $tmp = getenv('TMPDIR');
+        }
+
+        /* If we still cannot determine a value, then cycle through a list of
+         * preset possibilities. */
+        while (!strlen($tmp) && count($tmp_locations)) {
+            $tmp_check = array_shift($tmp_locations);
+            if (@is_dir($tmp_check)) {
+                $tmp = $tmp_check;
+            }
+        }
+
+        /* If it is still empty, we have failed, so return false; otherwise
+         * return the directory determined. */
+        return strlen($tmp) ? $tmp : false;
+    }
+
+    /**
      * Checks a diff for validity.
      *
      * This is here only for debugging purposes.
@@ -202,8 +286,6 @@ class Text_Diff {
 }
 
 /**
- * $Horde: framework/Text_Diff/Diff.php,v 1.17 2006/02/06 00:16:09 jan Exp $
- *
  * @package Text_Diff
  * @author  Geoffrey T. Dairiki <dairiki@dairiki.org>
  */
@@ -262,7 +344,7 @@ class Text_Diff_Op {
     var $orig;
     var $final;
 
-    function reverse()
+    function &reverse()
     {
         trigger_error('Abstract method', E_USER_ERROR);
     }

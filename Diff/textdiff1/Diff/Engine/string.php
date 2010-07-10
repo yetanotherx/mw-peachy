@@ -5,26 +5,32 @@
  * Example:
  * <code>
  * $patch = file_get_contents('example.patch');
- * $diff = &new Text_Diff('string', array($patch));
- * $renderer = &new Text_Diff_Renderer_inline();
+ * $diff = new Text_Diff('string', array($patch));
+ * $renderer = new Text_Diff_Renderer_inline();
  * echo $renderer->render($diff);
  * </code>
  *
- * @author    Örjan Persson <o@42mm.org>
- * @copyright Copyright 2005 Örjan Persson
- * @package   Text_Diff
- * @since     0.2.0
- * @access    private
+ * $Horde: framework/Text_Diff/Diff/Engine/string.php,v 1.5.2.7 2009/07/24 13:04:43 jan Exp $
+ *
+ * Copyright 2005 Örjan Persson <o@42mm.org>
+ * Copyright 2005-2009 The Horde Project (http://www.horde.org/)
+ *
+ * See the enclosed file COPYING for license information (LGPL). If you did
+ * not receive this file, see http://opensource.org/licenses/lgpl-license.php.
+ *
+ * @author  Örjan Persson <o@42mm.org>
+ * @package Text_Diff
+ * @since   0.2.0
  */
 class Text_Diff_Engine_string {
 
     /**
      * Parses a unified or context diff.
      *
-     * First param contains the whole diff and the second can be used to force 
-     * a specific diff type. If the second parameter is 'autodetect', the 
+     * First param contains the whole diff and the second can be used to force
+     * a specific diff type. If the second parameter is 'autodetect', the
      * diff will be examined to find out which type of diff this is.
-     * 
+     *
      * @param string $diff  The diff content.
      * @param string $mode  The diff mode of the content in $diff. One of
      *                      'context', 'unified', or 'autodetect'.
@@ -33,6 +39,19 @@ class Text_Diff_Engine_string {
      */
     function diff($diff, $mode = 'autodetect')
     {
+        // Detect line breaks.
+        $lnbr = "\n";
+        if (strpos($diff, "\r\n") !== false) {
+            $lnbr = "\r\n";
+        } elseif (strpos($diff, "\r") !== false) {
+            $lnbr = "\r";
+        }
+
+        // Make sure we have a line break at the EOF.
+        if (substr($diff, -strlen($lnbr)) != $lnbr) {
+            $diff .= $lnbr;
+        }
+
         if ($mode != 'autodetect' && $mode != 'context' && $mode != 'unified') {
             return PEAR::raiseError('Type of diff is unsupported');
         }
@@ -42,17 +61,20 @@ class Text_Diff_Engine_string {
             $unified = strpos($diff, '---');
             if ($context === $unified) {
                 return PEAR::raiseError('Type of diff could not be detected');
-            } elseif ($context === false || $context === false) {
+            } elseif ($context === false || $unified === false) {
                 $mode = $context !== false ? 'context' : 'unified';
             } else {
                 $mode = $context < $unified ? 'context' : 'unified';
             }
         }
 
-        // split by new line and remove the diff header
-        $diff = explode("\n", $diff);
-        array_shift($diff);
-        array_shift($diff);
+        // Split by new line and remove the diff header, if there is one.
+        $diff = explode($lnbr, $diff);
+        if (($mode == 'context' && strpos($diff[0], '***') === 0) ||
+            ($mode == 'unified' && strpos($diff[0], '---') === 0)) {
+            array_shift($diff);
+            array_shift($diff);
+        }
 
         if ($mode == 'context') {
             return $this->parseContextDiff($diff);
@@ -79,35 +101,40 @@ class Text_Diff_Engine_string {
                 do {
                     $diff1[] = substr($diff[$i], 1);
                 } while (++$i < $end && substr($diff[$i], 0, 1) == ' ');
-                $edits[] = &new Text_Diff_Op_copy($diff1);
+                $edits[] = new Text_Diff_Op_copy($diff1);
                 break;
+
             case '+':
                 // get all new lines
                 do {
                     $diff1[] = substr($diff[$i], 1);
                 } while (++$i < $end && substr($diff[$i], 0, 1) == '+');
-                $edits[] = &new Text_Diff_Op_add($diff1);
+                $edits[] = new Text_Diff_Op_add($diff1);
                 break;
+
             case '-':
                 // get changed or removed lines
                 $diff2 = array();
                 do {
                     $diff1[] = substr($diff[$i], 1);
                 } while (++$i < $end && substr($diff[$i], 0, 1) == '-');
+
                 while ($i < $end && substr($diff[$i], 0, 1) == '+') {
                     $diff2[] = substr($diff[$i++], 1);
                 }
                 if (count($diff2) == 0) {
-                    $edits[] = &new Text_Diff_Op_delete($diff1);
+                    $edits[] = new Text_Diff_Op_delete($diff1);
                 } else {
-                    $edits[] = &new Text_Diff_Op_change($diff1, $diff2);
+                    $edits[] = new Text_Diff_Op_change($diff1, $diff2);
                 }
                 break;
+
             default:
                 $i++;
                 break;
             }
         }
+
         return $edits;
     }
 
@@ -125,7 +152,7 @@ class Text_Diff_Engine_string {
         $end = count($diff) - 1;
         while ($i < $end && $j < $end) {
             while ($i >= $max_i && $j >= $max_j) {
-                // find the boundaries of the diff output of the two files
+                // Find the boundaries of the diff output of the two files
                 for ($i = $j;
                      $i < $end && substr($diff[$i], 0, 3) == '***';
                      $i++);
@@ -149,12 +176,14 @@ class Text_Diff_Engine_string {
                 $i++;
                 $j++;
             }
+
             while ($i < $max_i && ($max_j-$j) <= 1) {
                 if ($diff[$i] != '' && substr($diff[$i], 0, 1) != ' ') {
                     break;
                 }
                 $array[] = substr($diff[$i++], 2);
             }
+
             while ($j < $max_j && ($max_i-$i) <= 1) {
                 if ($diff[$j] != '' && substr($diff[$j], 0, 1) != ' ') {
                     break;
@@ -162,7 +191,7 @@ class Text_Diff_Engine_string {
                 $array[] = substr($diff[$j++], 2);
             }
             if (count($array) > 0) {
-                $edits[] = &new Text_Diff_Op_copy($array);
+                $edits[] = new Text_Diff_Op_copy($array);
             }
 
             if ($i < $max_i) {
@@ -176,19 +205,21 @@ class Text_Diff_Engine_string {
                             $diff2[] = substr($diff[$j++], 2);
                         }
                     } while (++$i < $max_i && substr($diff[$i], 0, 1) == '!');
-                    $edits[] = &new Text_Diff_Op_change($diff1, $diff2);
+                    $edits[] = new Text_Diff_Op_change($diff1, $diff2);
                     break;
+
                 case '+':
                     do {
                         $diff1[] = substr($diff[$i], 2);
                     } while (++$i < $max_i && substr($diff[$i], 0, 1) == '+');
-                    $edits[] = &new Text_Diff_Op_add($diff1);
+                    $edits[] = new Text_Diff_Op_add($diff1);
                     break;
+
                 case '-':
                     do {
                         $diff1[] = substr($diff[$i], 2);
                     } while (++$i < $max_i && substr($diff[$i], 0, 1) == '-');
-                    $edits[] = &new Text_Diff_Op_delete($diff1);
+                    $edits[] = new Text_Diff_Op_delete($diff1);
                     break;
                 }
             }
@@ -200,17 +231,20 @@ class Text_Diff_Engine_string {
                     do {
                         $diff2[] = substr($diff[$j++], 2);
                     } while ($j < $max_j && substr($diff[$j], 0, 1) == '+');
-                    $edits[] = &new Text_Diff_Op_add($diff2);
+                    $edits[] = new Text_Diff_Op_add($diff2);
                     break;
+
                 case '-':
                     do {
                         $diff2[] = substr($diff[$j++], 2);
                     } while ($j < $max_j && substr($diff[$j], 0, 1) == '-');
-                    $edits[] = &new Text_Diff_Op_delete($diff2);
+                    $edits[] = new Text_Diff_Op_delete($diff2);
                     break;
                 }
             }
         }
+
         return $edits;
     }
+
 }

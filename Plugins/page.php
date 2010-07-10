@@ -1496,7 +1496,7 @@ class Page {
 				}
 				elseif( $pageid == "-1" ) {
 					if( $page['title'] == $this->wiki->get_runpage() ) {
-						pecho("Edit failed, enable page does not exist.", PECHO_WARN);
+						pecho("Edit failed, enable page does not exist.\n\n", PECHO_WARN);
 						return false;
 					}
 					else {

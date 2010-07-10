@@ -75,10 +75,7 @@ if( $version[0] < '5' ) throw new DependancyError( "PHP 5", "http://php.net/down
 require_once( $IP . 'GenFunctions.php' );
 require_once( $IP . 'Diff/Diff.php' );
 require_once( $IP . 'Wiki.php' );
-require_once( $IP . 'Image.php' );
 require_once( $IP . 'Hooks.php' );
-require_once( $IP . 'Page.php' );
-require_once( $IP . 'User.php' );
 require_once( $IP . 'HTTP.php' );
 require_once( $IP . 'Script.php' );
 
@@ -206,31 +203,10 @@ class Peachy {
 	 * @access public
 	 * @param string|array $plugins Name of plugin(s) to load from Plugins directory, minus .php ending
 	 * @return void
+	 * @deprecated
 	 */
 	public static function loadPlugin( $plugins ) {
-		global $IP;
-		
-		if( is_string( $plugins ) ) {
-			$plugins = array( $plugins );
-		}
-		
-		foreach( $plugins as $plugin_name ) {
-			if( !is_file( $plugin_name ) ) {
-				if( is_file( $IP . 'Plugins/' . $plugin_name . '.php' ) ) {
-					Hooks::runHook( 'LoadPlugin', array( &$plugin_name ) );
-				
-					require_once( $IP . 'Plugins/' . $plugin_name . '.php' );
-				}
-			}
-			else {
-			
-				Hooks::runHook( 'LoadPlugin', array( &$plugin_name ) );
-				
-				require_once( $plugin_name );
-			}
-		
-			
-		}
+		pecho( "Warning: Peachy::loadPlugin() is deprecated. Thanks to the wonders of PHP 5, the call can just be removed.\n\n", PECHO_WARN );
 	}
 	
 	/**
@@ -239,13 +215,11 @@ class Peachy {
 	 * @static
 	 * @access public
 	 * @return void
+	 * @deprecated
 	 */
 	public static function loadAllPlugins() {
-		global $IP;
-		
-		foreach( glob( $IP . 'Plugins/*.php' ) as $plugin ) {
-			require_once( $plugin );
-		}
+		pecho( "Warning: Peachy::loadAllPlugins() is deprecated. Thanks to the wonders of PHP 5, the call can just be removed.\n\n", PECHO_WARN );
+
 	}
 	
 	/**

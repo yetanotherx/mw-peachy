@@ -277,3 +277,24 @@ if ( !function_exists( 'mb_substr' ) ) {
 	}
 }
 
+/**
+ * Called when a non-existant class is initiated, loads a plugin if it exists.
+ * 
+ * @param string $class_name Plugin name to load
+ * @return void
+ */
+function __autoload( $class_name ) {
+	global $IP;
+	
+	if( $class_name == "ImageModify" ) {
+		require_once( $IP . 'Plugins/image.php' );
+	}
+	
+	if( is_file( $IP . 'Plugins/' . strtolower( $class_name ) . '.php' ) ) {
+		Hooks::runHook( 'LoadPlugin', array( &$class_name ) );
+				
+		require_once( $IP . 'Plugins/' . strtolower( $class_name ) . '.php' );
+	}
+	
+}
+

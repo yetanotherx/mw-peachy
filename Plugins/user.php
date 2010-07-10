@@ -307,12 +307,16 @@ class User {
 	 * @access public
 	 * @param bool $force Whether or not to use the locally stored cache. Default false.
 	 * @param Database &$database Use an instance of the Database class to get a more accurate count
+	 * @param bool $liveonly Whether or not to only get the live edit count. Only works with $database. Defaulf false. 
 	 * @return int Edit count
 	 */
-	public function get_editcount( $force = false, &$database = null ) {
+	public function get_editcount( $force = false, &$database = null, $liveonly = false ) {
 	
 		//First check if $database exists, because that returns a more accurate count
 		if( !is_null( $database ) && $database instanceOf DatabaseBase ) {
+			
+			pecho( "Getting edit count for {$this->username} using the Database class...\n\n", PECHO_NORMAL );
+			
 			$count = $database->select(
 				'archive',
 				'COUNT(*) as count',
@@ -321,7 +325,7 @@ class User {
 				)
 			);
 		
-			if( isset( $count[0]['count'] ) ) {
+			if( isset( $count[0]['count'] ) && !$liveonly ) {
 				$del_count = $count[0]['count'];
 			}
 			else {
@@ -329,8 +333,6 @@ class User {
 			}
 			
 			unset($count);
-			
-			pecho( "Getting edit count for {$this->username} using the Database class...\n\n", PECHO_NORMAL );
 			
 			$count = $database->select(
 				'revision',

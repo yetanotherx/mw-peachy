@@ -792,6 +792,40 @@ class Page {
 	
 	}
 	
+	/**
+	 * Add text to the beginning of the page. Shortcut for Page::edit()
+	 * 
+	 * @access public
+	 * @link http://www.mediawiki.org/wiki/API:Edit_-_Create%26Edit_pages
+	 * @param string $text Text of the page that will be saved
+	 * @param string $summary Summary of the edit (default: "")
+	 * @param bool $minor Minor edit (default: false)
+	 * @param bool $bot Mark as bot edit (default: true)
+	 * @param bool $force Override nobots check (default: false)
+	 * @param bool $create Set to 'never' or 'only' to never create a new page or only create a new page, respectively (default: false) 
+	 * @return int|bool The revision id of the successful edit, false on failure.
+	 */
+	public function prepend( $text, $summary = "", $minor = false, $bot = true, $force = false, $create = false )  {
+		return $this->edit( $text, $summary, $minor, $bot, $force, 'pre', $create );
+	}
+	
+	/**
+	 * Add text to the end of the page. Shortcut for Page::edit()
+	 * 
+	 * @access public
+	 * @link http://www.mediawiki.org/wiki/API:Edit_-_Create%26Edit_pages
+	 * @param string $text Text of the page that will be saved
+	 * @param string $summary Summary of the edit (default: "")
+	 * @param bool $minor Minor edit (default: false)
+	 * @param bool $bot Mark as bot edit (default: true)
+	 * @param bool $force Override nobots check (default: false)
+	 * @param bool $create Set to 'never' or 'only' to never create a new page or only create a new page, respectively (default: false) 
+	 * @return int|bool The revision id of the successful edit, false on failure.
+	 */
+	public function append( $text, $summary = "", $minor = false, $bot = true, $force = false, $create = false )  {
+		return $this->edit( $text, $summary, $minor, $bot, $force, 'ap', $create );
+	}
+	
 	/*
 	 * Undoes one or more edits. (Subject to standard editing restrictions.)
 	 *

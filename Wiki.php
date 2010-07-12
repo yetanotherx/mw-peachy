@@ -193,6 +193,14 @@ class Wiki {
 	private $nologin;
 	
 	/**
+	 * Server that handled the last API query
+	 * 
+	 * @var string
+	 * @access private
+	 */
+	private $servedby;
+	
+	/**
 	 * Contruct function for the wiki. Handles login and related functions.
 	 * 
 	 * @access public
@@ -501,17 +509,34 @@ class Wiki {
 				return false;
 			}
 			
+			if( isset( $data['servedby'] ) ) {
+				$this->servedby = $data['servedby'];
+			}
+			
 			return $data;
 		}
 		else {
 		
 			Hooks::runHook( 'PreAPIGetQuery', array( &$arrayParams ) );
 			
-			return unserialize( $this->get_http()->get(
+			$data = unserialize( $this->get_http()->get(
 				$this->base_url,
 				$arrayParams
 			));
+			
+			if( isset( $data['servedby'] ) ) {
+				$this->servedby = $data['servedby'];
+			}
 		}
+	}
+	
+	/**
+	 * Returns the server that handled the previous request. Only works on MediaWiki versions 1.17 and up
+	 *
+	 * @return string
+	 */
+	public function get_servedby() {
+		return $this->servedby;
 	}
 	
 	/**

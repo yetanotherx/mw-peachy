@@ -145,7 +145,6 @@ class Script {
 	 */
 	protected function makeList() {
 		if( isset( $this->args['xml'] ) ) {
-			Peachy::loadPlugin( 'xml' );
 			
 			$this->list = XML::load( file_get_contents( $this->args['xml'] ) );
 		}

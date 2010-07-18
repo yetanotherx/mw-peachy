@@ -21,7 +21,7 @@ require( 'Init.php' );
 
 $x = Peachy::newWiki("sample"); //Loads the Configs/sample.cfg file
 
-$sites = SiteMatrix::load( $x ); //Generates sitematrix, logic in Plugins/sitematrix.php
+$sites = new SiteMatrix( $x ); //Generates sitematrix, logic in Plugins/sitematrix.php
 
 $y = initPage( "Main Page" );
 echo $y->get_text();

@@ -76,6 +76,7 @@ class HTTP {
 		curl_setopt($this->curl_instance,CURLOPT_CLOSEPOLICY,CURLCLOSEPOLICY_LEAST_RECENTLY_USED);
 		curl_setopt($this->curl_instance,CURLOPT_MAXREDIRS,10);
 		curl_setopt($this->curl_instance,CURLOPT_HTTPHEADER, array('Expect:'));
+		curl_setopt($this->curl_instance,CURLOPT_ENCODING, 'gzip');
 		curl_setopt($this->curl_instance,CURLOPT_RETURNTRANSFER,1);
 		curl_setopt($this->curl_instance,CURLOPT_TIMEOUT,30);
 		curl_setopt($this->curl_instance,CURLOPT_CONNECTTIMEOUT,10);

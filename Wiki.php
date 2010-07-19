@@ -527,6 +527,8 @@ class Wiki {
 			if( isset( $data['servedby'] ) ) {
 				$this->servedby = $data['servedby'];
 			}
+			
+			return $data;
 		}
 	}
 	

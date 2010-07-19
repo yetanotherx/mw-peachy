@@ -684,12 +684,18 @@ class Database {
 	private $db;
 	
 	/**
+	 * Database class
+	 * @var object
+	 * @access private
+	 */
+	private $object;
+	
+	/**
 	 * Constructor.
 	 * If passed as server, user, pass, dbname; the port is ignored. 
 	 * If passed as server, port, user, pass, dbname; the port is as given
 	 * Basically, the function will detect if a port was specified. 
 	 *
-	 * @static
 	 * @param string $server Server to connect to
 	 * @param int $port Port, default 3306
 	 * @param string $user Username
@@ -711,7 +717,9 @@ class Database {
 			$this->user = $port;
 			$this->password = $user;
 			$this->db = $pass;
-		}	
+		}
+		
+		$this->object = $this;	
 		
 		Hooks::runHook( 'LoadDatabase', array( &$this->server, &$this->port, &$this->user, &$this->password, &$this->db ) );
 
@@ -729,8 +737,19 @@ class Database {
 	/**
 	 * Inclused and initiates the appropriate DatabaseBase child
 	 * @return object
+	 * @deprecated
 	 */
 	public function &init() {
+		pecho( "Warning: Database::init() is deprecated. Thanks to the wonders of PHP 5, the call can just be removed.\n\n", PECHO_WARN );
+		
+		return $this->doInit();
+	}
+	
+	/**
+	 * Inclused and initiates the appropriate DatabaseBase child
+	 * @return object
+	 */
+	private function &doInit() {
 		global $IP;
 		
 		if( !class_exists( 'mysqli' ) ) {
@@ -742,22 +761,39 @@ class Database {
 		switch( $this->type ) {
 			case 'mysqli':
 				require_once( $IP . 'Plugins/database/MySQLi.php' );
-				return new DatabaseMySQLi( $this->server, $this->port, $this->user, $this->password, $this->db );
+				$this->object = new DatabaseMySQLi( $this->server, $this->port, $this->user, $this->password, $this->db );
+				return $this->object;
 				break;
 			case 'mysql':
 				require_once( $IP . 'Plugins/database/MySQL.php' );
-				return new DatabaseMySQL( $this->server, $this->port, $this->user, $this->password, $this->db );
+				$this->object = new DatabaseMySQL( $this->server, $this->port, $this->user, $this->password, $this->db );
+				return $this->object;
 				break;
 			case 'pgsql':
 				require_once( $IP . 'Plugins/database/PgSQL.php' );
-				return new DatabasePgSQL( $this->server, $this->port, $this->user, $this->password, $this->db );
+				$this->object = new DatabasePgSQL( $this->server, $this->port, $this->user, $this->password, $this->db );
+				return $this->object;
 				break;
 			default:
 				require_once( $IP . 'Plugins/database/MySQLi.php' );
-				return new DatabaseMySQLi( $this->server, $this->port, $this->user, $this->password, $this->db );
+				$this->object = new DatabaseMySQLi( $this->server, $this->port, $this->user, $this->password, $this->db );
+				return $this->object;
 				break;
 		}	
 	}
 	
+	public function __call( $name, $arguments ) {
+		
+		if( $this->object == $this ) {
+			$this->doInit();
+		}
+		
+		if( method_exists( $this->object, $name ) ) { 
+			return call_user_func_array( array( $this->object, $name ), $arguments );
+		}
+		else {
+			throw new Exception( "Call to invalid method: " . get_class( $this->object ) . "::$name( " . implode( ', ', $arguments ) . " )" );
+		}
+	}
 	
 }

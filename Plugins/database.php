@@ -732,6 +732,10 @@ class Database {
 	 */
 	public function set_type( $type ) {
 		$this->type = $type;
+		
+		if( $this->object != $this ) {
+			$this->doInit();
+		}
 	}
 	
 	/**

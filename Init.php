@@ -66,6 +66,10 @@ define( 'PECHO_FATAL', 4 );
 
 $IP = dirname(__FILE__) . '/';
 
+$pgAutoloader = array(
+	'Script' => 'Script.php',
+);
+
 require_once( $IP . 'Exceptions.php' );
 
 $version = explode( '.', phpversion() );
@@ -77,7 +81,6 @@ require_once( $IP . 'Diff/Diff.php' );
 require_once( $IP . 'Wiki.php' );
 require_once( $IP . 'Hooks.php' );
 require_once( $IP . 'HTTP.php' );
-require_once( $IP . 'Script.php' );
 
 $pgProxy = array();
 $pgVerbose = array(0,1,2,3,4);

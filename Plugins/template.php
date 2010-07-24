@@ -213,6 +213,9 @@ class Template {
      * @return string|boolean Value of template if it exists, otherwise boolean false
      */
     public function fieldvalue($fieldname) {
+    	if( is_numeric($fieldname)) {
+    		return trim($this->fields[$fieldname]);
+    	}
         if (isset($this->fields[$fieldname])) {
             return trim(substr($this->fields[$fieldname],strpos($this->fields[$fieldname],'=') + 1));
         } else {

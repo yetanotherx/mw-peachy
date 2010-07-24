@@ -284,7 +284,7 @@ if ( !function_exists( 'mb_substr' ) ) {
  * @return void
  */
 function __autoload( $class_name ) {
-	global $IP;
+	global $IP, $pgAutoloader;
 	
 	if( $class_name == "ImageModify" ) {
 		require_once( $IP . 'Plugins/image.php' );
@@ -294,6 +294,10 @@ function __autoload( $class_name ) {
 		Hooks::runHook( 'LoadPlugin', array( &$class_name ) );
 				
 		require_once( $IP . 'Plugins/' . strtolower( $class_name ) . '.php' );
+	}
+	
+	if( isset( $pgAutoloader[$class_name] ) ) {
+		require_once( $IP . $pgAutoloader[$class_name] );
 	}
 	
 }

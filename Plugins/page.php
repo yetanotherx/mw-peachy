@@ -62,6 +62,16 @@ class Page {
 	protected $exists = true;
 	
 	/**
+	 * Whether or not the page is a special page
+	 * 
+	 * (default value: false)
+	 * 
+	 * @var bool
+	 * @access protected
+	 */
+	protected $special = false;
+	
+	/**
 	 * When retriving the page information was a redirect followed
 	 * 
 	 * (default value: false)
@@ -230,10 +240,6 @@ class Page {
 					// Media or local variant, translate to File:
 					$title = $namespaces[6] . ":" . $chunks[1];
 				}
-				elseif( $namespace == $namespaces[-1] || $namespace == "special" ){
-					//Special or local variant, error
-					pecho( "Special pages are not currently supported by the API.\n\n", PECHO_ERROR );
-				}
 			}
 		}
 		
@@ -254,17 +260,8 @@ class Page {
 		
 		$info = $this->get_metadata( $pageInfoArray );
 		
-		if( isset( $info['invalid'] ) ) throw new BadTitle( $title );
-		
-		$this->title = $info['title'];
-		$this->namespace_id = $info['ns'];
-		
-		if( $this->namespace_id != 0 ) {
-			$this->title_wo_namespace = explode( ':', $this->title, 2 );
-			$this->title_wo_namespace = $this->title_wo_namespace[1];
-		}
-		else {
-			$this->title_wo_namespace = $this->title;
+		if( isset( $info['redirects'][0] ) ) {
+			$this->redirectFollowed = true;
 		}
 
 	}
@@ -1312,6 +1309,15 @@ class Page {
 	}
 	
 	/**
+	 * Returns whether or not the page is a special page
+	 * 
+	 * @return bool
+	 */
+	public function get_special() {
+		return $this->special;
+	}
+	
+	/**
 	 * Gets ID or name of the namespace
 	 * 
 	 * @param bool $id Set to true to get namespace ID, set to false to get namespace name. Default true
@@ -1374,6 +1380,11 @@ class Page {
 			'prop' => "info"
 		);
 		
+		if( isset( $pageInfoRes['warnings']['query']['*'] ) && in_string( 'special pages', $pageInfoRes['warnings']['query']['*'] ) ) {
+			pecho( "Special pages are not currently supported by the API.\n\n", PECHO_ERROR );
+			$this->exists = false;
+		}
+		
 		if( $pageInfoArray2 != null ) {
 			$pageInfoArray = array_merge($pageInfoArray, $pageInfoArray2);
 		} else {
@@ -1401,7 +1412,22 @@ class Page {
 			
 			if( isset( $info['missing'] ) ) $this->exists = false;
 			
-			return $info;
+			if( isset( $info['invalid'] ) ) throw new BadTitle( $title );
+		
+			$this->title = $info['title'];
+			$this->namespace_id = $info['ns'];
+			
+			if( $this->namespace_id != 0 ) {
+				$this->title_wo_namespace = explode( ':', $this->title, 2 );
+				$this->title_wo_namespace = $this->title_wo_namespace[1];
+			}
+			else {
+				$this->title_wo_namespace = $this->title;
+			}
+			
+			if( isset( $info['special'] ) ) $this->special = true;
+			
+			return $pageInfoRes;
 		}
 	}
 	

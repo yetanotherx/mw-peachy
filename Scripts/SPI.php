@@ -110,6 +110,8 @@ foreach( $list as $case ) {
 
 foreach( $cases as $style => $var ) usort( $cases[$style], 'sortThem' );
 
+print_r($cases);
+
 $out = <<<WIKI
 {|class="wikitable sortable" width="100%"
 ! Investigation !! Status !! Date filed !! Last user to edit case !! timestamp !! Last clerk/checkuser to edit case !! timestamp

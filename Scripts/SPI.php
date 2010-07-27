@@ -79,8 +79,10 @@ foreach( $list as $case ) {
 	
 	foreach( $history as $rev ) {
 		if( ( in_array( $rev['user'], $checkusers ) || in_array( $rev['user'], $clerks ) ) && !isset( $retArray['cuedit'] ) ) {
-			$retArray['cuuser'] = $rev['user'];
-			$retArray['cuedit'] = date( 'Y-m-d H:m \U\T\C', strtotime($rev['timestamp']));
+			if( strtotime($rev['timestamp']) >= strtotime($date[0]) ) {
+				$retArray['cuuser'] = $rev['user'];
+				$retArray['cuedit'] = date( 'Y-m-d H:m \U\T\C', strtotime($rev['timestamp']));
+			}
 		}
 		
 		if( !isset( $retArray['lastuser'] ) ) {

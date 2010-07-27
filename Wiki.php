@@ -65,12 +65,12 @@ class Wiki {
 	/**
 	 * Limit of results that can be returned by the API at one time.
 	 * 
-	 * (default value: 499)
+	 * (default value: 49)
 	 * 
 	 * @var int
 	 * @access protected
 	 */
-	protected $apiQueryLimit = 499;
+	protected $apiQueryLimit = 49;
 	
 	/**
 	 * Does the user have a bot flag.
@@ -405,6 +405,9 @@ class Wiki {
 					
 					if( in_array( 'apihighlimits', $userInfoRes['query']['userinfo']['rights'] ) ) {
 						$this->apiQueryLimit = 4999;
+					}
+					else {
+						$this->apiQueryLimit = 499;
 					}
 					
 					$this->userRights = $userInfoRes['query']['userinfo']['rights'];

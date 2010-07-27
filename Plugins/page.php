@@ -277,8 +277,7 @@ class Page {
 	 * @param bool $rollback_token Should a rollback token be returned (default: false)
 	 * @return array Revision data
 	 */
-	public function history( $count = 1, $dir = "older", $content = false, $revid = null, $rollback_token = false ) {
-
+	public function history( $count = 1, $dir = "older", $content = false, $revid = null, $rollback_token = false, $recurse = false ) {
 		if( !$this->exists ) return array();
 		
 		$historyArray = array(
@@ -300,22 +299,28 @@ class Page {
 		pecho( "Getting page history for {$this->title}..\n\n", PECHO_NORMAL );
 		
 		if( is_null( $count ) ) {
-			$history = $ei = $this->history( $this->wiki->get_api_limit() + 1, $dir, $content, $revid, $rollback_token );
-	
-			while( isset( $ei[ $this->wiki->get_api_limit() ] ) ) {
-				$ei = $this->history( $this->wiki->get_api_limit() + 1, $dir, $content, $ei[9]['revid'], $rollback_token );
-				foreach( $ei as $eg ) {
-					$history[] = $eg;
+			$history = $ei = $this->history( $this->wiki->get_api_limit() + 1, $dir, $content, $revid, $rollback_token, true );
+
+			while( isset( $ei[0][ $this->wiki->get_api_limit() ] ) ) {
+				$ei = $this->history( $this->wiki->get_api_limit() + 1, $dir, $content, $ei[1], $rollback_token, true );
+				foreach( $ei[0] as $eg ) {
+					$history[0][] = $eg;
 				}
 			}
 			
-			return $history;
+			return $history[0];
 			
 		}
 		else {
 			$historyResult = $this->wiki->apiQuery($historyArray);
-		
-			return $historyResult['query']['pages'][$this->pageid]['revisions'];
+
+			if( $recurse ) {
+				if( isset( $historyResult['query-continue'] ) ) return array( $historyResult['query']['pages'][$this->pageid]['revisions'], $historyResult['query-continue']['revisions']['rvstartid'] );
+				return array( $historyResult['query']['pages'][$this->pageid]['revisions'], null );
+			}
+			else {
+				return $historyResult['query']['pages'][$this->pageid]['revisions'];
+			}
 		}
 
 	}

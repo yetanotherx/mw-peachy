@@ -1508,7 +1508,7 @@ class Wiki {
 	 * @access public
 	 * @param int $rev1 The revision id of the old revision
 	 * @param int $rev2 The revision id of the new revision
-	 * @param string $method Format of diff. Either 'unified', or 'inline' (HTML diff)
+	 * @param string $method Format of diff. Either 'unified', 'inline' (HTML diff), or 'raw' (array( text1, text2))
 	 * @return string Returned diff
 	 */
 	public function diff( $rev1, $rev2, $method = 'unified' ) {
@@ -1549,6 +1549,7 @@ class Wiki {
 				$r2text = $r2pages['revisions'][0]['*'];
 			}
 			
+			if( $method == "raw" ) return array( $r1text, $r2text );
 			return getTextDiff($method, $r1text, $r2text);
 		}
 		

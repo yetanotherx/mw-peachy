@@ -285,7 +285,6 @@ class Page {
 			'action' => 'query',
 			'prop' => 'revisions',
 			'titles' => $this->title, 
-			'rvlimit' => $count,
 			'rvprop' => 'timestamp|ids|user|comment',
 			'rvdir' => $dir,
 			
@@ -293,17 +292,31 @@ class Page {
 		
 		if( $content ) $historyArray['rvprop'] .= "|content";
 		
-		if( !is_null( $revid ) ) {
-			$historyArray['rvstartid'] = $revid;
-		}
+		if( !is_null( $revid ) ) $historyArray['rvstartid'] = $revid;
+		if( !is_null( $count ) ) $historyArray['rvlimit'] = $count;
 		
 		if( $rollback_token ) $historyArray['rvtoken'] = 'rollback';
 		
 		pecho( "Getting page history for {$this->title}..\n\n", PECHO_NORMAL );
 		
-		$historyResult = $this->wiki->apiQuery($historyArray);
+		if( is_null( $count ) ) {
+			$history = $ei = $this->history( $this->wiki->get_api_limit() + 1, $dir, $content, $revid, $rollback_token );
+	
+			while( isset( $ei[ $this->wiki->get_api_limit() ] ) ) {
+				$ei = $this->history( $this->wiki->get_api_limit() + 1, $dir, $content, $ei[9]['revid'], $rollback_token );
+				foreach( $ei as $eg ) {
+					$history[] = $eg;
+				}
+			}
+			
+			return $history;
+			
+		}
+		else {
+			$historyResult = $this->wiki->apiQuery($historyArray);
 		
-		return $historyResult['query']['pages'][$this->pageid]['revisions'];
+			return $historyResult['query']['pages'][$this->pageid]['revisions'];
+		}
 
 	}
 	

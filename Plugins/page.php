@@ -316,6 +316,7 @@ class Page {
 	 * @return string Page content
 	 */
 	public function get_text( $force = false, $section = null ) {
+		global $mwVersion;
 		
 		pecho( "Getting page content for {$this->title}..\n\n", PECHO_NOTICE );
 		
@@ -341,10 +342,36 @@ class Page {
 				}
 			}
 			
+			if( !is_numeric( $section ) ) {
+				pecho( "Warning: Section not found.\n\n", PECHO_WARN );
+				return false;
+			}
+			
 			$offsets = array( '0' => '0' );
 			
-			foreach( $sections['parse']['sections'] as $section2 ) {
-				$offsets[$section2['number']] = $section2['byteoffset'];
+			if( $mwVersion < '1.16' ) {
+					
+				//FIXME: Implement proper notice suppression
+				
+				$ids = array();
+				
+				foreach( $sections['parse']['sections'] as $section3 ) {
+					$ids[$section3['line']] = $section3['number'];
+				}
+				
+				$regex = '/^(=+)\s*(.*?)\s*(\1)\s*/m';
+
+				preg_match_all($regex, $this->content, $m, PREG_OFFSET_CAPTURE|PREG_SET_ORDER );
+				
+				foreach( $m as $id => $match ) {
+					$offsets[$id + 1] = $match[0][1];
+				}
+				
+			}
+			else {
+				foreach( $sections['parse']['sections'] as $section2 ) {
+					$offsets[$section2['number']] = $section2['byteoffset'];
+				}
 			}
 			
 			if( intval( $section ) != count( $offsets ) - 1 ) {

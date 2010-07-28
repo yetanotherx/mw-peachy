@@ -155,7 +155,7 @@ function &initPage( $title = null, $pageid = null, $followRedir = true, $normali
 	$wiki = getSiteObject();
 	if( !$wiki ) return false;
 	
-	$page = new Page( &$wiki, $title, $pageid, $followRedir, $normalize );
+	$page = new Page( $wiki, $title, $pageid, $followRedir, $normalize );
 	return $page;
 }
 
@@ -169,7 +169,7 @@ function &initUser( $username ) {
 	$wiki = getSiteObject();
 	if( !$wiki ) return false;
 	
-	$user = new User( &$wiki, $username );
+	$user = new User( $wiki, $username );
 	return $user;
 }
 
@@ -184,7 +184,7 @@ function &initImage( $filename = null ) {
 	$wiki = getSiteObject();
 	if( !$wiki ) return false;
 	
-	$image = new Image( &$wiki, $filename );
+	$image = new Image( $wiki, $filename );
 	return $image;
 }
 

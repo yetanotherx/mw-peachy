@@ -1002,7 +1002,6 @@ class Wiki {
 		if( $user ) $leArray['leuser'] = $user;
 		if( $title ) $leArray['letitle'] = $title;
 		if( $tag ) $leArray['letag'] = $tag;
-		$leArray['limit'] = $this->apiQueryLimit;
 		
 		Hooks::runHook( 'PreQueryLog', array( &$leArray ) );
 		

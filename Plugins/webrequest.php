@@ -231,7 +231,7 @@ class WebRequest {
 	 * @return Boolean
 	 */
 	public function getBool( $name, $default = false ) {
-		return $this->getVal( $name, $default ) ? true : false;
+		return !empty( $this->getVal( $name, $default ) ) ? true : false;
 	}
 
 	/**

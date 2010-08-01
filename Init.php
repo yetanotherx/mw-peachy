@@ -67,6 +67,7 @@ define( 'PECHO_FATAL', 4 );
 $IP = dirname(__FILE__) . '/';
 
 $pgAutoloader = array(
+	'Wiki' => 'Wiki.php'
 	'Script' => 'Script.php',
 	'UtfNormal' => 'Plugins/normalize/UtfNormal.php',
 );
@@ -79,7 +80,6 @@ if( $version[0] < '5' ) throw new DependancyError( "PHP 5", "http://php.net/down
 
 require_once( $IP . 'GenFunctions.php' );
 require_once( $IP . 'Diff/Diff.php' );
-require_once( $IP . 'Wiki.php' );
 require_once( $IP . 'Hooks.php' );
 require_once( $IP . 'HTTP.php' );
 
@@ -127,7 +127,6 @@ class Peachy {
 		
 		pecho( "Loading Peachy (version " . PEACHYVERSION . ")...\n\n", PECHO_NORMAL );
 		
-		//throw new APIError( array( 'code' => "nopage", 'text' => "nopage exists" ) );
 		if( !is_null( $config_name ) ) {
 			$config_params = self::parse_config( $config_name );
 		

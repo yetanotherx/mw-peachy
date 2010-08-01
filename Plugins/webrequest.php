@@ -115,10 +115,16 @@ class WebRequest {
 	}
 	
 	public function getSafeVal( $callback ) {
-		if( !is_callable( array( $this, $callback ) ) ) {
+	
+		if( !method_exists( $this, $callback ) ) {
+			$args = func_get_args();
 			$callback = 'getVal';
 		}
-		array_shift( $args = func_get_args() );
+		else {
+			$args = func_get_args();
+			array_shift( $args );
+		}
+		
 		return htmlspecialchars( call_user_func_array( array( $this, $callback ), $args ) );
 	}
 
@@ -231,7 +237,8 @@ class WebRequest {
 	 * @return Boolean
 	 */
 	public function getBool( $name, $default = false ) {
-		return !empty( $this->getVal( $name, $default ) ) ? true : false;
+		$val = $this->getVal( $name, $default );
+		return !empty( $val ) ? true : false;
 	}
 
 	/**

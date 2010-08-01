@@ -277,6 +277,33 @@ if ( !function_exists( 'mb_substr' ) ) {
 	}
 }
 
+if( !function_exists('iconv') ) {
+	# iconv support is not in the default configuration and so may not be present.
+	# Assume will only ever use utf-8 and iso-8859-1.
+	# This will *not* work in all circumstances.
+	function iconv( $from, $to, $string ) {
+		if ( substr( $to, -8 ) == '//IGNORE' ) $to = substr( $to, 0, strlen( $to ) - 8 );
+		if(strcasecmp( $from, $to ) == 0) return $string;
+		if(strcasecmp( $from, 'utf-8' ) == 0) return utf8_decode( $string );
+		if(strcasecmp( $to, 'utf-8' ) == 0) return utf8_encode( $string );
+		return $string;
+	}
+}
+
+if ( !function_exists( 'istainted' ) ) {
+	function istainted( $var ) {
+		return 0;
+	}
+	function taint( $var, $level = 0 ) {}
+	function untaint( $var, $level = 0 ) {}
+	define( 'TC_HTML', 1 );
+	define( 'TC_SHELL', 1 );
+	define( 'TC_MYSQL', 1 );
+	define( 'TC_PCRE', 1 );
+	define( 'TC_SELF', 1 );
+}
+
+
 /**
  * Called when a non-existant class is initiated, loads a plugin if it exists.
  * 

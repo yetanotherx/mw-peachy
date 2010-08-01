@@ -96,12 +96,19 @@ class CURLError extends Exception {
  * @package Peachy_Exceptions
  */
 class BadTitle extends Exception {
-
+	
+	private $title;
+	
 	public function __construct( $title ) {
+		$this->title = $title;
 		parent::__construct( 
 			"Invalid title: $title"
 		);
  
+	}
+	
+	public function getTitle() {
+		return $this->title;
 	}
 }
 

@@ -68,6 +68,7 @@ $IP = dirname(__FILE__) . '/';
 
 $pgAutoloader = array(
 	'Script' => 'Script.php',
+	'UtfNormal' => 'Plugins/normalize/UtfNormal.php',
 );
 
 require_once( $IP . 'Exceptions.php' );

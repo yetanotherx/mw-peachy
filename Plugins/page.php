@@ -243,6 +243,8 @@ class Page {
 			}
 		}
 		
+		$this->title = $title;
+		
 		$pageInfoArray = array();
 		
 		if( !is_null( $pageid ) ) {
@@ -1457,7 +1459,7 @@ class Page {
 			
 			if( isset( $info['missing'] ) ) $this->exists = false;
 			
-			if( isset( $info['invalid'] ) ) throw new BadTitle( $title );
+			if( isset( $info['invalid'] ) ) throw new BadTitle( $this->title );
 		
 			$this->title = $info['title'];
 			$this->namespace_id = $info['ns'];

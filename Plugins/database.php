@@ -240,16 +240,20 @@ abstract class DatabaseBase {
 				$where_tmp = array();
 				
 				foreach( $where as $col => $val ) {
-					
-					if( is_array( $val ) ) {
-						$opr = $val[0];
-						$val = $this->strencode( $val[1] );
-						
-						$where_tmp[] = "`$col` $opr '$val'";
+					if( is_numeric( $col ) ) {
+						$where_tmp[] = $val;
 					}
 					else {
-						$val = $this->strencode( $val );
-						$where_tmp[] = "`$col` = '$val'";
+						if( is_array( $val ) ) {
+							$opr = $val[0];
+							$val = $this->strencode( $val[1] );
+							
+							$where_tmp[] = "`$col` $opr '$val'";
+						}
+						else {
+							$val = $this->strencode( $val );
+							$where_tmp[] = "`$col` = '$val'";
+						}
 					}				
 				}
 				$where = implode( ' AND ', $where_tmp );

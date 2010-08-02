@@ -145,6 +145,8 @@ abstract class DatabaseBase {
 		
 		Hooks::runHook( 'DatabasePostRunQuery', array( &$ret ) );
 		
+		if( is_bool( $ret ) ) return $ret;
+		
 		$ret = $this->resultObject( $ret );
 		if( !$ret ) {
 			throw new DBError( $this->lastError(), $this->lastErrno(), $sql ); 

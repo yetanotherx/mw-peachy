@@ -66,6 +66,10 @@ class WebRequest {
 	function normalize( $s ) {
 		return UtfNormal::cleanUp( $s );
 	}
+	
+	static function normalize_static( $s ) {
+		return UtfNormal::cleanUp( $s );
+	}
 
 	/**
 	 * Fetch a value from the given array or return $default if it's not set.
@@ -283,6 +287,9 @@ class WebRequest {
 		if ( count( $names ) == 0 ) {
 			$names = array_keys( $this->data );
 		}
+		elseif( is_array( $names[0] ) ) {
+			$names = $names[0];
+		}
 
 		$retVal = array();
 		foreach ( $names as $name ) {
@@ -377,6 +384,10 @@ class WebRequest {
 	 */
 	public function getFullRequestURL() {
 		return $this->getServer() . $this->getRequestURL();
+	}
+	
+	function getIP() {
+		return @$_SERVER['REMOTE_ADDR'];
 	}
 	
 	function getServer() {

@@ -48,6 +48,14 @@ function getTextDiff($method, $diff1, $diff2) {
 			
 			$diff = $renderer->render($diff);
 			break;
+		case 'context':
+			require_once $IP . 'Diff/textdiff/Diff/Renderer/context.php';
+			$diff = new Text_Diff('auto', array(explode("\n",$diff1), explode("\n",$diff2)));
+
+			$renderer = new Text_Diff_Renderer_context();
+			
+			$diff = $renderer->render($diff);
+			break;
 	}
 	unset($renderer);
 	return $diff;

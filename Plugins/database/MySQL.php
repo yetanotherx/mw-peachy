@@ -115,7 +115,6 @@ class DatabaseMySQL extends DatabaseBase {
 	public function fetchRow( $res ) {
 	
 		Hooks::runHook( 'DatabaseFetchRow', array( &$res ) );
-		
 		$row = mysql_fetch_assoc( $res ); 
 		
 		if( $this->lastErrno() ) {

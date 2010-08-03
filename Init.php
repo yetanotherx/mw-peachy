@@ -64,7 +64,7 @@ define( 'PECHO_ERROR', 3 );
  */
 define( 'PECHO_FATAL', 4 );
 
-$IP = dirname(__FILE__) . '/';
+$pgIP = dirname(__FILE__) . '/';
 
 $pgAutoloader = array(
 	'Wiki' => 'Wiki.php'
@@ -72,16 +72,16 @@ $pgAutoloader = array(
 	'UtfNormal' => 'Plugins/normalize/UtfNormal.php',
 );
 
-require_once( $IP . 'Exceptions.php' );
+require_once( $pgIP . 'Exceptions.php' );
 
 $version = explode( '.', phpversion() );
 
 if( $version[0] < '5' ) throw new DependancyError( "PHP 5", "http://php.net/downloads.php" );
 
-require_once( $IP . 'GenFunctions.php' );
-require_once( $IP . 'Diff/Diff.php' );
-require_once( $IP . 'Hooks.php' );
-require_once( $IP . 'HTTP.php' );
+require_once( $pgIP . 'GenFunctions.php' );
+require_once( $pgIP . 'Diff/Diff.php' );
+require_once( $pgIP . 'Hooks.php' );
+require_once( $pgIP . 'HTTP.php' );
 
 $pgProxy = array();
 $pgVerbose = array(0,1,2,3,4);
@@ -123,7 +123,7 @@ class Peachy {
 	 * @return Wiki Instance of the Wiki class, where most functions are stored
 	 */
 	public static function newWiki( $config_name = null, $username = null, $password = null, $base_url = 'http://en.wikipedia.org/w/api.php' ) {
-		global $IP;
+		global $pgIP;
 		
 		pecho( "Loading Peachy (version " . PEACHYVERSION . ")...\n\n", PECHO_NORMAL );
 		
@@ -233,13 +233,13 @@ class Peachy {
 	 * @return array Config params
 	 */
 	private static function parse_config( $config_name ) {
-		global $IP;
+		global $pgIP;
 		if( !is_file( $config_name ) ) {
-			if( !is_file( $IP . 'Configs/' . $config_name . '.cfg' ) ) {
+			if( !is_file( $pgIP . 'Configs/' . $config_name . '.cfg' ) ) {
 				throw new BadEntryError( "BadConfig", "A non-existent configuration file was specified." );
 			}
 			else {
-				$config_name = $IP . 'Configs/' . $config_name . '.cfg';
+				$config_name = $pgIP . 'Configs/' . $config_name . '.cfg';
 			}
 		}
 		

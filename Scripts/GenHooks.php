@@ -2,7 +2,7 @@
 
 require_once( '/home/soxred93/Peachy/Init.php' );
 
-$IP = '/home/soxred93/Peachy/';
+$pgIP = '/home/soxred93/Peachy/';
 
 $x = Peachy::newWiki( "compwhizii" );
 
@@ -11,9 +11,9 @@ $files = array();
 getFiles();
 
 function getFiles( $dir = false ) {
-	global $IP, $files;
+	global $pgIP, $files;
 	
-	if( !$dir ) $dir = $IP;
+	if( !$dir ) $dir = $pgIP;
 	
 	$y = glob( $dir . '*' );
 	

@@ -760,7 +760,7 @@ class Database {
 	 * @return object
 	 */
 	private function &doInit() {
-		global $IP;
+		global $pgIP;
 		
 		if( !class_exists( 'mysqli' ) ) {
 			$this->type = 'mysql';
@@ -770,22 +770,22 @@ class Database {
 		
 		switch( $this->type ) {
 			case 'mysqli':
-				require_once( $IP . 'Plugins/database/MySQLi.php' );
+				require_once( $pgIP . 'Plugins/database/MySQLi.php' );
 				$this->object = new DatabaseMySQLi( $this->server, $this->port, $this->user, $this->password, $this->db );
 				return $this->object;
 				break;
 			case 'mysql':
-				require_once( $IP . 'Plugins/database/MySQL.php' );
+				require_once( $pgIP . 'Plugins/database/MySQL.php' );
 				$this->object = new DatabaseMySQL( $this->server, $this->port, $this->user, $this->password, $this->db );
 				return $this->object;
 				break;
 			case 'pgsql':
-				require_once( $IP . 'Plugins/database/PgSQL.php' );
+				require_once( $pgIP . 'Plugins/database/PgSQL.php' );
 				$this->object = new DatabasePgSQL( $this->server, $this->port, $this->user, $this->password, $this->db );
 				return $this->object;
 				break;
 			default:
-				require_once( $IP . 'Plugins/database/MySQLi.php' );
+				require_once( $pgIP . 'Plugins/database/MySQLi.php' );
 				$this->object = new DatabaseMySQLi( $this->server, $this->port, $this->user, $this->password, $this->db );
 				return $this->object;
 				break;

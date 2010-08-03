@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-require_once( $IP . 'Diff/textdiff/Diff.php' );
-require_once( $IP . 'Diff/textdiff/Diff/Renderer.php' );
+require_once( $pgIP . 'Diff/textdiff/Diff.php' );
+require_once( $pgIP . 'Diff/textdiff/Diff/Renderer.php' );
 
 /**
  * Generates a diff between two strings
@@ -30,10 +30,10 @@ require_once( $IP . 'Diff/textdiff/Diff/Renderer.php' );
  * @link http://pear.php.net/package/Text_Diff/redirected
  */
 function getTextDiff($method, $diff1, $diff2) {
-	global $IP;
+	global $pgIP;
 	switch ($method) {
 		case 'unified':
-			require_once $IP . 'Diff/textdiff/Diff/Renderer/unified.php';
+			require_once $pgIP . 'Diff/textdiff/Diff/Renderer/unified.php';
 			$diff = new Text_Diff('auto', array(explode("\n",$diff1), explode("\n",$diff2)));
 
 			$renderer = new Text_Diff_Renderer_unified();
@@ -41,7 +41,7 @@ function getTextDiff($method, $diff1, $diff2) {
 			$diff = $renderer->render($diff);
 			break;
 		case 'inline':
-			require_once $IP . 'Diff/textdiff/Diff/Renderer/inline.php';
+			require_once $pgIP . 'Diff/textdiff/Diff/Renderer/inline.php';
 			$diff = new Text_Diff('auto', array(explode("\n",$diff1), explode("\n",$diff2)));
 
 			$renderer = new Text_Diff_Renderer_inline();
@@ -49,7 +49,7 @@ function getTextDiff($method, $diff1, $diff2) {
 			$diff = $renderer->render($diff);
 			break;
 		case 'context':
-			require_once $IP . 'Diff/textdiff/Diff/Renderer/context.php';
+			require_once $pgIP . 'Diff/textdiff/Diff/Renderer/context.php';
 			$diff = new Text_Diff('auto', array(explode("\n",$diff1), explode("\n",$diff2)));
 
 			$renderer = new Text_Diff_Renderer_context();

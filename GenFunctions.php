@@ -311,20 +311,20 @@ if ( !function_exists( 'istainted' ) ) {
  * @return void
  */
 function __autoload( $class_name ) {
-	global $IP, $pgAutoloader;
+	global $pgIP, $pgAutoloader;
 	
 	if( $class_name == "ImageModify" ) {
-		require_once( $IP . 'Plugins/image.php' );
+		require_once( $pgIP . 'Plugins/image.php' );
 	}
 	
-	if( is_file( $IP . 'Plugins/' . strtolower( $class_name ) . '.php' ) ) {
+	if( is_file( $pgIP . 'Plugins/' . strtolower( $class_name ) . '.php' ) ) {
 		Hooks::runHook( 'LoadPlugin', array( &$class_name ) );
 				
-		require_once( $IP . 'Plugins/' . strtolower( $class_name ) . '.php' );
+		require_once( $pgIP . 'Plugins/' . strtolower( $class_name ) . '.php' );
 	}
 	
 	if( isset( $pgAutoloader[$class_name] ) ) {
-		require_once( $IP . $pgAutoloader[$class_name] );
+		require_once( $pgIP . $pgAutoloader[$class_name] );
 	}
 	
 }

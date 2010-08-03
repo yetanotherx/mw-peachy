@@ -305,7 +305,7 @@ class OldImage {
 	 * @return void
 	 */
 	public function upload( $file, $text = '', $comment = '', $watch = false, $ignorewarnings = true ) {
-		global $mwVersion, $IP;
+		global $mwVersion, $pgIP;
 		
 		$tokens = $this->wiki->get_tokens();
 		
@@ -313,7 +313,7 @@ class OldImage {
 			$localfile = $file;
 		}
 		else {
-			$localfile = $IP . 'Images/' . str_replace( ' ', '_', $this->name );
+			$localfile = $pgIP . 'Images/' . str_replace( ' ', '_', $this->name );
 		}
 		
 		pecho( "Uploading $file to {$this->name}..\n\n", PECHO_NOTICE );
@@ -373,7 +373,7 @@ class OldImage {
 	 * @return void
 	 */
 	public function download( $name = null, $width = null, $height = null ) {
-		global $IP;
+		global $pgIP;
 		
 		if( $this->commons ) {
 			throw new ImageError( "Attempted to download a file on a shared respository instead of a local one" );
@@ -418,7 +418,7 @@ class OldImage {
 			break;
 		}
 		
-		$localname = $IP . 'Images/' . str_replace(' ','_',urlencode( $this->getName(false) ) );
+		$localname = $pgIP . 'Images/' . str_replace(' ','_',urlencode( $this->getName(false) ) );
 		if( $name ) $localname = $name;
 		
 		Hooks::runHook( 'DownloadImage', array( &$url, &$name, &$localname ) );

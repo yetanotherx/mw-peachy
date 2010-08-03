@@ -42,7 +42,7 @@ class ImageModify extends Image {
 	 * @return void
 	 */
 	public function resize( $width = null, $height = null, $reupload = false, $newname = null, $text = '', $comment = '', $watch = false, $ignorewarnings = true ) {
-		global $IP;
+		global $pgIP;
 		
 		if( !is_null( $width ) && !is_null( $height ) ) {	
 			$this->download();
@@ -94,13 +94,13 @@ class ImageModify extends Image {
 
 			$image = imagecreatetruecolor( $width, $height );
 
-			$new_image = $image_create_func( $IP . 'Images/' . $this->localname );
+			$new_image = $image_create_func( $pgIP . 'Images/' . $this->localname );
 			
-			$info = getimagesize( $IP . 'Images/' . $this->localname );
+			$info = getimagesize( $pgIP . 'Images/' . $this->localname );
 
 			imagecopyresampled( $image, $new_image, 0, 0, 0, 0, $width, $height, $info[0], $info[1] );
 
-        	$image_save_func( $image, $IP . 'Images/' . $this->localname );
+        	$image_save_func( $image, $pgIP . 'Images/' . $this->localname );
 
 		}
 		elseif( !is_null( $width ) ) {

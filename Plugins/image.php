@@ -385,15 +385,15 @@ class Image {
 	 * @return bool|void
 	 */
 	public function upload( $localname = null, $text = '', $comment = '', $watch = false, $ignorewarnings = true ) {
-		global $IP, $mwVersion;
+		global $pgIP, $mwVersion;
 		
 		if( !is_file( $localname ) ) {
 		
-			if( is_file( $IP . 'Images/' . $localname ) ) {
-				$localname = $IP . 'Images/' . $localname;
+			if( is_file( $pgIP . 'Images/' . $localname ) ) {
+				$localname = $pgIP . 'Images/' . $localname;
 			}
 			else {
-				$localname = $IP . 'Images/' . $this->localname;
+				$localname = $pgIP . 'Images/' . $this->localname;
 			}
 
 			if( !is_file( $localname ) ) {
@@ -502,7 +502,7 @@ class Image {
 	 * @return void
 	 */
 	public function download( $localname = null, $width = -1, $height = -1 ) {
-		global $IP;
+		global $pgIP;
 		
 		if( !$this->local ) {
 			pecho( "Attempted to download a file on a shared respository instead of a local one", PECHO_NOTICE );
@@ -525,7 +525,7 @@ class Image {
 			}
 			
 			if( is_null( $localname ) ) {
-				$localname = $IP . 'Images/' . $this->localname;
+				$localname = $pgIP . 'Images/' . $this->localname;
 			}
 			
 			Hooks::runHook( 'DownloadImage', array( &$url, &$localname ) );

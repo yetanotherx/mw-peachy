@@ -67,7 +67,7 @@ define( 'PECHO_FATAL', 4 );
 $pgIP = dirname(__FILE__) . '/';
 
 $pgAutoloader = array(
-	'Wiki' => 'Wiki.php'
+	'Wiki' => 'Wiki.php',
 	'Script' => 'Script.php',
 	'UtfNormal' => 'Plugins/normalize/UtfNormal.php',
 );

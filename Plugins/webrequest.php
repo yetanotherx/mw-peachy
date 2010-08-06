@@ -109,8 +109,8 @@ class WebRequest {
 		if ( $isutf8 ) {
 			return $s;
 		}
-
-		return $this->iconv( $this->fallback8bitEncoding(), 'utf-8', $s );
+		return $s;//fallback, has problems.
+		//return $this->iconv( $this->fallback8bitEncoding(), 'utf-8', $s );
 	} 
 	
 	function iconv( $in, $out, $string ) {

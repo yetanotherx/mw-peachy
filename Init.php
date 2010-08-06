@@ -70,6 +70,7 @@ $pgAutoloader = array(
 	'Wiki' => 'Wiki.php',
 	'Script' => 'Script.php',
 	'UtfNormal' => 'Plugins/normalize/UtfNormal.php',
+	'ImageModify' => 'Plugins/image.php',
 );
 
 require_once( $pgIP . 'Exceptions.php' );
@@ -92,13 +93,14 @@ $pgIRCTrigger = array( '!', '.' );
 $pgHTTP = new HTTP;
 
 //Last version check
-$PeachyInfo = unserialize( $pgHTTP->get( 'http://compwhizii.net/peachy/wiki/Template:Autoupdate/Check?action=raw' ) );
+$tmp = null;
+$PeachyInfo = MWReleases::load( $tmp, true );
 
-if( version_compare( $PeachyInfo['minversion'], PEACHYVERSION, '>' ) ) {
-	pecho( "Peachy version is below minimum version {$PeachyInfo['minversion']}\n\n", PECHO_ERROR );
+if( !$PeachyInfo->isSupported( PEACHYVERSION ) ) {
+	pecho( "Peachy version is below minimum version {$PeachyInfo->get_min_version()}\n\n", PECHO_ERROR );
 }
-elseif( version_compare( $PeachyInfo['nowversion'], PEACHYVERSION, '>' ) ) {
-	pecho( "New version of Peachy available: {$PeachyInfo['nowversion']}\n\n", PECHO_WARN );
+elseif( $PeachyInfo->newerVersionExists( PEACHYVERSION ) ) {
+	pecho( "New version of Peachy available: {$PeachyInfo->get_current_version()}\n\n", PECHO_WARN );
 }
 
 if( function_exists( 'mb_internal_encoding' ) ) {

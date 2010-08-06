@@ -52,6 +52,28 @@ function in_string( $needle, $haystack, $insensitive = false ) {
 }
 
 /**
+ * Recursive in_array function
+ * 
+ * @param string $needle What to search for
+ * @param string $haystack What to search in
+ * @param bool Whether or not to do a case-insensitive search
+ * @return bool True if $needle is found in $haystack
+ * @link http://us3.php.net/in_array
+ */
+function in_array_recursive( $needle, $haystack, $insensitive = false ) {
+	$fnc = 'in_array';
+	if( $insensitive ) $fnc = 'iin_array';
+	
+	if( $fnc( $needle, $haystack ) ) return true;
+	foreach( $haystack as $key => $val ) {
+		if( is_array( $val ) ) {
+			return in_array_recursive( $needle, $val );
+		}
+	}
+	return false;
+}
+
+/**
  * Detects the presence of a nobots template or one that denies editing by ours
  * 
  * @access public
@@ -312,10 +334,6 @@ if ( !function_exists( 'istainted' ) ) {
  */
 function __autoload( $class_name ) {
 	global $pgIP, $pgAutoloader;
-	
-	if( $class_name == "ImageModify" ) {
-		require_once( $pgIP . 'Plugins/image.php' );
-	}
 	
 	if( is_file( $pgIP . 'Plugins/' . strtolower( $class_name ) . '.php' ) ) {
 		Hooks::runHook( 'LoadPlugin', array( &$class_name ) );

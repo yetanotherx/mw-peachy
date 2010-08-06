@@ -480,12 +480,16 @@ class Wiki {
 	 * @access public
 	 * @param array $arrayParams Parameters given to query with (default: array())
 	 * @param bool $post Should it be a POST reqeust? (default: false)
+	 * @param bool $recursed Is this a recursed reqest (default: false)
 	 * @return array Returns an array with the API result
 	 */
-	public function apiQuery( $arrayParams = array(), $post = false, $errorcheck = true ) {
-
+	public function apiQuery( $arrayParams = array(), $post = false, $errorcheck = true, $recursed = false ) {
+		
+		$requestid = mt_rand();
+		
 		$arrayParams['format'] = 'php';
 		$arrayParams['servedby'] = '';
+		$arrayParams['requestid'] = $requestid;
 		$assert = false;
 		
 		if( $post && $this->isFlagged && in_array( 'assert', array_values( $arrayParams ) ) && $arrayParams['assert'] == 'user' ) {
@@ -526,6 +530,16 @@ class Wiki {
 				$this->servedby = $data['servedby'];
 			}
 			
+			if( isset( $data['requestid'] ) ) {
+				if( $data['requestid'] != $requestid ) {
+					if( $recursed ) {
+						pecho( "API Error... requestid's didn't match twice.\n\n", PECHO_FATAL );
+						return false;
+					}
+					return $this->apiQuery( $arrayParams, $post, $errorcheck, true );
+				}
+			}
+			
 			return $data;
 		}
 		else {
@@ -539,6 +553,16 @@ class Wiki {
 			
 			if( isset( $data['servedby'] ) ) {
 				$this->servedby = $data['servedby'];
+			}
+			
+			if( isset( $data['requestid'] ) ) {
+				if( $data['requestid'] != $requestid ) {
+					if( $recursed ) {
+						pecho( "API Error... requestid's didn't match twice.\n\n", PECHO_FATAL );
+						return false;
+					}
+					return $this->apiQuery( $arrayParams, $post, $errorcheck, true );
+				}
 			}
 			
 			return $data;

@@ -336,8 +336,6 @@ class Page {
 	 * @return string Page content
 	 */
 	public function get_text( $force = false, $section = null ) {
-		global $mwVersion;
-		
 		pecho( "Getting page content for {$this->title}..\n\n", PECHO_NOTICE );
 		
 		if( !$this->exists ) return null;
@@ -369,7 +367,7 @@ class Page {
 			
 			$offsets = array( '0' => '0' );
 			
-			if( $mwVersion < '1.16' ) {
+			if( $this->wiki->get_mw_version() < '1.16' ) {
 					
 				//FIXME: Implement proper notice suppression
 				

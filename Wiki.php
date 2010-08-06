@@ -201,6 +201,15 @@ class Wiki {
 	private $servedby;
 	
 	/**
+	 * Version of MediaWiki server is running. 
+	 * The only reason this is public is so the Peachy class can set it. It should not be changed again.
+	 * 
+	 * @var string
+	 * @access public
+	 */
+	public $mwversion;
+	
+	/**
 	 * Contruct function for the wiki. Handles login and related functions.
 	 * 
 	 * @access public
@@ -476,6 +485,7 @@ class Wiki {
 	public function apiQuery( $arrayParams = array(), $post = false, $errorcheck = true ) {
 
 		$arrayParams['format'] = 'php';
+		$arrayParams['servedby'] = '';
 		$assert = false;
 		
 		if( $post && $this->isFlagged && in_array( 'assert', array_values( $arrayParams ) ) && $arrayParams['assert'] == 'user' ) {
@@ -542,6 +552,15 @@ class Wiki {
 	 */
 	public function get_servedby() {
 		return $this->servedby;
+	}
+	
+	/**
+	 * Returns the version of MediaWiki that is on the server
+	 *
+	 * @return string
+	 */
+	public function get_mw_version() {
+		return $this->mwversion;
 	}
 	
 	/**

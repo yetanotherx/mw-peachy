@@ -385,7 +385,7 @@ class Image {
 	 * @return bool|void
 	 */
 	public function upload( $localname = null, $text = '', $comment = '', $watch = false, $ignorewarnings = true ) {
-		global $pgIP, $mwVersion;
+		global $pgIP;
 		
 		if( !is_file( $localname ) ) {
 		
@@ -403,7 +403,7 @@ class Image {
 		
 		pecho( "Uploading $localname to {$this->title}..\n\n", PECHO_NOTICE );
 
-		if( version_compare( $mwVersion, '1.16' ) >= 0 ) {
+		if( version_compare( $this->wiki->get_mw_version(), '1.16' ) >= 0 ) {
 			return $this->api_upload( $localname, $text, $comment, $watch, $ignorewarnings );
 		}
 		else {

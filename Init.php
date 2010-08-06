@@ -75,21 +75,19 @@ $pgAutoloader = array(
 
 require_once( $pgIP . 'Exceptions.php' );
 
-$version = explode( '.', phpversion() );
-
-if( $version[0] < '5' ) throw new DependancyError( "PHP 5", "http://php.net/downloads.php" );
+peachyCheckPHPVersion();
 
 require_once( $pgIP . 'GenFunctions.php' );
+require_once( $pgIP . 'Globals.php' );
 require_once( $pgIP . 'Diff/Diff.php' );
 require_once( $pgIP . 'Hooks.php' );
 require_once( $pgIP . 'HTTP.php' );
 
-$pgProxy = array();
 $pgVerbose = array(0,1,2,3,4);
 $pgUA = 'Peachy MediaWiki Bot API Version ' . PEACHYVERSION;
-$mwVersion = null;
 $pgIRCTrigger = array( '!', '.' );
 
+$pgProxy = array();
 $pgHTTP = new HTTP;
 
 //Last version check
@@ -150,11 +148,13 @@ class Peachy {
 			$config_params['nologin'] = true;
 		}
 		
-		$extensions = Peachy::wikiChecks( $config_params['baseurl'] );
+		list( $version, $extensions ) = Peachy::wikiChecks( $config_params['baseurl'] );
 		
 		Hooks::runHook( 'StartLogin', array( &$config_params, &$extensions ) );
 		
 		$w = new Wiki( $config_params, $extensions, false, null );
+		$w->mwversion = $version;
+		
 		return $w;
 	}
 	
@@ -168,7 +168,7 @@ class Peachy {
 	 * @return array Installed extensions
 	 */
 	public static function wikiChecks( $base_url ) {
-		global $pgHTTP, $mwVersion;
+		global $pgHTTP;
 		
 		$siteinfo = unserialize( $pgHTTP->get( 
 			$base_url,
@@ -178,14 +178,12 @@ class Peachy {
 				'siprop' => 'extensions|general',
 		)));
 		
-		$version = preg_replace( '/[^0-9\.]/','',str_replace('MediaWiki ', '', $siteinfo['query']['general']['generator'] ));
+		$version = preg_replace( '/[^0-9\.]/', '', $siteinfo['query']['general']['generator'] );
 		
 		if( version_compare( $version, MINMW ) < 0 ) {
 			throw new DependencyError( "MediaWiki " . MINMW, "http://mediawiki.org" );
 		}
-		
-		$mwVersion = $version;
-		
+
 		$extensions = array();
 		
 		foreach( $siteinfo['query']['extensions'] as $ext ) {
@@ -197,7 +195,7 @@ class Peachy {
 			}
 		}
 		
-		return $extensions;
+		return array( $version, $extensions );
 	}
 	
 	/**
@@ -254,7 +252,14 @@ class Peachy {
 		}
 		
 		return $config_params;
-	}
-	
-	
+	}	
+}
+
+/**
+ * Simple phpversion() wrapper
+ * @return void
+ */
+function peachyCheckPHPVersion() {
+	$version = explode( '.', phpversion() );
+	if( $version[0] < '5' ) throw new DependancyError( "PHP 5", "http://php.net/downloads.php" );
 }

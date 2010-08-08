@@ -78,7 +78,6 @@ require_once( $pgIP . 'Exceptions.php' );
 peachyCheckPHPVersion();
 
 require_once( $pgIP . 'GenFunctions.php' );
-require_once( $pgIP . 'Globals.php' );
 require_once( $pgIP . 'Diff/Diff.php' );
 require_once( $pgIP . 'Hooks.php' );
 require_once( $pgIP . 'HTTP.php' );

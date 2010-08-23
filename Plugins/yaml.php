@@ -22,17 +22,50 @@
 */
 
 class YAML {
-
+	
+	/**
+	 * __construct function.
+	 * 
+	 * @access public
+	 * @param mixed $data. (default: null)
+	 * @return void
+	 */
 	function __construct($data = null) {
 		$version = peachyCheckPHPVersion();
 		if( $version[1] < 2 || ( $version[1] == 2 && $version[2] < 4 ) ) throw new DependancyError( "PHP 5.2.4", "http://php.net/downloads.php" );
 		$this->data = $data;
 	}
 	
+	/**
+	 * load function.
+	 * 
+	 * @access public
+	 * @static
+	 * @param mixed $data
+	 * @return void
+	 */
 	public static function load($data) {
 		return new YAML($data);
 	}
 	
+	/**
+	 * parse function.
+	 * 
+	 * @access public
+	 * @static
+	 * @param mixed $data
+	 * @return void
+	 */
+	public static function parse($data) {
+		return self::__invoke($data);
+	}
+	
+	/**
+	 * toArray function.
+	 * 
+	 * @access public
+	 * @return void
+	 */
 	public function toArray() {
 		global $pgAutoloader;
 		$pgAutoloader['sfYamlParser'] = 'Plugins/yaml/sfYamlParser.php';
@@ -53,6 +86,12 @@ class YAML {
 		
 	}
 	
+	/**
+	 * toYaml function.
+	 * 
+	 * @access public
+	 * @return void
+	 */
 	public function toYaml() {
 		global $pgAutoloader;
 		$pgAutoloader['sfYamlDumper'] = 'Plugins/yaml/sfYamlDumper.php';
@@ -73,10 +112,23 @@ class YAML {
 		
 	}
 	
+	/**
+	 * __toString function.
+	 * 
+	 * @access public
+	 * @return void
+	 */
 	public function __toString() {
 		return $this->toYaml();
 	}
 	
+	/**
+	 * __invoke function.
+	 * 
+	 * @access public
+	 * @param mixed $data
+	 * @return void
+	 */
 	public function __invoke($data) {
 		if( is_array( $data ) ) {
 			return YAML::load($data)->toYaml();

@@ -260,5 +260,6 @@ class Peachy {
  */
 function peachyCheckPHPVersion() {
 	$version = explode( '.', phpversion() );
-	if( $version[0] < '5' ) throw new DependancyError( "PHP 5", "http://php.net/downloads.php" );
+	if( $version[0] < 5 ) throw new DependancyError( "PHP 5", "http://php.net/downloads.php" );
+	return $version;
 }

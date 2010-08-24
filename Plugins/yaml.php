@@ -56,8 +56,8 @@ class YAML {
 	 * @param mixed $data
 	 * @return void
 	 */
-	public static function parse($data) {
-		return self::__invoke($data);
+	public static function parse($data,$indent = 5) {
+		return self::__invoke($data,$indent);
 	}
 	
 	/**
@@ -92,7 +92,7 @@ class YAML {
 	 * @access public
 	 * @return void
 	 */
-	public function toYaml() {
+	public function toYaml( $indent = 5 ) {
 		global $pgAutoloader;
 		$pgAutoloader['sfYamlDumper'] = 'Plugins/yaml/sfYamlDumper.php';
 		
@@ -102,7 +102,7 @@ class YAML {
 		
 		try {
 			$yaml = new sfYamlDumper();
-			$parsed = $yaml->dump( $this->data, 5 );
+			$parsed = $yaml->dump( $this->data, $indent );
 		}
 		catch( Exception $e ) {
 			throw new BadEntryError( 'badyaml', sprintf( 'YAML::toYaml() needs a valid array: %s', $e->getMessage() ) );
@@ -129,9 +129,9 @@ class YAML {
 	 * @param mixed $data
 	 * @return void
 	 */
-	public function __invoke($data) {
+	public function __invoke($data,$indent = 5) {
 		if( is_array( $data ) ) {
-			return YAML::load($data)->toYaml();
+			return YAML::load($data)->toYaml($indent);
 		}
 		else {
 			return YAML::load($data)->toArray();

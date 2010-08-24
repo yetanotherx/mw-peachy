@@ -67,7 +67,7 @@ define( 'PECHO_FATAL', 4 );
 $pgIP = dirname(__FILE__) . '/';
 
 $pgAutoloader = array(
-	'Wiki' => 'Wiki.php',
+	'Wiki' => 'Includes/Wiki.php',
 	'Script' => 'Script.php',
 	'UtfNormal' => 'Plugins/normalize/UtfNormal.php',
 	'ImageModify' => 'Plugins/image.php',
@@ -80,13 +80,13 @@ $pgAutoloader = array(
 	'lime_registration' => 'Plugins/lime.php',
 );
 
-require_once( $pgIP . 'Exceptions.php' );
+require_once( $pgIP . 'Includes/Exceptions.php' );
 
 peachyCheckPHPVersion();
 
 require_once( $pgIP . 'GenFunctions.php' );
-require_once( $pgIP . 'Diff/Diff.php' );
-require_once( $pgIP . 'Hooks.php' );
+require_once( $pgIP . 'Includes/Diff/Diff.php' );
+require_once( $pgIP . 'Includes/Hooks.php' );
 require_once( $pgIP . 'HTTP.php' );
 
 $pgVerbose = array(0,1,2,3,4);

@@ -15,6 +15,8 @@ if( in_array( 'test:one', $argv ) ) {
 	foreach ( $args as $name ) {
 		$file_name = dirname( __FILE__ ) . '/Tests/' . basename($name) . '.php';
 		
+		if( isset( $opts['peachy'] ) ) $file_name = dirname( __FILE__ ) . '/Includes/Tests/' . basename($name) . '.php';
+		
 		if( file_exists( $file_name ) ) $files[] = $file_name;
 	}
 	
@@ -37,7 +39,10 @@ elseif( in_array( 'test:all', $argv ) ) {
 	
 	$h->base_dir = dirname( __FILE__ ) . '/Tests';
 	
-	$h->register(glob(dirname( __FILE__ ) . '/Tests/*.php'));
+	$files = glob(dirname( __FILE__ ) . '/Tests/*.php');
+	if( isset( $opts['peachy'] ) ) $files = glob(dirname( __FILE__ ) . '/Includes/Tests/*.php');
+	
+	$h->register($files);
 	
 	$ret = $h->run() ? 0 : 1;
 	

@@ -1,0 +1,156 @@
+#!/usr/bin/env php
+<?php
+
+#	This program is free software: you can redistribute it and/or modify
+#	it under the terms of the GNU General Public License as published by
+#	the Free Software Foundation, either version 3 of the License, or
+#	(at your option) any later version.
+#
+#	THIS SOFTWARE AND DOCUMENTATION IS PROVIDED "AS IS," AND COPYRIGHT
+#	HOLDERS MAKE NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED,
+#	INCLUDING BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY OR
+#	FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE SOFTWARE
+#	OR DOCUMENTATION WILL NOT INFRINGE ANY THIRD PARTY PATENTS,
+#	COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.COPYRIGHT HOLDERS WILL NOT
+#	BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL
+#	DAMAGES ARISING OUT OF ANY USE OF THE SOFTWARE OR DOCUMENTATION.
+#
+#	You should have received a copy of the GNU General Public License
+#	along with this program. If not, see <http://gnu.org/licenses/>.
+
+chdir(dirname(__FILE__));
+
+$dir = dirname(__FILE__);
+
+require_once($dir . '/Init.php');
+
+$params = $argv;
+array_shift($params);
+
+if( !count( $params ) ) dieMsg();
+
+function dieMsg() {
+	$msg = <<<OUT
+
+Peachy CLI Interface
+
+Running a script:
+	
+  To run Scripts/Foobar.php:
+	php peachy run:script Foobar
+	php peachy run:file Scripts/Foobar.php
+	php Scripts/Foobar.php
+	
+  To run /path/to/Foobar.php:
+	php peachy run:file /path/to/Foobar.php
+	php /path/to/foobar.php
+
+  To run Scripts/Foobar.php as a 15 entry trial:
+	php peachy trial-15:script Foobar
+	php peachy trial-15:file Scripts/Foobar.php
+	
+Running unit tests:
+
+  To test Tests/Foobar.php
+	php peachy test:one Foobar
+	php Tests/Foobar.php
+	
+  To test all tests in the Tests/ folder:
+	php peachy test:all
+
+OUT;
+	die($msg);
+}
+
+$run_opts = explode(':', $params[0]);
+
+switch( $run_opts[0] ) {
+
+	case 'run':
+	
+		peachyRunFile();
+		
+	case 'test':
+		switch( @$run_opts[1] ) {
+			case 'all':
+				
+				foreach (glob( $dir . "/Tests/*") as $filename) {
+					include_once( $filename );
+				}
+				
+			case 'one':
+			default:
+				if( !isset( $params[1] ) ) dieMsg();
+				
+				if( file_exists( $params[1] ) ) include_once( $params[1] );
+				
+				require_once( $dir . '/Tests' . $params[1] . '.php' );
+				
+				
+		}
+	default:
+		if( substr( $run_opts[0], 0, 5 ) == "trial" ) {
+			$trial_opts = explode( '-' );
+			
+			if( 
+				( count( $trial_opts ) <= 1 || count( $trial_opts ) > 3 ) ||
+				( !is_numeric( $trial_opts[1] ) ) ) {
+				
+					dieMsg();
+			}
+			else {
+				$pgHooks['StartEdit'][] = array( 'peachy_log_edit', $trial_opts[1] );	
+				
+				peachyRunFile();
+			}
+		}
+		else {
+			dieMsg();
+		}
+}
+
+
+
+
+
+function peachyRunFile() {
+	global $params, $run_opts;
+	
+	if( !isset( $params[1] ) ) dieMsg();
+	
+	$file = basename( $params[1] );
+	
+	if( !isset( $run_opts[1] ) ) {
+		$file_dir = dirname( $params[1] );
+	}
+	else {
+		switch( $run_opts[1] ) {
+			case 'script':
+				$file_dir = $dir . '/Scripts';
+				$file = $params[1] . '.php';
+				break;
+			case 'file':
+			default:
+				$file_dir = dirname( $params[1] );
+		}
+	}
+	
+	require_once( $file_dir . '/' . $file );
+}
+
+
+$peachy_log_edit_count = 0;
+function peachy_log_edit( $count ) {
+	global $peachy_log_edit_count;
+	
+	$peachy_log_edit_count++;
+	
+	if( $peachy_log_edit_count > $count ) exit;
+}
+
+
+
+
+
+
+

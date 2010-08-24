@@ -71,6 +71,13 @@ $pgAutoloader = array(
 	'Script' => 'Script.php',
 	'UtfNormal' => 'Plugins/normalize/UtfNormal.php',
 	'ImageModify' => 'Plugins/image.php',
+	'lime_test' => 'Plugins/lime.php',
+	'lime_output' => 'Plugins/lime.php',
+	'lime_output_color' => 'Plugins/lime.php',
+	'lime_colorizer' => 'Plugins/lime.php',
+	'lime_harness' => 'Plugins/lime.php',
+	'lime_coverage' => 'Plugins/lime.php',
+	'lime_registration' => 'Plugins/lime.php',
 );
 
 require_once( $pgIP . 'Exceptions.php' );

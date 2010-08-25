@@ -370,29 +370,31 @@ function rglob($pattern='*', $flags = 0, $path='') {
  * Echo function with color capabilities.
  * 
  * Syntax:
- * [Text to colorize|NAME] where NAME is the name of a defined style. For example:
+ *
+ * <i>[Text to colorize|NAME] where NAME is the name of a defined style.</i> For example:
  * 
- * This text is standard terminal color. [This text will be yellow.|COMMENT] [This text will be white on red.|ERROR]
+ * <i>This text is standard terminal color. [This text will be yellow.|COMMENT] [This text will be white on red.|ERROR]</i>
  * 
  * Defined styles:
- *   ERROR: White on red, bold
- *   INFO: Green text, bold
- *   PARAMETER: Cyan text
- *   COMMENT: Yellow text
- *   GREEN_BAR: White on green, bold
- *   RED_BAR: White on red, bold
- *   INFO_BAR: Cyan text, bold
- * 
+ * <ul>
+ * <li>ERROR: White on red, bold</li>
+ * <li>INFO: Green text, bold</li>
+ * <li>PARAMETER: Cyan text</li>
+ * <li>COMMENT: Yellow text</li>
+ * <li>GREEN_BAR: White on green, bold</li>
+ * <li>RED_BAR: White on red, bold</li>
+ * <li>INFO_BAR: Cyan text, bold</li>
+ * </ul>
  *
  * You can define your own styles by using this syntax:
  *
- *   lime_colorizer::style('STYLE_NAME', array('bg' => 'red', 'fg' => 'white'));
+ *   <code>lime_colorizer::style('STYLE_NAME', array('bg' => 'red', 'fg' => 'white'));<code>
  *
- * Available colors: black, red, green, yellow, blue, magenta, cyan, white
+ * (Available colors: black, red, green, yellow, blue, magenta, cyan, white)
  * 
- * You can also set options for how the text is formatted:
+ * You can also set options for how the text is formatted (not available on all systems):
  *
- *   lime_colorizer::style('STYLE_NAME', array('bg' => 'red', 'fg' => 'white', 'bold' => true )); (sets bold text)
+ *   <code>lime_colorizer::style('STYLE_NAME', array('bg' => 'red', 'fg' => 'white', 'bold' => true ));</code> (sets bold text)
  *
  * Available options: bold, underscore, blink, reverse, conceal
  *  

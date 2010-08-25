@@ -350,6 +350,15 @@ function __autoload( $class_name ) {
 	
 }
 
+/**
+ * Recursive glob() function.
+ * 
+ * @access public
+ * @param string $pattern. (default: '*')
+ * @param int $flags. (default: 0)
+ * @param string $path. (default: '')
+ * @return void
+ */
 function rglob($pattern='*', $flags = 0, $path='') {
     $paths=glob($path.'*', GLOB_MARK|GLOB_ONLYDIR|GLOB_NOSORT);
     $files=glob($path.$pattern, $flags);
@@ -357,4 +366,47 @@ function rglob($pattern='*', $flags = 0, $path='') {
     return $files;
 }
 
+/**
+ * Echo function with color capabilities.
+ * 
+ * Syntax:
+ * [Text to colorize|NAME] where NAME is the name of a defined style. For example:
+ * 
+ * This text is standard terminal color. [This text will be yellow.|COMMENT] [This text will be white on red.|ERROR]
+ * 
+ * Defined styles:
+ *   ERROR: White on red, bold
+ *   INFO: Green text, bold
+ *   PARAMETER: Cyan text
+ *   COMMENT: Yellow text
+ *   GREEN_BAR: White on green, bold
+ *   RED_BAR: White on red, bold
+ *   INFO_BAR: Cyan text, bold
+ * 
+ *
+ * You can define your own styles by using this syntax:
+ *
+ *   lime_colorizer::style('STYLE_NAME', array('bg' => 'red', 'fg' => 'white'));
+ *
+ * Available colors: black, red, green, yellow, blue, magenta, cyan, white
+ * 
+ * You can also set options for how the text is formatted:
+ *
+ *   lime_colorizer::style('STYLE_NAME', array('bg' => 'red', 'fg' => 'white', 'bold' => true )); (sets bold text)
+ *
+ * Available options: bold, underscore, blink, reverse, conceal
+ *  
+ * 
+ * @access public
+ * @param mixed $text
+ * @return void
+ */
+function cecho( $text ) {
+	global $pgColorizer;
+	
+	if( !isset( $pgColorizer ) ) $pgColorizer = new lime_colorizer( true );
+	
+	echo preg_replace('/\[(.+?)\|(\w+)\]/se', '$pgColorizer->colorize("$1", "$2")', $text);
+	
+}
 

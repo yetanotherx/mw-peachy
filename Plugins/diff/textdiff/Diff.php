@@ -37,7 +37,6 @@ class Text_Diff {
      */
     function Text_Diff($engine, $params)
     {
-    	global $pgIP;
     	
         // Backward compatibility workaround.
         if (!is_string($engine)) {
@@ -51,7 +50,6 @@ class Text_Diff {
             $engine = basename($engine);
         }
 
-        require_once( $pgIP . 'Includes/Diff/textdiff/Diff/Engine/' . $engine . '.php' );
         $class = 'Text_Diff_Engine_' . $engine;
         $diff_engine = new $class();
 

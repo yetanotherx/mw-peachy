@@ -30,8 +30,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @return bool True if $needle is found in $haystack, case insensitive
  * @link http://us3.php.net/in_array
  */
-function iin_array( $needle, $haystack ) {
-	return in_array( strtoupper( $needle ), array_map( 'strtoupper', $haystack ) );
+function iin_array( $needle, $haystack, $strict = false ) {
+	if( is_string( $needle ) ) 
+		return in_array( strtoupper( $needle ), array_map( 'strtoupper', $haystack ), $strict );
+	
+	return in_array( $needle, $haystack, $strict );
 }
 
 /**

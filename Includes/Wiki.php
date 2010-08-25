@@ -522,6 +522,7 @@ class Wiki {
 			
 			Hooks::runHook( 'APIQueryCheckError', array( &$data['error'] ) );
 			if( isset( $data['error'] ) && $errorcheck ) {
+				
 				pecho( "API Error...\n\nCode: {$data['error']['code']}\nText: {$data['error']['info']}\n\n", PECHO_FATAL );
 				return false;
 			}
@@ -550,6 +551,13 @@ class Wiki {
 				$this->base_url,
 				$arrayParams
 			));
+			
+			Hooks::runHook( 'APIQueryCheckError', array( &$data['error'] ) );
+			if( isset( $data['error'] ) && $errorcheck ) {
+				
+				pecho( "API Error...\n\nCode: {$data['error']['code']}\nText: {$data['error']['info']}\n\n", PECHO_FATAL );
+				return false;
+			}
 			
 			if( isset( $data['servedby'] ) ) {
 				$this->servedby = $data['servedby'];

@@ -51,7 +51,7 @@ class Text_Diff {
             $engine = basename($engine);
         }
 
-        require_once( $pgIP . 'Diff/textdiff/Diff/Engine/' . $engine . '.php' );
+        require_once( $pgIP . 'Includes/Diff/textdiff/Diff/Engine/' . $engine . '.php' );
         $class = 'Text_Diff_Engine_' . $engine;
         $diff_engine = new $class();
 

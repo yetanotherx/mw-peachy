@@ -31,73 +31,73 @@ class User {
 	 * Wiki class
 	 * 
 	 * @var Wiki
-	 * @access private
+	 * @access protected
 	 */
-	private $wiki; 
+	protected $wiki; 
 	
 	/**
 	 * Username
 	 * 
 	 * @var string
-	 * @access private
+	 * @access protected
 	 */
-	private $username;
+	protected $username;
 	
 	/**
 	 * Whether or not user exists
 	 * 
 	 * @var bool
-	 * @access private
+	 * @access protected
 	 */
-	private $exists = true;
+	protected $exists = true;
 	
 	/**
 	 * Whether or not user is blocked
 	 * 
 	 * @var bool
-	 * @access private
+	 * @access protected
 	 */
-	private $blocked = false;
+	protected $blocked = false;
 	
 	/**
 	 * Rough estimate as to number of edits
 	 * 
 	 * @var int
-	 * @access private
+	 * @access protected
 	 */
-	private $editcount;
+	protected $editcount;
 	
 	/**
 	 * List of groups user is a member of
 	 * 
 	 * @var array
-	 * @access private
+	 * @access protected
 	 */
-	private $groups;
+	protected $groups;
 	
 	/**
 	 * Whether or not user is an IP
 	 * 
 	 * @var bool
-	 * @access private
+	 * @access protected
 	 */
-	private $ip = false;
+	protected $ip = false;
 	
 	/**
 	 * Whether or not user has email enabled
 	 * 
 	 * @var bool
-	 * @access private
+	 * @access protected
 	 */
-	private $hasemail = false;
+	protected $hasemail = false;
 	
 	/**
 	 * Date the user registered
 	 * 
 	 * @var string
-	 * @access private
+	 * @access protected
 	 */
-	private $registration;
+	protected $registration;
 	
 	/**
 	 * Construction method for the User class
@@ -122,6 +122,11 @@ class User {
 				'lelimit' => 1,
 				'usprop' => 'editcount|groups|blockinfo|emailable|registration'
 		));
+		
+		if( !$uiRes ) {
+			$this->username = $username;
+			$this->exists = false;
+		}
 		
 		$this->username = $uiRes['query']['users'][0]['name'];
 		

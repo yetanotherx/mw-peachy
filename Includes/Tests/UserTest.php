@@ -50,6 +50,13 @@ $last = array_pop($contribs);
 
 $t->cmp_ok( $first['timestamp'], '<', $last['timestamp'], 'get_contribs(false) gets oldest first' );
 
+$contribs = $u1->get_contribs( false, 40 );
+$t->cmp_ok( count($contribs), '<=', 40, 'get_contribs(false,40) returns only 40 values' );
+
+$contribs = $u1->get_contribs();
+$t->cmp_ok( count($contribs), '>', 5000, 'get_contribs() works as expected' );
+
+
 $u2 = new UserTest( $site, 'Example' );
 $t->cmp_ok( $u2->get_editcount(), '>=', 1, 'get_editcount() returns correct values' );
 $t->cmp_ok( count($u2->get_contribs()), '>=', 1, 'get_contribs() returns correct values' );

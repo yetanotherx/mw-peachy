@@ -625,12 +625,7 @@ class Wiki {
 		}
 		
 		$tArray['action'] = 'query';
-		$tArray[$code . 'limit'] = ($this->apiQueryLimit + 1);
-		if($code == 'sr'){
-			$tArray['srlimit'] = intval($tArray['srlimit']) / 10;
-		} elseif($code == 'rn'){
-			$tArray['rnlimit'] = 10 * (1 + intval($this->apiQueryLimit == 4999));
-		}
+		$tArray[$code . 'limit'] = 'max';
 		$retrieved = 0;
 		
 		if( isset($limit) && !is_null($limit) ){
@@ -689,13 +684,10 @@ class Wiki {
 			}
 			
 			if(!is_null($limit)){
-				$retrieved = $retrieved + $tArray[$code . 'limit'];
-				if($retrieved > $limit){
-					if(count($endArray) >= $limit){
-						$endArray = array_slice($endArray,0,$limit);
-					}
-					break;
+				if(count($endArray) >= $limit){
+					$endArray = array_slice($endArray,0,$limit);
 				}
+				break;
 			}
 			
 			if( isset( $tRes['query-continue'] ) ) {

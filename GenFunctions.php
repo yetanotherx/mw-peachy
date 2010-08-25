@@ -388,7 +388,7 @@ function rglob($pattern='*', $flags = 0, $path='') {
  *
  * You can define your own styles by using this syntax:
  *
- *   <code>lime_colorizer::style('STYLE_NAME', array('bg' => 'red', 'fg' => 'white'));<code>
+ *   <code>lime_colorizer::style('STYLE_NAME', array('bg' => 'red', 'fg' => 'white'));</code>
  *
  * (Available colors: black, red, green, yellow, blue, magenta, cyan, white)
  * 

@@ -335,19 +335,57 @@ if ( !function_exists( 'istainted' ) ) {
  * @param string $class_name Plugin name to load
  * @return void
  */
-function __autoload( $class_name ) {
+function peachyAutoload( $class_name ) {
 	global $pgIP, $pgAutoloader;
+	
+	if( isset( $pgAutoloader[$class_name] ) ) {
+		require_once( $pgIP . $pgAutoloader[$class_name] );
+		return;
+	}
 	
 	if( is_file( $pgIP . 'Plugins/' . strtolower( $class_name ) . '.php' ) ) {
 		Hooks::runHook( 'LoadPlugin', array( &$class_name ) );
 				
 		require_once( $pgIP . 'Plugins/' . strtolower( $class_name ) . '.php' );
 	}
-	
-	if( isset( $pgAutoloader[$class_name] ) ) {
-		require_once( $pgIP . $pgAutoloader[$class_name] );
+	else {
+		$version = peachyCheckPHPVersion();
+		if( $version[1] < 2 || ( $version[1] == 2 && $version[2] < 1 ) ) throw new DependancyError( "PHP 5.2.1", "http://php.net/downloads.php" );
+		
+		global $pgHTTP;
+		
+		if( isset( $pgAutoloader[$class_name] ) ) {
+			$file = $pgHTTP->get( 'http://mw-peachy.googlecode.com/svn/trunk/' . $pgAutoloader[$class_name] );
+		}
+		else {
+			$file = $pgHTTP->get( 'http://mw-peachy.googlecode.com/svn/trunk/Plugins/' . strtolower( $class_name ) . '.php' );
+		}
+		
+		if( $pgHTTP->get_HTTP_code() == 200 ) {
+			$temp_file = tempnam(sys_get_temp_dir(), 'peachy');
+			
+			file_put_contents($temp_file, <<<EOF
+$file
+EOF
+      		);
+      		
+      		require_once( $temp_file );
+      		
+      		unlink( $temp_file );
+		}
+		
 	}
 	
+}
+
+if ( function_exists( 'spl_autoload_register' ) ) {
+	spl_autoload_register( 'peachyAutoload' );
+} else {
+	function __autoload( $class ) {
+		peachyAutoload( $class );
+	}
+
+	ini_set( 'unserialize_callback_func', '__autoload' );
 }
 
 /**

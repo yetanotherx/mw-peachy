@@ -116,6 +116,8 @@ abstract class DatabaseBase {
 		$this->mPassword = $password;
 		$this->mDB = $dbname;
 		
+		Hooks::runHook( 'DatabaseConnect', array( &$this->mServer, &$this->mPort, &$this->mUser, &$this->mPassword, &$this->mDB ) );
+		
 		$this->open();
 	}
 	

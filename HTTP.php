@@ -53,6 +53,22 @@ class HTTP {
 	private $echo;
 	
 	/**
+	 * Useragent
+	 * 
+	 * @var mixed
+	 * @access private
+	 */
+	private $user_agent;
+	
+	/**
+	 * Temporary file where cookies are stored
+	 * 
+	 * @var mixed
+	 * @access private
+	 */
+	private $cookie_jar;
+	
+	/**
 	 * Construction method for the HTTP class
 	 * 
 	 * @access public
@@ -69,9 +85,11 @@ class HTTP {
 		$this->echo = $echo;
 		$this->curl_instance = curl_init();
 		$this->cookie_hash = md5( time() . '-' . rand( 0, 999 ) );
+		$this->cookie_jar = sys_get_temp_dir() . 'peachy.cookies.'.$this->cookie_hash.'.dat';
+		$this->user_agent = 'Peachy MediaWiki Bot API Version ' . PEACHYVERSION;
 		
-		curl_setopt($this->curl_instance,CURLOPT_COOKIEJAR,'/tmp/peachy.cookies.'.$this->cookie_hash.'.dat');
-		curl_setopt($this->curl_instance,CURLOPT_COOKIEFILE,'/tmp/peachy.cookies.'.$this->cookie_hash.'.dat');
+		$this->setCookieJar( $this->cookie_jar );
+		
 		curl_setopt($this->curl_instance,CURLOPT_MAXCONNECTS,100);
 		curl_setopt($this->curl_instance,CURLOPT_CLOSEPOLICY,CURLCLOSEPOLICY_LEAST_RECENTLY_USED);
 		curl_setopt($this->curl_instance,CURLOPT_MAXREDIRS,10);
@@ -80,9 +98,23 @@ class HTTP {
 		curl_setopt($this->curl_instance,CURLOPT_RETURNTRANSFER,1);
 		curl_setopt($this->curl_instance,CURLOPT_TIMEOUT,30);
 		curl_setopt($this->curl_instance,CURLOPT_CONNECTTIMEOUT,10);
-		curl_setopt($this->curl_instance,CURLOPT_USERAGENT, $pgUA);
+		
+		$this->setUserAgent( $pgUA );
 
 		##FIXME: Allow for logging in with a saved cookie, to save login time
+	}
+	
+	function setCookieJar( $cookie_file ) {
+		$this->cookie_jar = $cookie_file;
+		
+		curl_setopt($this->curl_instance,CURLOPT_COOKIEJAR, $cookie_file);
+		curl_setopt($this->curl_instance,CURLOPT_COOKIEFILE, $cookie_file);
+	}
+	
+	function setUserAgent( $user_agent = null ) {
+		$this->user_agent = $user_agent;
+		
+		curl_setopt($this->curl_instance,CURLOPT_USERAGENT, $user_agent);
 	}
 	
 	/**
@@ -253,7 +285,7 @@ class HTTP {
 	 */
 	function __destruct () {
 		curl_close($this->curl_instance);
-		@unlink('/tmp/peachy.cookies.'.$this->cookie_hash.'.dat');
+		//@unlink($this->cookie_jar);
 	}
 
 

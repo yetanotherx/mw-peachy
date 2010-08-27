@@ -35,6 +35,11 @@ define( 'PEACHYVERSION', '0.1beta' );
 define( 'MINMW', '1.15' );
 
 /**
+ * Minimum MediaWiki version that is required for Peachy 
+ */
+define( 'MINPHP', '5.2.1' );
+
+/**
  * PECHO constants, used for {@link outputText}()
  */
 define( 'PECHO_VERBOSE', -1 );
@@ -186,6 +191,7 @@ class Peachy {
 		
 		Hooks::runHook( 'StartLogin', array( &$config_params, &$extensions ) );
 		
+		$config_params['encodedparams'] = rawurlencode( serialize( $config_params ) );
 		$w = new Wiki( $config_params, $extensions, false, null );
 		$w->mwversion = $version;
 		
@@ -293,8 +299,18 @@ class Peachy {
  * Simple phpversion() wrapper
  * @return void
  */
-function peachyCheckPHPVersion() {
-	$version = explode( '.', phpversion() );
-	if( $version[0] < 5 ) throw new DependancyError( "PHP 5", "http://php.net/downloads.php" );
+function peachyCheckPHPVersion( $check_version = null ) {
+	if( is_null( $check_version ) ) $check_version = phpversion();
+	
+	$version = explode( '.', $check_version );
+	
+	$min_version = explode( '.', MINPHP );
+	
+	if( 
+		( $version[0] < $min_version[0] ) ||
+		( $version[0] == $min_version[0] && $version[1] < $min_version[1] ) ||
+		( $version[0] == $min_version[0] && $version[1] == $min_version[1] && $version[2] < $min_version[2] )
+	) throw new DependancyError( "PHP " . MINPHP, "http://php.net/downloads.php" );
+	
 	return $version;
 }

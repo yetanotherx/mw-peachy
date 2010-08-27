@@ -2,8 +2,6 @@
 
 require_once(dirname(__FILE__) . '/Init.php' );
 
-$version = peachyCheckPHPVersion();
-if( $version[1] < 2 || ( $version[1] == 2 && $version[2] < 1 ) ) throw new DependancyError( "PHP 5.2.1", "http://php.net/downloads.php" );
 
 if( in_array( 'test:one', $argv ) ) {
 	list( $args, $opts ) = getArgs();

@@ -221,7 +221,7 @@ class Wiki {
 	 * @return void
 	 */
 	function __construct( $configuration, $extensions = array(), $recursed = 0, $token = null ) {
-		global $pgProxy, $pgVerbose, $pgUA;
+		global $pgProxy, $pgVerbose;
 		
 		$this->base_url = $configuration['baseurl'];
 		$this->username = $configuration['username'];
@@ -261,7 +261,19 @@ class Wiki {
 		}
 		
 		if( isset( $configuration['useragent'] ) ) {
-			$pgUA = $configuration['useragent'];
+			$this->http->setUserAgent( $configuration['useragent'] );
+		}
+		
+		$use_cookie_login = false;
+		if( isset( $configuration['cookiejar'] ) ) {
+			$this->http->setCookieJar( $configuration['cookiejar'] );
+		}
+		else {
+			
+			$this->http->setCookieJar( sys_get_temp_dir() . 'PeachyCookieSite' . sha1( $configuration['encodedparams'] ) );
+			
+			$cookieInfo = $this->apiQuery( array( 'action' => 'query', 'meta' => 'userinfo' ) );
+			if( $cookieInfo['query']['userinfo']['id'] != 0 ) $use_cookie_login = true;
 		}
 		
 		if( isset( $configuration['optout'] ) ) {
@@ -339,15 +351,22 @@ class Wiki {
 			return;
 		}
 		
-		Hooks::runHook( 'PreLogin', array( &$lgarray ) );
-		
-		if(!$recursed){
-			pecho( "Logging in to {$this->base_url}...\n\n", PECHO_NOTICE );
+		if( $use_cookie_login ) {
+			pecho( "Logging in to {$this->base_url} as {$this->username}, using a saved login cookie\n\n", PECHO_NORMAL );
+					
+			$this->runSuccess( &$configuration );
 		}
-		
-		$loginRes = $this->apiQuery( $lgarray, true );
-		
-		Hooks::runHook( 'PostLogin', array( &$loginRes ) );
+		elseif( !$this->nologin ) {
+			Hooks::runHook( 'PreLogin', array( &$lgarray ) );
+			
+			if( !$recursed ) {
+				pecho( "Logging in to {$this->base_url}...\n\n", PECHO_NOTICE );
+			}
+			
+			$loginRes = $this->apiQuery( $lgarray, true );
+			
+			Hooks::runHook( 'PostLogin', array( &$loginRes ) );
+		}
 		
 		if( isset( $loginRes['login']['result'] ) ) {
 			switch( $loginRes['login']['result'] ) {
@@ -404,51 +423,48 @@ class Wiki {
 				case 'Success':
 					pecho( "Successfully logged in to {$this->base_url} as {$this->username}\n\n", PECHO_NORMAL );
 					
-					$userInfoRes = $this->apiQuery(
-						array(
-							'action' => 'query',
-							'meta' => 'userinfo',
-							'uiprop' => 'blockinfo|rights|groups'
-						)
-					);
-					
-					if( in_array( 'apihighlimits', $userInfoRes['query']['userinfo']['rights'] ) ) {
-						$this->apiQueryLimit = 4999;
-					}
-					else {
-						$this->apiQueryLimit = 499;
-					}
-					
-					$this->userRights = $userInfoRes['query']['userinfo']['rights'];
-					
-					if( in_array( 'bot', $userInfoRes['query']['userinfo']['groups'] ) ) {
-						$this->isFlagged = true;
-					}
-					
-					$tokens = $this->apiQuery( array(	
-						'action' => 'query',
-						'prop' => "info",
-						'titles' => 'Main Page',
-						'intoken' => 'edit|delete|protect|move|block|unblock|email|import'
-					));
-					
-					if( !isset( $tokens['query']['pages'] ) ) return false;
-					
-					foreach( $tokens['query']['pages'] as $x ) {
-						foreach( $x as $y => $z ) {
-							if( in_string( 'token', $y ) ) {
-								$this->tokens[str_replace('token','',$y)] = $z;
-							}
-						}
-					}
-					
-					$this->configuration = $configuration;
-					unset($this->configuration['password']);
+					$this->runSuccess( &$configuration );
 					
 
 			}
 		}
 		
+	}
+	
+	
+	/**
+	 * runSuccess function.
+	 * 
+	 * @access private
+	 * @param mixed &$configuration
+	 * @return void
+	 */
+	private function runSuccess( &$configuration ) {
+		$userInfoRes = $this->apiQuery(
+			array(
+				'action' => 'query',
+				'meta' => 'userinfo',
+				'uiprop' => 'blockinfo|rights|groups'
+			)
+		);
+		
+		if( in_array( 'apihighlimits', $userInfoRes['query']['userinfo']['rights'] ) ) {
+			$this->apiQueryLimit = 4999;
+		}
+		else {
+			$this->apiQueryLimit = 499;
+		}
+		
+		$this->userRights = $userInfoRes['query']['userinfo']['rights'];
+		
+		if( in_array( 'bot', $userInfoRes['query']['userinfo']['groups'] ) ) {
+			$this->isFlagged = true;
+		}
+		
+		$this->get_tokens();
+		
+		$this->configuration = $configuration;
+		unset($this->configuration['password']);
 	}
 	
 	/**

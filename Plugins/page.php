@@ -262,7 +262,7 @@ class Page {
 		
 		$info = $this->get_metadata( $pageInfoArray );
 		
-		if( isset( $info['redirects'][0] ) ) {
+		if( isset( $info['query']['redirects'][0] ) ) {
 			$this->redirectFollowed = true;
 		}
 

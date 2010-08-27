@@ -613,6 +613,10 @@ class lime_test
   }
 }
 
+/**
+ * lime_output class.
+ * @package lime
+ */
 class lime_output
 {
   public $colorizer = null;
@@ -743,10 +747,20 @@ class lime_output
   }
 }
 
+/**
+ * lime_output_color class.
+ * 
+ * @extends lime_output
+ * @package lime
+ */
 class lime_output_color extends lime_output
 {
 }
 
+/**
+ * lime_colorizer class.
+ * @package lime
+ */
 class lime_colorizer
 {
   static public $styles = array();
@@ -814,6 +828,12 @@ lime_colorizer::style('GREEN_BAR', array('fg' => 'white', 'bg' => 'green', 'bold
 lime_colorizer::style('RED_BAR', array('fg' => 'white', 'bg' => 'red', 'bold' => true));
 lime_colorizer::style('INFO_BAR', array('fg' => 'cyan', 'bold' => true));
 
+/**
+ * lime_harness class.
+ * 
+ * @extends lime_registration
+ * @package lime
+ */
 class lime_harness extends lime_registration
 {
   public $options = array();
@@ -1101,6 +1121,12 @@ EOF
   }
 }
 
+/**
+ * lime_coverage class.
+ * 
+ * @extends lime_registration
+ * @package lime
+ */
 class lime_coverage extends lime_registration
 {
   public $files = array();
@@ -1464,6 +1490,10 @@ EOF;
   }
 }
 
+/**
+ * lime_registration class.
+ * @package lime
+ */
 class lime_registration
 {
   public $files = array();

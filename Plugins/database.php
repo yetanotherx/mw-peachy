@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * DatabaseBase class, specifies the general functions for the Database classes
  * @abstract
+ * @package Database
  */
 abstract class DatabaseBase {
 	
@@ -306,8 +307,7 @@ abstract class DatabaseBase {
 	 */
 	function insert( $table, $values, $options = array(), $select = "INSERT" ) {
 	
-		##FIXME: Make doc for this, the bot won't find it
-		Hooks::runHook( 'DatabaseRun' . ucfirst( strtolower( $select ) ), array( &$table, &$values, &$options, &$select ) );
+		Hooks::runHook( 'DatabaseRunInsert', array( &$table, &$values, &$options, &$select ) );
 		
 		if ( !count( $values ) ) {
 			return true;
@@ -451,7 +451,15 @@ abstract class DatabaseBase {
 	
 }
 
-//Iterator is the built-in PHP class that allows other classes to use foreach(), for(), etc
+/**
+ * ResultWrapper class.
+ * Iterator is the built-in PHP class that allows other classes to use foreach(), for(), etc
+ * 
+ * @implements Iterator
+ * @implements Countable
+ * @implements ArrayAccess
+ * @package Database
+ */
 class ResultWrapper implements Iterator, Countable, ArrayAccess {
 	
 	/**

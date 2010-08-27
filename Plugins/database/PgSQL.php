@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * DatabasePgSQL class, specifies the PostgreSQL-specific functions 
  * @todo Add hooks in here
+ * @package Database
  */
 class DatabasePgSQL extends DatabaseBase {
 

@@ -21,6 +21,7 @@ require_once( $pgIP . 'Plugins/database/MySQL.php' );
 
 /**
  * DatabaseMySQLi class, specifies the MySQLi-specific functions 
+ * @package Database
  */
 class DatabaseMySQLi extends DatabaseMySQL {
 	

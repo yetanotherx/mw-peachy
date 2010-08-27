@@ -221,6 +221,7 @@ function cecho( $text ) {
  * @param string $diff3 New text #2 (if in three-way mode)
  * @return string Generated diff
  * @link http://pear.php.net/package/Text_Diff/redirected
+ * @package Text_Diff
  */
 function getTextDiff($method, $diff1, $diff2, $diff3 = null) {
 	switch ($method) {
@@ -258,6 +259,7 @@ function getTextDiff($method, $diff1, $diff2, $diff3 = null) {
  * Gets the first defined Wiki object
  * 
  * @return Wiki|bool
+ * @package initFunctions
  */
 function &getSiteObject() {
 
@@ -280,6 +282,7 @@ function &getSiteObject() {
  * @param bool $followRedir Should it follow a redirect when retrieving the page (default: true)
  * @param bool $normalize Should the class automatically normalize the title (default: true)
  * @return Page
+ * @package initFunctions
  */
 function &initPage( $title = null, $pageid = null, $followRedir = true, $normalize = true ) {
 	$wiki = getSiteObject();
@@ -294,6 +297,7 @@ function &initPage( $title = null, $pageid = null, $followRedir = true, $normali
  * 
  * @param mixed $username Username
  * @return User
+ * @package initFunctions
  */
 function &initUser( $username ) {
 	$wiki = getSiteObject();
@@ -308,6 +312,7 @@ function &initUser( $username ) {
  * 
  * @param string $filename Filename
  * @return Image
+ * @package initFunctions
  */
 function &initImage( $filename = null ) {
 	
@@ -326,6 +331,7 @@ if ( !function_exists( 'mb_strlen' ) ) {
 	 * @link http://svn.wikimedia.org/svnroot/mediawiki/trunk/phase3/includes/GlobalFunctions.php
 	 * @param string $str String to get
 	 * @return int
+	 * @package Fallback
 	 */
 	function mb_strlen( $str ) {
 		$counts = count_chars( $str );
@@ -349,6 +355,7 @@ if ( !function_exists( 'mb_substr' ) ) {
 	/**
 	 * Fallback implementation for mb_substr. This is VERY slow, from 5x to 100x slower. Use only if necessary.
 	 * @link http://svn.wikimedia.org/svnroot/mediawiki/trunk/phase3/includes/GlobalFunctions.php
+	 * @package Fallback
 	 */
 	function mb_substr( $str, $start, $count = 'end' ) {
 		if( $start != 0 ) {
@@ -364,6 +371,11 @@ if ( !function_exists( 'mb_substr' ) ) {
 		return $str;
 	}
 	
+	/**
+	 * Continuing support for mb_substr. Do not use.
+	 * @link http://svn.wikimedia.org/svnroot/mediawiki/trunk/phase3/includes/GlobalFunctions.php
+	 * @package Fallback
+	 */
 	function mb_substr_split_unicode( $str, $splitPos ) {
 		if( $splitPos == 0 ) {
 			return 0;
@@ -408,9 +420,20 @@ if ( !function_exists( 'mb_substr' ) ) {
 }
 
 if( !function_exists('iconv') ) {
-	# iconv support is not in the default configuration and so may not be present.
-	# Assume will only ever use utf-8 and iso-8859-1.
-	# This will *not* work in all circumstances.
+	/**
+	 * Fallback iconv function.
+	 * 
+	 * iconv support is not in the default configuration and so may not be present.
+	 * Assume will only ever use utf-8 and iso-8859-1.
+	 * This will *not* work in all circumstances.
+	 *
+	 * @access public
+	 * @param mixed $from
+	 * @param mixed $to
+	 * @param mixed $string
+	 * @return void
+	 * @package Fallback
+	 */
 	function iconv( $from, $to, $string ) {
 		if ( substr( $to, -8 ) == '//IGNORE' ) $to = substr( $to, 0, strlen( $to ) - 8 );
 		if(strcasecmp( $from, $to ) == 0) return $string;
@@ -421,14 +444,63 @@ if( !function_exists('iconv') ) {
 }
 
 if ( !function_exists( 'istainted' ) ) {
+	
+	/**
+	 * Fallback istainted function.
+	 * 
+	 * @access public
+	 * @param mixed $var
+	 * @return void
+	 * @package Fallback
+	 */
 	function istainted( $var ) {
 		return 0;
 	}
+	
+	/**
+	 * Fallback taint function.
+	 * 
+	 * @access public
+	 * @param mixed $var
+	 * @param int $level
+	 * @return void
+	 * @package Fallback
+	 */
 	function taint( $var, $level = 0 ) {}
+	
+	/**
+	 * Fallback untaint function.
+	 * 
+	 * @access public
+	 * @param mixed $var
+	 * @param int $level
+	 * @return void
+	 * @package Fallback
+	 */
 	function untaint( $var, $level = 0 ) {}
+	
+	/**
+	 * @package Fallback
+	 */
 	define( 'TC_HTML', 1 );
+	
+	/**
+	 * @package Fallback
+	 */
 	define( 'TC_SHELL', 1 );
+	
+	/**
+	 * @package Fallback
+	 */
 	define( 'TC_MYSQL', 1 );
+	
+	/**
+	 * @package Fallback
+	 */
 	define( 'TC_PCRE', 1 );
+	
+	/**
+	 * @package Fallback
+	 */
 	define( 'TC_SELF', 1 );
 }

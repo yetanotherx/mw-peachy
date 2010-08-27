@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * DatabaseMySQL class, specifies the MySQL-specific functions 
+ * @package Database
  */
 class DatabaseMySQL extends DatabaseBase {
 	

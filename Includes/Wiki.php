@@ -1763,6 +1763,7 @@ class Wiki {
 	 * @param bool $followRedir Should it follow a redirect when retrieving the page (default: true)
 	 * @param bool $normalize Should the class automatically normalize the title (default: true)
 	 * @return Page
+	 * @package initFunctions
 	 */
 	public function &initPage( $title = null, $pageid = null, $followRedir = true, $normalize = true ) {
 		$page = new Page( $this, $title, $pageid, $followRedir, $normalize );
@@ -1775,6 +1776,7 @@ class Wiki {
 	 * @access public
 	 * @param mixed $username Username
 	 * @return User
+	 * @package initFunctions
 	 */
 	public function &initUser( $username ) {
 		$user = new User( $this, $username );
@@ -1789,6 +1791,7 @@ class Wiki {
 	 * @param int $pageid Page ID of image
 	 * @param array $prop Informatation to set. Default array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' )
 	 * @return Image
+	 * @package initFunctions
 	 */
 	public function &initImage( $filename = null, $pageid = null, $prop = array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' ) ) {
 		$image = new Image( $this, $filename, $pageid, $prop );

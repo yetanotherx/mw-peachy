@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * Generic Peachy Error
  * 
- * @package Peachy_Exceptions
+ * @package Exceptions
  */
 class PeachyError extends Exception {
 
@@ -39,7 +39,7 @@ class PeachyError extends Exception {
 /**
  * Generic API Error
  * 
- * @package Peachy_Exceptions
+ * @package Exceptions
  */
 class APIError extends Exception {
 
@@ -53,7 +53,7 @@ class APIError extends Exception {
 /**
  * Error with user permissions
  * 
- * @package Peachy_Exceptions
+ * @package Exceptions
  */
 class PermissionsError extends Exception {
 	public function __construct( $error ) {
@@ -66,7 +66,7 @@ class PermissionsError extends Exception {
 /**
  * Generic cURL Error
  * 
- * @package Peachy_Exceptions
+ * @package Exceptions
  */
 class CURLError extends Exception {
 	private $errno;
@@ -93,7 +93,7 @@ class CURLError extends Exception {
 /**
  * Invalid Title Error
  * 
- * @package Peachy_Exceptions
+ * @package Exceptions
  */
 class BadTitle extends Exception {
 	
@@ -115,7 +115,7 @@ class BadTitle extends Exception {
 /**
  * No Title Error
  * 
- * @package Peachy_Exceptions
+ * @package Exceptions
  */
 class NoTitle extends Exception {
 
@@ -130,7 +130,7 @@ class NoTitle extends Exception {
 /**
  * No User Error
  * 
- * @package Peachy_Exceptions
+ * @package Exceptions
  */
 class NoUser extends Exception {
 
@@ -145,7 +145,7 @@ class NoUser extends Exception {
 /**
  * Blocked User Error
  * 
- * @package Peachy_Exceptions
+ * @package Exceptions
  */
 class UserBlocked extends Exception {
 
@@ -161,7 +161,7 @@ class UserBlocked extends Exception {
 /**
  * Logged Out Error
  * 
- * @package Peachy_Exceptions
+ * @package Exceptions
  */
 class LoggedOut extends Exception {
 
@@ -177,7 +177,7 @@ class LoggedOut extends Exception {
 /**
  * Missing DependencyError Error
  * 
- * @package Peachy_Exceptions
+ * @package Exceptions
  */
 class DependencyError extends Exception {
 
@@ -195,7 +195,7 @@ class DependencyError extends Exception {
 /**
  * Misspelling of "dependency", used for backwards compatibility
  * 
- * @package Peachy_Exceptions
+ * @package Exceptions
  */
 class DependancyError extends DependencyError {
 	public function __construct( $software, $url = false ) {
@@ -206,7 +206,7 @@ class DependancyError extends DependencyError {
 /**
  * Login Error
  * 
- * @package Peachy_Exceptions
+ * @package Exceptions
  */
 class LoginError extends Exception {
 	public function __construct( $error ) {
@@ -219,7 +219,7 @@ class LoginError extends Exception {
 /**
  * Peachy Hook Error
  * 
- * @package Peachy_Exceptions
+ * @package Exceptions
  * @package Peachy_Hooks
  */
 class HookError extends Exception {
@@ -233,7 +233,7 @@ class HookError extends Exception {
 /**
  * Generic Database Error
  * 
- * @package Peachy_Exceptions
+ * @package Exceptions
  * @package Peachy_Database
  */
 class DBError extends Exception {
@@ -247,7 +247,7 @@ class DBError extends Exception {
 /**
  * Generic Edit Error
  * 
- * @package Peachy_Exceptions
+ * @package Exceptions
  */
 class EditError extends Exception {
 	public function __construct( $error, $text ) {
@@ -260,7 +260,7 @@ class EditError extends Exception {
 /**
  * Generic Move Error
  * 
- * @package Peachy_Exceptions
+ * @package Exceptions
  */
 class MoveError extends Exception {
 	public function __construct( $error, $text ) {
@@ -273,7 +273,7 @@ class MoveError extends Exception {
 /**
  * Generic Delete Error
  * 
- * @package Peachy_Exceptions
+ * @package Exceptions
  */
 class DeleteError extends Exception {
 	public function __construct( $error, $text ) {
@@ -286,7 +286,7 @@ class DeleteError extends Exception {
 /**
  * Generic Undelete Error
  * 
- * @package Peachy_Exceptions
+ * @package Exceptions
  */
 class UndeleteError extends Exception {
 	public function __construct( $error, $text ) {
@@ -299,7 +299,7 @@ class UndeleteError extends Exception {
 /**
  * Generic Protect Error
  * 
- * @package Peachy_Exceptions
+ * @package Exceptions
  */
 class ProtectError extends Exception {
 	public function __construct( $error, $text ) {
@@ -312,7 +312,7 @@ class ProtectError extends Exception {
 /**
  * Generic Email Error
  * 
- * @package Peachy_Exceptions
+ * @package Exceptions
  */
 class EmailError extends Exception {
 	public function __construct( $error, $text ) {
@@ -325,7 +325,7 @@ class EmailError extends Exception {
 /**
  * Generic Image Error
  * 
- * @package Peachy_Exceptions
+ * @package Exceptions
  */
 class ImageError extends Exception {
 	public function __construct( $error ) {
@@ -338,7 +338,7 @@ class ImageError extends Exception {
 /**
  * Error for wrong parameters in a function
  * 
- * @package Peachy_Exceptions
+ * @package Exceptions
  */
 class BadEntryError extends Exception {
 	public function __construct( $error, $text ) {
@@ -351,7 +351,7 @@ class BadEntryError extends Exception {
 /**
  * Generic XML Error
  * 
- * @package Peachy_Exceptions
+ * @package Exceptions
  * @package XML
  */
 class XMLError extends Exception {

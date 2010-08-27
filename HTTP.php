@@ -101,7 +101,6 @@ class HTTP {
 		
 		$this->setUserAgent( $pgUA );
 
-		##FIXME: Allow for logging in with a saved cookie, to save login time
 	}
 	
 	function setCookieJar( $cookie_file ) {
@@ -278,7 +277,7 @@ class HTTP {
 	}
 	
 	/**
-	 * Destructor, deleted cookies and closes cURL class
+	 * Destructor, deletes cookies and closes cURL class
 	 * 
 	 * @access public
 	 * @return void

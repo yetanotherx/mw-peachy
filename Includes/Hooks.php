@@ -27,7 +27,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Hooks class
  * Stores and runs {@link http://compwhizii.net/peachy/wiki/Manual/Hooks hooks} 
  * 
- * @package Hooks
  */
 class Hooks {
 
@@ -37,7 +36,6 @@ class Hooks {
 	 * @param string $hook_name Name of hook to search for
 	 * @param array $args Arguments to pass to the hook function
 	 * @return mixed Output of hook function
-	 * @package Hooks
 	 */
 	public static function runHook( $hook_name, $args = array() ) {
 		 global $pgHooks;

@@ -12,7 +12,6 @@
  * 
  * Facilitate the isolation and editing of templates.
  * 
- * @package Pillar
  * @todo Convert this to Peachy standards
  */
 class Template {

@@ -77,6 +77,22 @@ function in_array_recursive( $needle, $haystack, $insensitive = false ) {
 }
 
 /**
+ * Recursive glob() function.
+ * 
+ * @access public
+ * @param string $pattern. (default: '*')
+ * @param int $flags. (default: 0)
+ * @param string $path. (default: '')
+ * @return void
+ */
+function rglob($pattern='*', $flags = 0, $path='') {
+    $paths=glob($path.'*', GLOB_MARK|GLOB_ONLYDIR|GLOB_NOSORT);
+    $files=glob($path.$pattern, $flags);
+    foreach ($paths as $path) { $files=array_merge($files,rglob($pattern, $flags, $path)); }
+    return $files;
+}
+
+/**
  * Detects the presence of a nobots template or one that denies editing by ours
  * 
  * @access public
@@ -147,6 +163,95 @@ function outputText( $text, $cat = 0 ) {
  */
 function pecho( $text, $cat = 0 ) {
 	outputText( $text, $cat );
+}
+
+/**
+ * Echo function with color capabilities.
+ * 
+ * Syntax:
+ *
+ * <i>[Text to colorize|NAME] where NAME is the name of a defined style.</i> For example:
+ * 
+ * <i>This text is standard terminal color. [This text will be yellow.|COMMENT] [This text will be white on red.|ERROR]</i>
+ * 
+ * Defined styles:
+ * <ul>
+ * <li>ERROR: White on red, bold</li>
+ * <li>INFO: Green text, bold</li>
+ * <li>PARAMETER: Cyan text</li>
+ * <li>COMMENT: Yellow text</li>
+ * <li>GREEN_BAR: White on green, bold</li>
+ * <li>RED_BAR: White on red, bold</li>
+ * <li>INFO_BAR: Cyan text, bold</li>
+ * </ul>
+ *
+ * You can define your own styles by using this syntax:
+ *
+ *   <code>lime_colorizer::style('STYLE_NAME', array('bg' => 'red', 'fg' => 'white'));</code>
+ *
+ * (Available colors: black, red, green, yellow, blue, magenta, cyan, white)
+ * 
+ * You can also set options for how the text is formatted (not available on all systems):
+ *
+ *   <code>lime_colorizer::style('STYLE_NAME', array('bg' => 'red', 'fg' => 'white', 'bold' => true ));</code> (sets bold text)
+ *
+ * Available options: bold, underscore, blink, reverse, conceal
+ *  
+ * 
+ * @access public
+ * @param mixed $text
+ * @return void
+ */
+function cecho( $text ) {
+	global $pgColorizer;
+	
+	if( !isset( $pgColorizer ) ) $pgColorizer = new lime_colorizer( true );
+	
+	echo preg_replace('/\[(.+?)\|(\w+)\]/se', '$pgColorizer->colorize("$1", "$2")', $text);
+	
+}
+
+
+/**
+ * Generates a diff between two strings
+ * 
+ * @param string $method Which style of diff to generate: unified, inline (HTML), context, threeway
+ * @param string $diff1 Old text
+ * @param string $diff2 New text
+ * @param string $diff3 New text #2 (if in three-way mode)
+ * @return string Generated diff
+ * @link http://pear.php.net/package/Text_Diff/redirected
+ */
+function getTextDiff($method, $diff1, $diff2, $diff3 = null) {
+	switch ($method) {
+		case 'unified':
+			$diff = new Text_Diff('auto', array(explode("\n",$diff1), explode("\n",$diff2)));
+
+			$renderer = new Text_Diff_Renderer_unified();
+			
+			$diff = $renderer->render($diff);
+			break;
+		case 'inline':
+			$diff = new Text_Diff('auto', array(explode("\n",$diff1), explode("\n",$diff2)));
+
+			$renderer = new Text_Diff_Renderer_inline();
+			
+			$diff = $renderer->render($diff);
+			break;
+		case 'context':
+			$diff = new Text_Diff('auto', array(explode("\n",$diff1), explode("\n",$diff2)));
+
+			$renderer = new Text_Diff_Renderer_context();
+			
+			$diff = $renderer->render($diff);
+			break;
+		case 'threeway':
+			$diff = new Text_Diff3( explode("\n",$diff1), explode("\n",$diff2), explode("\n",$diff3) );
+			$diff = implode( "\n", $diff->mergedOutput() );
+			$rendered = null;
+	}
+	unset($renderer);
+	return $diff;
 }
 
 /**
@@ -326,169 +431,4 @@ if ( !function_exists( 'istainted' ) ) {
 	define( 'TC_MYSQL', 1 );
 	define( 'TC_PCRE', 1 );
 	define( 'TC_SELF', 1 );
-}
-
-
-/**
- * Called when a non-existant class is initiated, loads a plugin if it exists.
- * 
- * @param string $class_name Plugin name to load
- * @return void
- */
-function peachyAutoload( $class_name ) {
-	global $pgIP, $pgAutoloader;
-	
-	if( isset( $pgAutoloader[$class_name] ) ) {
-		require_once( $pgIP . $pgAutoloader[$class_name] );
-		return;
-	}
-	
-	if( is_file( $pgIP . 'Plugins/' . strtolower( $class_name ) . '.php' ) ) {
-		Hooks::runHook( 'LoadPlugin', array( &$class_name ) );
-				
-		require_once( $pgIP . 'Plugins/' . strtolower( $class_name ) . '.php' );
-	}
-	else {
-		$version = peachyCheckPHPVersion();
-		if( $version[1] < 2 || ( $version[1] == 2 && $version[2] < 1 ) ) throw new DependancyError( "PHP 5.2.1", "http://php.net/downloads.php" );
-		
-		global $pgHTTP;
-		
-		if( isset( $pgAutoloader[$class_name] ) ) {
-			$file = $pgHTTP->get( 'http://mw-peachy.googlecode.com/svn/trunk/' . $pgAutoloader[$class_name] );
-		}
-		else {
-			$file = $pgHTTP->get( 'http://mw-peachy.googlecode.com/svn/trunk/Plugins/' . strtolower( $class_name ) . '.php' );
-		}
-		
-		if( $pgHTTP->get_HTTP_code() == 200 ) {
-			$temp_file = tempnam(sys_get_temp_dir(), 'peachy');
-			
-			file_put_contents($temp_file, <<<EOF
-$file
-EOF
-      		);
-      		
-      		require_once( $temp_file );
-      		
-      		unlink( $temp_file );
-		}
-		
-	}
-	
-}
-
-if ( function_exists( 'spl_autoload_register' ) ) {
-	spl_autoload_register( 'peachyAutoload' );
-} else {
-	function __autoload( $class ) {
-		peachyAutoload( $class );
-	}
-
-	ini_set( 'unserialize_callback_func', '__autoload' );
-}
-
-/**
- * Recursive glob() function.
- * 
- * @access public
- * @param string $pattern. (default: '*')
- * @param int $flags. (default: 0)
- * @param string $path. (default: '')
- * @return void
- */
-function rglob($pattern='*', $flags = 0, $path='') {
-    $paths=glob($path.'*', GLOB_MARK|GLOB_ONLYDIR|GLOB_NOSORT);
-    $files=glob($path.$pattern, $flags);
-    foreach ($paths as $path) { $files=array_merge($files,rglob($pattern, $flags, $path)); }
-    return $files;
-}
-
-/**
- * Echo function with color capabilities.
- * 
- * Syntax:
- *
- * <i>[Text to colorize|NAME] where NAME is the name of a defined style.</i> For example:
- * 
- * <i>This text is standard terminal color. [This text will be yellow.|COMMENT] [This text will be white on red.|ERROR]</i>
- * 
- * Defined styles:
- * <ul>
- * <li>ERROR: White on red, bold</li>
- * <li>INFO: Green text, bold</li>
- * <li>PARAMETER: Cyan text</li>
- * <li>COMMENT: Yellow text</li>
- * <li>GREEN_BAR: White on green, bold</li>
- * <li>RED_BAR: White on red, bold</li>
- * <li>INFO_BAR: Cyan text, bold</li>
- * </ul>
- *
- * You can define your own styles by using this syntax:
- *
- *   <code>lime_colorizer::style('STYLE_NAME', array('bg' => 'red', 'fg' => 'white'));</code>
- *
- * (Available colors: black, red, green, yellow, blue, magenta, cyan, white)
- * 
- * You can also set options for how the text is formatted (not available on all systems):
- *
- *   <code>lime_colorizer::style('STYLE_NAME', array('bg' => 'red', 'fg' => 'white', 'bold' => true ));</code> (sets bold text)
- *
- * Available options: bold, underscore, blink, reverse, conceal
- *  
- * 
- * @access public
- * @param mixed $text
- * @return void
- */
-function cecho( $text ) {
-	global $pgColorizer;
-	
-	if( !isset( $pgColorizer ) ) $pgColorizer = new lime_colorizer( true );
-	
-	echo preg_replace('/\[(.+?)\|(\w+)\]/se', '$pgColorizer->colorize("$1", "$2")', $text);
-	
-}
-
-
-/**
- * Generates a diff between two strings
- * 
- * @param string $method Which style of diff to generate: unified, inline (HTML), context, threeway
- * @param string $diff1 Old text
- * @param string $diff2 New text
- * @param string $diff3 New text #2 (if in three-way mode)
- * @return string Generated diff
- * @link http://pear.php.net/package/Text_Diff/redirected
- */
-function getTextDiff($method, $diff1, $diff2, $diff3 = null) {
-	switch ($method) {
-		case 'unified':
-			$diff = new Text_Diff('auto', array(explode("\n",$diff1), explode("\n",$diff2)));
-
-			$renderer = new Text_Diff_Renderer_unified();
-			
-			$diff = $renderer->render($diff);
-			break;
-		case 'inline':
-			$diff = new Text_Diff('auto', array(explode("\n",$diff1), explode("\n",$diff2)));
-
-			$renderer = new Text_Diff_Renderer_inline();
-			
-			$diff = $renderer->render($diff);
-			break;
-		case 'context':
-			$diff = new Text_Diff('auto', array(explode("\n",$diff1), explode("\n",$diff2)));
-
-			$renderer = new Text_Diff_Renderer_context();
-			
-			$diff = $renderer->render($diff);
-			break;
-		case 'threeway':
-			$diff = new Text_Diff3( explode("\n",$diff1), explode("\n",$diff2), explode("\n",$diff3) );
-			$diff = implode( "\n", $diff->mergedOutput() );
-			$rendered = null;
-	}
-	unset($renderer);
-	return $diff;
 }

@@ -71,53 +71,11 @@ define( 'PECHO_FATAL', 4 );
 
 $pgIP = dirname(__FILE__) . '/';
 
-$pgAutoloader = array(
-	'Wiki' => 'Includes/Wiki.php',
-	'Script' => 'Script.php',
-	'UtfNormal' => 'Plugins/normalize/UtfNormal.php',
-	'ImageModify' => 'Plugins/image.php',
-	
-	
-	'lime_test' => 'Plugins/lime.php',
-	'lime_output' => 'Plugins/lime.php',
-	'lime_output_color' => 'Plugins/lime.php',
-	'lime_colorizer' => 'Plugins/lime.php',
-	'lime_harness' => 'Plugins/lime.php',
-	'lime_coverage' => 'Plugins/lime.php',
-	'lime_registration' => 'Plugins/lime.php',
-	
-	
-	'Text_Diff' => 'Plugins/diff/textdiff/Diff.php',
-	'Text_MappedDiff' => 'Plugins/diff/textdiff/Diff.php',
-	'Text_Diff_Op' => 'Plugins/diff/textdiff/Diff.php',
-	'Text_Diff_Op_copy' => 'Plugins/diff/textdiff/Diff.php',
-	'Text_Diff_Op_delete' => 'Plugins/diff/textdiff/Diff.php',
-	'Text_Diff_Op_add' => 'Plugins/diff/textdiff/Diff.php',
-	'Text_Diff_Op_change' => 'Plugins/diff/textdiff/Diff.php',
-	'Text_Diff3' => 'Plugins/diff/textdiff/Diff3.php',
-	'Text_Diff3_Op' => 'Plugins/diff/textdiff/Diff3.php',
-	'Text_Diff3_Op_copy' => 'Plugins/diff/textdiff/Diff3.php',
-	'Text_Diff3_BlockBuilder' => 'Plugins/diff/textdiff/Diff3.php',
-	'Text_Diff_ThreeWay' => 'Plugins/diff/textdiff/Diff/ThreeWay.php',
-	'Text_Diff_ThreeWay_Op' => 'Plugins/diff/textdiff/Diff/ThreeWay.php',
-	'Text_Diff_ThreeWay_Op_copy' => 'Plugins/diff/textdiff/Diff/ThreeWay.php',
-	'Text_Diff_ThreeWay_BlockBuilder' => 'Plugins/diff/textdiff/Diff/ThreeWay.php',
-	'Text_Diff_Renderer' => 'Plugins/diff/textdiff/Diff/Renderer.php',
-	'Text_Diff_Mapped' => 'Plugins/diff/textdiff/Diff/Mapped.php',
-	'Text_Diff_Renderer_unified' => 'Plugins/diff/textdiff/Diff/Renderer/unified.php',
-	'Text_Diff_Renderer_inline' => 'Plugins/diff/textdiff/Diff/Renderer/inline.php',
-	'Text_Diff_Renderer_context' => 'Plugins/diff/textdiff/Diff/Renderer/context.php',
-	'Text_Diff_Engine_xdiff' => 'Plugins/diff/textdiff/Diff/Engine/xdiff.php',
-	'Text_Diff_Engine_string' => 'Plugins/diff/textdiff/Diff/Engine/string.php',
-	'Text_Diff_Engine_shell' => 'Plugins/diff/textdiff/Diff/Engine/shell.php',
-	'Text_Diff_Engine_native' => 'Plugins/diff/textdiff/Diff/Engine/native.php',
-	
-);
-
 require_once( $pgIP . 'Includes/Exceptions.php' );
 
 peachyCheckPHPVersion();
 
+require_once( $pgIP . 'Includes/Autoloader.php' );
 require_once( $pgIP . 'GenFunctions.php' );
 require_once( $pgIP . 'Includes/Hooks.php' );
 require_once( $pgIP . 'HTTP.php' );

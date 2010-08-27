@@ -118,7 +118,12 @@ class Script {
 	protected function parseArgs( $args ) {
 		foreach( $args as $arg ) {
 			$tmp = explode( ':', $arg, 2 );
+			
+			if( $tmp[1] == '"' && substr( $tmp[1], -1 ) == '"' ) $tmp[1] = substr( $tmp[1], 1, strlen( $tmp[1] ) - 2 );
+			
 			if( $arg[0] == "-" ) $this->args[ substr( $tmp[0], 1 ) ] = $tmp[1];
+			if( substr( $arg, 0, 2 ) == '--' ) $this->args[ substr( $tmp[0], 2 ) ] = $tmp[1];
+			
 		}
 	}
 	
@@ -142,6 +147,7 @@ class Script {
 	 * 
 	 * @access protected
 	 * @return void
+	 * @todo XML parsing needs to be improved
 	 */
 	protected function makeList() {
 		if( isset( $this->args['xml'] ) ) {

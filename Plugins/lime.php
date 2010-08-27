@@ -392,7 +392,19 @@ class lime_test
 		$message
 	);
   }
-
+  
+  /**
+   * Sortcut for {@link is}(), performs a strict check.
+   * 
+   * @access public
+   * @param mixed $exp1
+   * @param mixed $exp2
+   * @param string $message. (default: '')
+   * @return void
+   */
+  public function is_strict($exp1, $exp2, $message = '') {		
+	return $this->cmp_ok( $exp1, '===', $exp2, $message );
+  }
 
   /**
    * Always passes--useful for testing exceptions

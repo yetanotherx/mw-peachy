@@ -60,6 +60,16 @@ class User {
 	protected $blocked = false;
 	
 	/**
+	 * Array of block parameters
+	 * 
+	 * (default value: array())
+	 * 
+	 * @var array
+	 * @access protected
+	 */
+	protected $blockinfo = array();
+	
+	/**
 	 * Rough estimate as to number of edits
 	 * 
 	 * @var int
@@ -136,6 +146,10 @@ class User {
 			
 			if( isset( $uiRes['query']['logevents'][0]['block']['expiry'] ) && strtotime( $uiRes['query']['logevents'][0]['block']['expiry'] ) > time() ) {
 				$this->blocked = true;
+				$this->blockinfo = array(
+					'by' => $uiRes['query']['logevents'][0]['user'],
+					'reason' => $uiRes['query']['logevents'][0]['comment'],
+				);
 			}
 		}
 		elseif( isset( $uiRes['query']['users'][0]['missing'] ) || isset( $uiRes['query']['users'][0]['invalid'] ) ) {
@@ -150,6 +164,10 @@ class User {
 			
 			if( isset( $uiRes['query']['users'][0]['blockedby'] ) ) 
 				$this->blocked = true;
+				$this->blockinfo = array(
+					'by' => $uiRes['query']['users'][0]['blockedby'],
+					'reason' => $uiRes['query']['users'][0]['blockreason'],
+				);
 			
 			if( isset( $uiRes['query']['users'][0]['emailable'] ) ) 
 				$this->hasemail = true;
@@ -174,17 +192,19 @@ class User {
 		
 		pecho( "Checking if {$this->username} is blocked...\n\n", PECHO_NORMAL );
 		
-		$biRes = $this->wiki->apiQuery( array(
-				'action' => 'query',
-				'list' => 'blocks',
-				'bkusers' => $this->username,
-				'bkprop' => 'id'
-		));
+		$this->__construct( $this->wiki, $this->username );
 		
-		if( count( $biRes['query']['blocks'] ) > 0 ) 
-			return true;
-			
-		return false;
+		return $this->blocked;
+	}
+	
+	/**
+	 * get_blockinfo function.
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function get_blockinfo() {
+		return $this->blockinfo;
 	}
 	
 	/**
@@ -201,7 +221,12 @@ class User {
 		$token = $this->wiki->get_tokens();
 		
 		if( !in_array( 'block', $this->wiki->get_userrights() ) ) {
-			pecho( "User is not allowed to block users", PECHO_FATAL );
+			pecho( "User is not allowed to block users.\n\n", PECHO_FATAL );
+			return false;
+		}
+		
+		if( !$this->exists() ) {
+			pecho( "User does not exist.\n\n", PECHO_FATAL );
 			return false;
 		}
 		
@@ -472,7 +497,7 @@ class User {
 		}
 		elseif( isset( $result['emailuser'] ) ) {
 			if( $result['emailuser']['result'] == "Success" ) {
-				$this->__construct( $this->wiki, $this->title );
+				$this->__construct( $this->wiki, $this->username );
 				return true;
 			}
 			else {

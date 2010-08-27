@@ -52,11 +52,11 @@ ksort( $hooks );
 print_r($hooks);
 
 foreach( $hooks as $hook => $args ) {
-	$page = $x->initPage( "Manual/Hooks/$hook" );
+	$page = $x->initPage( "Hook:$hook" );
 	
 	if( $page->exists() ) continue;
 	
-	$output = '{{PeachyHook|name='.$hook.'|version='/*PEACHYVERSION*/.'0.1alpha'.'|args='.$args['args'].'|source='.$args['file'].'|summary=}}
+	$output = '{{PeachyHook|name='.$hook.'|version='/*PEACHYVERSION*/.'1.0'.'|args='.$args['args'].'|source='.$args['file'].'|summary=}}
 
 == Details ==
 
@@ -70,7 +70,7 @@ foreach( $hooks as $hook => $args ) {
 	$page->edit( $output );
 }
 
-$newpage = $x->initPage( "Manual/Hooks/Table" );
+$newpage = $x->initPage( "Hook:Table" );
 
 $new = '{| class="wikitable" width="100%" style="text-align: center;"
 ! Hook name !! Filename !! Version !! Description
@@ -78,7 +78,7 @@ $new = '{| class="wikitable" width="100%" style="text-align: center;"
 
 foreach( $hooks as $hook => $args ) {
 $new .= '
-| [[Manual/Hooks/'.$hook.'|'.$hook.']] || '. $args['file'].' || '/*PEACHYVERSION*/.'0.1alpha'.' || 
+| [[Hook:'.$hook.'|'.$hook.']] || '. $args['file'].' || '/*PEACHYVERSION*/.'0.1alpha'.' || 
 |-';
 }
 

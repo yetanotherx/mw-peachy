@@ -8,7 +8,7 @@ class UserTest extends User {
 
 $t = new lime_test();
 
-$site = Peachy::newWiki( null, null, null, 'http://en.wikipedia.org/w/api.php' );
+$site = Peachy::newWiki( 'Tests/enwikitest' );
 
 $u1 = $site->initUser( 'Jimbo Wales' );
 $u2 = initUser( 'Jimbo Wales' );
@@ -70,8 +70,22 @@ $t->cmp_ok( strtotime($u2->get_registration()), '<', strtotime('01-01-2007'), 'g
 
 $t->is( serialize($u2->getPageClass()), serialize(initPage('User:X!')), 'getPageClass() works correctly' );
 
+$site2 = Peachy::newWiki( 'Tests/compwhiziitest' );
+$site2_u = $site2->initUser( 'UserTestAccount' );
 
+$t->info('4 - User action functions' );
 
+$t->is_strict( $site2_u->block(), true, 'block() returns true' );
+sleep(5);
+$t->is( $site2_u->is_blocked(), true, 'is_blocked() returns true' );
+$t->is_strict( $site2_u->unblock(), true, 'unblock() works as default' );
+sleep(5);
+$t->is( $site2_u->is_blocked(), false, 'is_blocked() returns false' );
 
+$site2_u->block( "Because I can" );
+sleep(5);
+$blockinfo = $site2_u->get_blockinfo();
 
+$t->is( $blockinfo['reason'], "Because I can", 'get_blockinfo() works as expected' );
+$site2_u->unblock( "Because I can't" );
 

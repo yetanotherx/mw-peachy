@@ -6,6 +6,11 @@ $pgAutoloader = array(
 	'UtfNormal' => 'Plugins/normalize/UtfNormal.php',
 	'ImageModify' => 'Plugins/image.php',
 	
+	'DatabaseMySQL' => 'Plugins/database/DatabaseMySQL.php',
+	'DatabaseMySQLi' => 'Plugins/database/DatabaseMySQLi.php',
+	'DatabasePgSQL' => 'Plugins/database/DatabasePgSQL.php',
+	'DatabaseBase' => 'Plugins/database.php',
+	'ResultWrapper' => 'Plugins/database.php',
 	
 	'lime_test' => 'Plugins/lime.php',
 	'lime_output' => 'Plugins/lime.php',

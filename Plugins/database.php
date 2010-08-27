@@ -780,22 +780,18 @@ class Database {
 		
 		switch( $this->type ) {
 			case 'mysqli':
-				require_once( $pgIP . 'Plugins/database/MySQLi.php' );
 				$this->object = new DatabaseMySQLi( $this->server, $this->port, $this->user, $this->password, $this->db );
 				return $this->object;
 				break;
 			case 'mysql':
-				require_once( $pgIP . 'Plugins/database/MySQL.php' );
 				$this->object = new DatabaseMySQL( $this->server, $this->port, $this->user, $this->password, $this->db );
 				return $this->object;
 				break;
 			case 'pgsql':
-				require_once( $pgIP . 'Plugins/database/PgSQL.php' );
 				$this->object = new DatabasePgSQL( $this->server, $this->port, $this->user, $this->password, $this->db );
 				return $this->object;
 				break;
 			default:
-				require_once( $pgIP . 'Plugins/database/MySQLi.php' );
 				$this->object = new DatabaseMySQLi( $this->server, $this->port, $this->user, $this->password, $this->db );
 				return $this->object;
 				break;

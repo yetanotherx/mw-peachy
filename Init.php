@@ -35,7 +35,7 @@ define( 'PEACHYVERSION', '0.1beta' );
 define( 'MINMW', '1.15' );
 
 /**
- * Minimum MediaWiki version that is required for Peachy 
+ * Minimum PHP version that is required for Peachy 
  */
 define( 'MINPHP', '5.2.1' );
 

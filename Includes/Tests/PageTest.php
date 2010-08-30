@@ -53,6 +53,11 @@ $p4 = new PageTest( $site, 'Barack Obama' );
 $t->is( count($p4->history()), 1, 'history() correctly gets 1 revision' );
 $t->cmp_ok( count($p4->history( null )), '>', 5000, 'history(null) correctly gets multiple pages' );
 
+$t->info( '5 - Checking for special compatibility' );
+
+$p4 = new PageTest( $site, 'A&W' );
+
+$t->is( $p4->get_exists(), true, 'initPage() works with ampersands' );
 
 
 

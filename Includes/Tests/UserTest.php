@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(dirname(dirname(__FILE__))).'/Plugins/lime.php';
+require_once dirname(dirname(dirname(__FILE__))).'/Includes/lime.php';
 
 class UserTest extends User {
 	function getParam($param) { return $this->$param; }

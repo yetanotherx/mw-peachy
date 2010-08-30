@@ -1,5 +1,5 @@
 <?php
-require_once dirname(dirname(dirname(__FILE__))).'/Plugins/lime.php';
+require_once dirname(dirname(dirname(__FILE__))).'/Includes/lime.php';
 
 class PageTest extends Page {
 	function getParam($param) { return $this->$param; }

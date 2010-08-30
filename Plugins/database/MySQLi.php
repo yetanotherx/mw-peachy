@@ -17,8 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-require_once( $pgIP . 'Plugins/database/MySQL.php' );
-
 /**
  * DatabaseMySQLi class, specifies the MySQLi-specific functions 
  * @package Database

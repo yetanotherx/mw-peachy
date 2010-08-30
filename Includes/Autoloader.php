@@ -19,6 +19,10 @@ $pgAutoloader = array(
 	'lime_coverage' => 'Includes/lime.php',
 	'lime_registration' => 'Includes/lime.php',
 	
+	'sfYaml' => 'Plugins/yaml/sfYaml.php',
+	'sfYamlDumper' => 'Plugins/yaml/sfYamlDumper.php',
+	'sfYamlInline' => 'Plugins/yaml/sfYamlInline.php',
+	'sfYamlParser' => 'Plugins/yaml/sfYamlParser.php',
 	
 	'Text_Diff' => 'Plugins/diff/textdiff/Diff.php',
 	'Text_MappedDiff' => 'Plugins/diff/textdiff/Diff.php',

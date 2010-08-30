@@ -30,7 +30,12 @@ if( $script->getArg( 'reason' ) ) {
 	$reason = $script->getArg( 'reason' );
 }
 
-$output = $wiki->initPage( 'User:X!/SPI' );
+$page = 'User:X!/SPI';
+if( $script->getArg( 'page' ) ) {
+	$page = $script->getArg( 'page' );
+}
+
+$output = $wiki->initPage( $page );
 if( $script->getArg( 'output' ) ) {
 	$output = $wiki->initPage( $script->getArg( 'output' ) );
 }

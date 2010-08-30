@@ -89,3 +89,5 @@ $blockinfo = $site2_u->get_blockinfo();
 $t->is( $blockinfo['reason'], "Because I can", 'get_blockinfo() works as expected' );
 $site2_u->unblock( "Because I can't" );
 
+$t->is_strict( $site2_u->userrights( array( 'sysop' ), array(), 'Because I can' ), true, 'userrights() returns true' );
+$t->is_strict( $site2_u->userrights( array(), array( 'sysop' ), 'Because I can' ), true, 'userrights() returns true' );

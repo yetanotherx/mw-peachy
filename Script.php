@@ -199,6 +199,19 @@ class Script {
 	}
 	
 	/**
+	 * Returns the page specified in the --page param, or false if not specified.
+	 * 
+	 * @access public
+	 * @return string|bool
+	 */
+	public function getPage() {
+		if( $this->getArg( 'page' ) ) {
+			return $this->getArg( 'page' );
+		}
+		return false;
+	}
+	
+	/**
 	 * Returns the wiki class specified in the constructor
 	 * 
 	 * @access public

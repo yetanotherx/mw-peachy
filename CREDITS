@@ -29,3 +29,5 @@ following names for their contribution to the product.
 *test.php inspiration: Symfony Project <http://symfony-project.com>
 *Recursive glob() function: http://www.php.net/manual/en/function.glob.php#87221
 *Colorizer: Symfony Project <http://symfony-project.com>
+*mb_unserialize function: TheMariner <http://www.php.net/manual/en/function.unserialize.php#84730>
+*SVN Info function: MediaWiki <http://mediawiki.org>

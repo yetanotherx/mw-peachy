@@ -403,7 +403,39 @@ class lime_test
    * @return void
    */
   public function is_strict($exp1, $exp2, $message = '') {		
-	return $this->cmp_ok( $exp1, '===', $exp2, $message );
+	if (is_float($exp1) && is_float($exp2))
+    {
+      $value = abs($exp1 - $exp2) < self::EPSILON;
+    }
+    else
+    {
+      $value = $exp1 === $exp2;
+    }
+
+    if (!$result = $this->ok($value, $message))
+    {
+      $this->set_last_test_errors(array(sprintf("           got: (%s) %s", gettype($exp1), var_export($exp1, true)), sprintf("      expected: (%s) %s", gettype($exp2), var_export($exp2, true))));
+    }
+
+    return $result;
+  }
+  
+  /**
+   * Sortcut for {@link isnt}(), performs a strict check.
+   * 
+   * @access public
+   * @param mixed $exp1
+   * @param mixed $exp2
+   * @param string $message. (default: '')
+   * @return void
+   */
+  public function isnt_strict($exp1, $exp2, $message = '') {		
+	if (!$result = $this->ok($exp1 !== $exp2, $message))
+    {
+      $this->set_last_test_errors(array(sprintf("      (%s) %s", gettype($exp1), var_export($exp1, true)), '          ne', sprintf("      (%s) %s", gettype( $exp2), var_export($exp2, true))));
+    }
+
+    return $result;
   }
 
   /**
@@ -826,6 +858,7 @@ lime_colorizer::style('COMMENT', array('fg' => 'yellow'));
 
 lime_colorizer::style('GREEN_BAR', array('fg' => 'white', 'bg' => 'green', 'bold' => true));
 lime_colorizer::style('RED_BAR', array('fg' => 'white', 'bg' => 'red', 'bold' => true));
+lime_colorizer::style('YELLOW_BAR', array('fg' => 'black', 'bg' => 'yellow', 'bold' => true));
 lime_colorizer::style('INFO_BAR', array('fg' => 'cyan', 'bold' => true));
 
 /**

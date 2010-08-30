@@ -31,10 +31,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @link http://us3.php.net/in_array
  */
 function iin_array( $needle, $haystack, $strict = false ) {
-	if( is_string( $needle ) ) 
-		return in_array( strtoupper( $needle ), array_map( 'strtoupper', $haystack ), $strict );
-	
-	return in_array( $needle, $haystack, $strict );
+	return in_array_recursive( strtoupper_safe( $needle ), array_map( 'strtoupper_safe', $haystack ), $strict );
+}
+
+function strtoupper_safe( $str ) {
+	if( is_string( $str ) ) return strtoupper($str);
+	if( is_array( $str ) ) $str = array_map( 'strtoupper_safe', $str );
+	return $str;
 }
 
 /**
@@ -111,8 +114,8 @@ function checkExclusion( &$wiki, $text = '', $username = null, $optout = null ) 
 	if( preg_match( '/\{\{bots\s*\|\s*allow\s*=\s*(.*?)\s*\}\}/i', $text, $allow ) ) {
 		if( $allow[1] == "all" ) return false;
 		if( $allow[1] == "none" ) return true;
-		$allow = explode(',', $allow[1]);
-		if( !is_null($username) && in_array( $username, $allow ) ) {
+		$allow = array_map( 'trim', explode(',', $allow[1]) );
+		if( !is_null($username) && in_array( trim($username), $allow ) ) {
 			return false;
 		}
 		return true;
@@ -121,8 +124,8 @@ function checkExclusion( &$wiki, $text = '', $username = null, $optout = null ) 
 	if( preg_match( '/\{\{bots\s*\|\s*deny\s*=\s*(.*?)\s*\}\}/i', $text, $deny ) ) {
 		if( $deny[1] == "all" ) return true;
 		if( $deny[1] == "none" ) return false;
-		$deny = explode(',', $deny[1]);
-		if( !is_null($username) && in_array( $username, $deny ) ) {
+		$allow = array_map( 'trim', explode(',', $deny[1]) );
+		if( !is_null($username) && in_array( trim($username), $allow ) ) {
 			return true;
 		}
 		return false;
@@ -130,8 +133,8 @@ function checkExclusion( &$wiki, $text = '', $username = null, $optout = null ) 
 	
 	if( !is_null( $optout ) && preg_match( '/\{\{bots\s*\|\s*optout\s*=\s*(.*?)\s*\}\}/i', $text, $allow ) ) {
 		if( $allow[1] == "all" ) return true;
-		$allow = explode(',', $allow[1]);
-		if( in_array( $optout, $allow ) ) {
+		$allow = array_map( 'trim', explode(',', $allow[1]) );
+		if( in_array( trim($optout), $allow ) ) {
 			return true;
 		}
 		return false;
@@ -145,12 +148,19 @@ function checkExclusion( &$wiki, $text = '', $username = null, $optout = null ) 
  * @param int $cat Category of text, such as PECHO_WARN, PECHO_NORMAL
  * @return void
  */
-function outputText( $text, $cat = 0 ) {
+function outputText( $text, $cat = 0, $func = 'echo' ) {
 	global $pgVerbose;
 	
-	Hooks::runHook( 'OutputText', array( &$text, &$cat ) );
+	Hooks::runHook( 'OutputText', array( &$text, &$cat, &$func ) );
 	
-	if( in_array( $cat, $pgVerbose ) ) echo $text;
+	if( in_array( $cat, $pgVerbose ) ) {
+		if( $func == 'echo' ) {
+			echo $text;
+		}
+		else {
+			$func($text);
+		}
+	}
 }
 
 /**
@@ -161,8 +171,8 @@ function outputText( $text, $cat = 0 ) {
  * @link outputText
  * @return void
  */
-function pecho( $text, $cat = 0 ) {
-	outputText( $text, $cat );
+function pecho( $text, $cat = 0, $func = 'echo' ) {
+	outputText( $text, $cat, $func );
 }
 
 /**
@@ -182,6 +192,7 @@ function pecho( $text, $cat = 0 ) {
  * <li>COMMENT: Yellow text</li>
  * <li>GREEN_BAR: White on green, bold</li>
  * <li>RED_BAR: White on red, bold</li>
+ * <li>YELLOW_BAR: Black on yellow, bold</li>
  * <li>INFO_BAR: Cyan text, bold</li>
  * </ul>
  *
@@ -202,12 +213,16 @@ function pecho( $text, $cat = 0 ) {
  * @param mixed $text
  * @return void
  */
-function cecho( $text ) {
+function cecho( $text, $return = false ) {
 	global $pgColorizer;
 	
 	if( !isset( $pgColorizer ) ) $pgColorizer = new lime_colorizer( true );
 	
-	echo preg_replace('/\[(.+?)\|(\w+)\]/se', '$pgColorizer->colorize("$1", "$2")', $text);
+	$text = preg_replace('/\[(.+?)\|(\w+)\]/se', '$pgColorizer->colorize("$1", "$2")', $text);
+	
+	if( $return ) return $text;
+	
+	echo $text;
 	
 }
 
@@ -215,44 +230,12 @@ function cecho( $text ) {
 /**
  * Generates a diff between two strings
  * 
- * @param string $method Which style of diff to generate: unified, inline (HTML), context, threeway
- * @param string $diff1 Old text
- * @param string $diff2 New text
- * @param string $diff3 New text #2 (if in three-way mode)
- * @return string Generated diff
- * @link http://pear.php.net/package/Text_Diff/redirected
  * @package Text_Diff
+ * @deprecated
  */
-function getTextDiff($method, $diff1, $diff2, $diff3 = null) {
-	switch ($method) {
-		case 'unified':
-			$diff = new Text_Diff('auto', array(explode("\n",$diff1), explode("\n",$diff2)));
-
-			$renderer = new Text_Diff_Renderer_unified();
-			
-			$diff = $renderer->render($diff);
-			break;
-		case 'inline':
-			$diff = new Text_Diff('auto', array(explode("\n",$diff1), explode("\n",$diff2)));
-
-			$renderer = new Text_Diff_Renderer_inline();
-			
-			$diff = $renderer->render($diff);
-			break;
-		case 'context':
-			$diff = new Text_Diff('auto', array(explode("\n",$diff1), explode("\n",$diff2)));
-
-			$renderer = new Text_Diff_Renderer_context();
-			
-			$diff = $renderer->render($diff);
-			break;
-		case 'threeway':
-			$diff = new Text_Diff3( explode("\n",$diff1), explode("\n",$diff2), explode("\n",$diff3) );
-			$diff = implode( "\n", $diff->mergedOutput() );
-			$rendered = null;
-	}
-	unset($renderer);
-	return $diff;
+function getTextDiff() {
+	Peachy::deprecatedWarn( 'getTextDiff()', 'Diff::load()' );
+	return call_user_func_array( array('Diff', 'load'), func_get_args());
 }
 
 /**

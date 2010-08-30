@@ -4,11 +4,10 @@ $pgAutoloader = array(
 	'Wiki' => 'Includes/Wiki.php',
 	'Script' => 'Script.php',
 	'UtfNormal' => 'Plugins/normalize/UtfNormal.php',
-	'ImageModify' => 'Plugins/image.php',
 	
-	'DatabaseMySQL' => 'Plugins/database/DatabaseMySQL.php',
-	'DatabaseMySQLi' => 'Plugins/database/DatabaseMySQLi.php',
-	'DatabasePgSQL' => 'Plugins/database/DatabasePgSQL.php',
+	'DatabaseMySQL' => 'Plugins/database/MySQL.php',
+	'DatabaseMySQLi' => 'Plugins/database/MySQLi.php',
+	'DatabasePgSQL' => 'Plugins/database/PgSQL.php',
 	'DatabaseBase' => 'Plugins/database.php',
 	'ResultWrapper' => 'Plugins/database.php',
 	
@@ -76,11 +75,23 @@ class AutoLoader {
 			
 			global $pgHTTP;
 			
-			if( isset( $pgAutoloader[$class_name] ) ) {
-				$file = $pgHTTP->get( 'http://mw-peachy.googlecode.com/svn/trunk/' . $pgAutoloader[$class_name] );
+			$trunk_url = 'http://mw-peachy.googlecode.com/svn/trunk';
+			
+			$svninfo = Peachy::getSvnInfo();
+			
+			if( isset( $svninfo['url'] ) ) {
+				$trunk_url = $svninfo['url'];
 			}
 			else {
-				$file = $pgHTTP->get( 'http://mw-peachy.googlecode.com/svn/trunk/Plugins/' . strtolower( $class_name ) . '.php' );
+				$trunk_url = 'http://mw-peachy.googlecode.com/svn/branches/REL' . strtoupper( str_replace( '.', '_', PEACHYVERSION ) );
+			}
+			
+			if( isset( $pgAutoloader[$class_name] ) ) {
+				$file = $pgHTTP->get( $trunk_url . '/' . $pgAutoloader[$class_name] );
+			}
+			else {
+				$file = $pgHTTP->get( $trunk_url . '/Plugins/' . strtolower( $class_name ) . '.php' );
+				Hooks::runHook( 'LoadPlugin', array( &$class_name ) );
 			}
 			
 			if( $pgHTTP->get_HTTP_code() == 200 ) {

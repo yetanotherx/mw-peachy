@@ -65,7 +65,7 @@ class Xml {
 				$out .= " {$name}=\"" . self::encodeAttribute( $val ) . '"';
 			return $out;
 		} else {
-			throw new MWException( 'Expected attribute array, got something else in ' . __METHOD__ );
+			throw new Exception( 'Expected attribute array, got something else in ' . __METHOD__ );
 		}
 	}
 
@@ -85,9 +85,7 @@ class Xml {
 			$attribs = array_map( array( 'UtfNormal', 'cleanUp' ), $attribs );
 		}
 		if( $contents ) {
-			wfProfileIn( __METHOD__ . '-norm' );
 			$contents = WebRequest::normalize_static( $contents );
-			wfProfileOut( __METHOD__ . '-norm' );
 		}
 		return self::element( $element, $attribs, $contents );
 	}
@@ -292,9 +290,10 @@ class Xml {
 
 	/**
 	 * @deprecated Synonymous to Html::hidden()
+	 * @todo This is broken
 	 */
 	public static function hidden( $name, $value, $attribs = array() ) {
-		return Xml::hidden( $name, $value, $attribs );
+		//return Xml::hidden( $name, $value, $attribs );
 	}
 
 	/**

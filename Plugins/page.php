@@ -298,12 +298,11 @@ class Page {
 		
 		if( $rollback_token ) $historyArray['rvtoken'] = 'rollback';
 		
-		pecho( "Getting page history for {$this->title}..\n\n", PECHO_NORMAL );
+		if( !$recurse ) pecho( "Getting page history for {$this->title}..\n\n", PECHO_NORMAL );
 		
 		if( is_null( $count ) ) {
 			$history = $ei = $this->history( $this->wiki->get_api_limit() + 1, $dir, $content, $revid, $rollback_token, true );
-
-			while( isset( $ei[0][ $this->wiki->get_api_limit() ] ) ) {
+			while( !is_null( $ei[1] ) ) {
 				$ei = $this->history( $this->wiki->get_api_limit() + 1, $dir, $content, $ei[1], $rollback_token, true );
 				foreach( $ei[0] as $eg ) {
 					$history[0][] = $eg;
@@ -434,6 +433,7 @@ class Page {
 	 * @deprecated
 	 */
 	public function exists() {
+		Peachy::deprecatedWarn( 'Page::exists()', 'Page::get_exists()' );
 		return $this->exists;
 	}
 	
@@ -1260,9 +1260,10 @@ class Page {
 	 * Alias of embeddedin
 	 * 
 	 * @see Page::embeddedin()
+	 * @deprecated
 	 */
 	public function get_transclusions( $namespace = null, $limit = null ) {	
-		pecho( "Warning: Page::get_transclusions() is deprecated. Please use Page::embeddedin() instead.\n\n", PECHO_WARN );
+		Peachy::deprecatedWarn( 'Page::get_transclusions()', 'Page::embeddedin()' );
 		return $this->embeddedin($namespace, $limit);
 		
     }
@@ -1425,11 +1426,6 @@ class Page {
 			'prop' => "info"
 		);
 		
-		if( isset( $pageInfoRes['warnings']['query']['*'] ) && in_string( 'special pages', $pageInfoRes['warnings']['query']['*'] ) ) {
-			pecho( "Special pages are not currently supported by the API.\n\n", PECHO_ERROR );
-			$this->exists = false;
-		}
-		
 		if( $pageInfoArray2 != null ) {
 			$pageInfoArray = array_merge($pageInfoArray, $pageInfoArray2);
 		} else {
@@ -1437,6 +1433,12 @@ class Page {
 		}
 		
 		$pageInfoRes = $this->wiki->apiQuery($pageInfoArray);
+		
+		if( isset( $pageInfoRes['warnings']['query']['*'] ) && in_string( 'special pages', $pageInfoRes['warnings']['query']['*'] ) ) {
+			pecho( "Special pages are not currently supported by the API.\n\n", PECHO_ERROR );
+			$this->exists = false;
+			$this->special = true;
+		}
 		
 		foreach( $pageInfoRes['query']['pages'] as $key => $info ) {
 			$this->pageid = $key;

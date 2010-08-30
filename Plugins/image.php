@@ -176,7 +176,7 @@ class Image {
 		
 		if( $this->wiki->removeNamespace( $title ) == $title ) {
 			$namespaces = $this->wiki->get_namespaces();
-			$this->title = $namespaces[6] . $title;
+			$this->title = $namespaces[6] . ':' . $title;
 		}
 		
 		$ii = $this->imageinfo();
@@ -254,24 +254,13 @@ class Image {
 	 * 
 	 * @access public
 	 * @param bool $force Whether or not to always refresh. Default false
-	 * @param string $start Timestamp to start enumerating at. Default null
-	 * @param string $end Timestamp to end at. Default null
+	 * @param string $dir Which direction to go. Default 'older'
 	 * @param int $limit Number of revisions to get. Default null (all revisions)
 	 * @return void
 	 */
-	public function get_history( $force = false, $start = null, $end = null, $limit = null ) {
+	public function get_history( $dir = 'older', $limit = null ) {
 		
-		if( $force || !count( $this->history ) ) { 
-			
-			if( is_null( $limit ) ) $limit = $this->wiki->get_api_limit();
-			
-			$ii = $this->imageinfo( $limit, -1, -1, $start, $end );
-			
-			if( isset( $ii[ $this->page->get_id() ]['imageinfo'] ) ) {
-				$this->history = $ii[ $this->page->get_id() ]['imageinfo'];
-			}
-		}
-		
+		$this->history = $this->page->history( $limit, $dir );
 		return $this->history;
 	}
 	
@@ -328,7 +317,7 @@ class Image {
 		
 		if( $force || !count( $this->duplicates ) ) {
 			
-			if( !$this->page->exists() ) {
+			if( !$this->page->get_exists() ) {
 				return $this->duplicates;
 			}
 		
@@ -508,7 +497,7 @@ class Image {
 			pecho( "Attempted to download a file on a shared respository instead of a local one", PECHO_NOTICE );
 		}
 		
-		if( !$this->page->exists() ) {
+		if( !$this->page->get_exists() ) {
 			pecho( "Attempted to download a non-existant file.", PECHO_NOTICE );
 		}
 		

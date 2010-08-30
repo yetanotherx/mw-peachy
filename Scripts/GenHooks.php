@@ -49,12 +49,10 @@ foreach( $files as $file ) {
 
 ksort( $hooks );
 
-print_r($hooks);
-
 foreach( $hooks as $hook => $args ) {
 	$page = $x->initPage( "Hook:$hook" );
 	
-	if( $page->exists() ) continue;
+	//if( $page->get_exists() ) continue;
 	
 	$output = '{{PeachyHook|name='.$hook.'|version='/*PEACHYVERSION*/.'1.0'.'|args='.$args['args'].'|source='.$args['file'].'|summary=}}
 
@@ -78,7 +76,7 @@ $new = '{| class="wikitable" width="100%" style="text-align: center;"
 
 foreach( $hooks as $hook => $args ) {
 $new .= '
-| [[Hook:'.$hook.'|'.$hook.']] || '. $args['file'].' || '/*PEACHYVERSION*/.'0.1alpha'.' || 
+| [[Hook:'.$hook.'|'.$hook.']] || '. $args['file'].' || '/*PEACHYVERSION*/.'1.0'.' || 
 |-';
 }
 

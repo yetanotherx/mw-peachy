@@ -760,8 +760,7 @@ class Database {
 	 * @deprecated
 	 */
 	public function &init() {
-		pecho( "Warning: Database::init() is deprecated. Thanks to the wonders of PHP 5, the call can just be removed.\n\n", PECHO_WARN );
-		
+		self::deprectaedWarn( null, null, "Warning: Database::init() is deprecated. Thanks to the wonders of PHP 5, the call can just be removed." );
 		return $this->doInit();
 	}
 	

@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * The version that Peachy is running 
  */
-define( 'PEACHYVERSION', '0.1beta' );
+define( 'PEACHYVERSION', '1.0' );
 
 /**
  * Minimum MediaWiki version that is required for Peachy 
@@ -119,7 +119,7 @@ class Peachy {
 	 * @param string $base_url URL to api.php if no config file specified. Defaults to English Wikipedia's API.
 	 * @return Wiki Instance of the Wiki class, where most functions are stored
 	 */
-	public static function newWiki( $config_name = null, $username = null, $password = null, $base_url = 'http://en.wikipedia.org/w/api.php' ) {
+	public static function newWiki( $config_name = null, $username = null, $password = null, $base_url = 'http://en.wikipedia.org/w/api.php', $classname = 'Wiki' ) {
 		global $pgIP;
 		
 		pecho( "Loading Peachy (version " . PEACHYVERSION . ")...\n\n", PECHO_NORMAL );
@@ -150,7 +150,7 @@ class Peachy {
 		Hooks::runHook( 'StartLogin', array( &$config_params, &$extensions ) );
 		
 		$config_params['encodedparams'] = rawurlencode( serialize( $config_params ) );
-		$w = new Wiki( $config_params, $extensions, false, null );
+		$w = new $classname( $config_params, $extensions, false, null );
 		$w->mwversion = $version;
 		
 		return $w;
@@ -206,7 +206,7 @@ class Peachy {
 	 * @deprecated
 	 */
 	public static function loadPlugin( $plugins ) {
-		pecho( "Warning: Peachy::loadPlugin() is deprecated. Thanks to the wonders of PHP 5, the call can just be removed.\n\n", PECHO_WARN );
+		self::deprectaedWarn( null, null, "Warning: Peachy::loadPlugin() is deprecated. Thanks to the wonders of PHP 5, the call can just be removed." );
 	}
 	
 	/**
@@ -218,7 +218,7 @@ class Peachy {
 	 * @deprecated
 	 */
 	public static function loadAllPlugins() {
-		pecho( "Warning: Peachy::loadAllPlugins() is deprecated. Thanks to the wonders of PHP 5, the call can just be removed.\n\n", PECHO_WARN );
+		self::deprectaedWarn( null, null, "Warning: Peachy::loadAllPlugins() is deprecated. Thanks to the wonders of PHP 5, the call can just be removed." );
 
 	}
 	
@@ -250,7 +250,52 @@ class Peachy {
 		}
 		
 		return $config_params;
+	}
+	
+	public static function deprecatedWarn( $method, $newfunction, $message = null ) {
+		if( is_null( $message ) ) {
+			$message = "Warning: $method is deprecated. Please use $newfunction instead.";
+		}
+		
+		$message = "[$message|YELLOW_BAR]\n\n";
+		
+		pecho( $message, PECHO_WARN, 'cecho' );
 	}	
+	
+	public static function getSvnInfo() {
+		global $pgIP;
+		
+		// http://svnbook.red-bean.com/nightly/en/svn.developer.insidewc.html
+		$entries = $pgIP . '/.svn/entries';
+
+		if( !file_exists( $entries ) ) {
+			return false;
+		}
+
+		$lines = file( $entries );
+		if ( !count( $lines ) ) {
+			return false;
+		}
+
+		// check if file is xml (subversion release <= 1.3) or not (subversion release = 1.4)
+		if( preg_match( '/^<\?xml/', $lines[0] ) ) {			
+			return false;
+		}
+
+		// Subversion is release 1.4 or above.
+		if ( count( $lines ) < 11 ) {
+			return false;
+		}
+		
+		$info = array(
+			'checkout-rev' => intval( trim( $lines[3] ) ),
+			'url' => trim( $lines[4] ),
+			'repo-url' => trim( $lines[5] ),
+			'directory-rev' => intval( trim( $lines[10] ) )
+		);
+		
+		return $info;
+	}
 }
 
 /**

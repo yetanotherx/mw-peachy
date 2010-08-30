@@ -222,8 +222,8 @@ class RFA {
 	/*
  	* Analyzes an RFA. Returns TRUE on success, FALSE on failure
  	*/
-	function __construct($wiki, $page) {
-		$rawwikitext = $wiki->initPage( $page )->get_text();
+	function __construct($wiki, $page, $rawwikitext = null) {
+		if( is_null( $rawwikitext ) ) $rawwikitext = $wiki->initPage( $page )->get_text();
 		
 		$split  = preg_split("/^(?:(?:'''|(?:<includeonly><noin<\/includeonly><includeonly>clude><\/includeonly>)?={4,5}(?:<includeonly><\/noin<\/includeonly><includeonly>clude><\/includeonly>''')?)"
 		."\s*?(Support|Oppose|Neutral|Comments)\s*?(?:'''|(?:'''<includeonly><noin<\/includeonly><includeonly>clude><\/includeonly>)?={4,5}(?:<includeonly><\/noin<\/includeonly><includeonly>clude><\/includeonly>)?)|;\s*(Support|Oppose|Neutral|Comments))\s*(?:<br>|<br \/>)?\s*$/im"

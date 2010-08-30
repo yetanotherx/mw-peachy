@@ -86,9 +86,9 @@ class Wiki {
 	 * Array of extenstions on the Wiki in the form of name => version.
 	 * 
 	 * @var array
-	 * @access private
+	 * @access protected
 	 */
-	private $extensions;
+	protected $extensions;
 	
 	/**
 	 * Array of tokens for editing.
@@ -116,9 +116,9 @@ class Wiki {
 	 * (default value: null)
 	 * 
 	 * @var array
-	 * @access private
+	 * @access protected
 	 */
-	private $namespaces = null;
+	protected $namespaces = null;
 	
 	/**
 	 * array of namespaces that have subpages allowed, by namespace id.
@@ -126,9 +126,9 @@ class Wiki {
 	 * (default value: null)
 	 * 
 	 * @var array
-	 * @access private
+	 * @access protected
 	 */
-	private $allowSubpages = null;
+	protected $allowSubpages = null;
 	
 	/**
 	 * Should the wiki follow nobots rules?
@@ -136,9 +136,9 @@ class Wiki {
 	 * (default value: true)
 	 * 
 	 * @var bool
-	 * @access private
+	 * @access protected
 	 */
-	private $nobots = true;
+	protected $nobots = true;
 	
 	/**
 	 * Text to search for in the optout= field of the {{nobots}} template
@@ -146,9 +146,9 @@ class Wiki {
 	 * (default value: null)
 	 * 
 	 * @var null
-	 * @access private
+	 * @access protected
 	 */
-	private $optout = null;
+	protected $optout = null;
 	
 	/**
 	 * Whether or not to not edit if the user has new messages
@@ -156,49 +156,49 @@ class Wiki {
 	 * (default value: false)
 	 * 
 	 * @var bool
-	 * @access private
+	 * @access protected
 	 */
-	private $stoponnewmessages = false;
+	protected $stoponnewmessages = false;
 	
 	/**
 	 * Page title to use for enable page
 	 * 
 	 * @var string
-	 * @access private
+	 * @access protected
 	 */
-	private $runpage;
+	protected $runpage;
 	
 	/**
 	 * Configuration (sans password)
 	 * 
 	 * @var array
-	 * @access private
+	 * @access protected
 	 */
-	private $configuration;
+	protected $configuration;
 	
 	/**
 	 * HTTP Class
 	 * 
 	 * @var HTTP
-	 * @access private
+	 * @access protected
 	 */
-	private $http;
+	protected $http;
 	
 	/**
 	 * Whether or not to log in. True restricts logging in, false lets it log in. Setting to true restricts the available functions.
 	 * 
 	 * @var bool
-	 * @access private
+	 * @access protected
 	 */
-	private $nologin;
+	protected $nologin;
 	
 	/**
 	 * Server that handled the last API query
 	 * 
 	 * @var string
-	 * @access private
+	 * @access protected
 	 */
-	private $servedby;
+	protected $servedby;
 	
 	/**
 	 * Version of MediaWiki server is running. 
@@ -272,8 +272,7 @@ class Wiki {
 			
 			$this->http->setCookieJar( sys_get_temp_dir() . 'PeachyCookieSite' . sha1( $configuration['encodedparams'] ) );
 			
-			$cookieInfo = $this->apiQuery( array( 'action' => 'query', 'meta' => 'userinfo' ) );
-			if( $cookieInfo['query']['userinfo']['id'] != 0 ) $use_cookie_login = true;
+			if( $this->is_logged_in() ) $use_cookie_login = true;
 		}
 		
 		if( isset( $configuration['optout'] ) ) {
@@ -431,15 +430,21 @@ class Wiki {
 		
 	}
 	
+	public function is_logged_in() {
+		$cookieInfo = $this->apiQuery( array( 'action' => 'query', 'meta' => 'userinfo' ) );
+		if( $cookieInfo['query']['userinfo']['id'] != 0 ) return true;
+		return false;
+	}
+	
 	
 	/**
 	 * runSuccess function.
 	 * 
-	 * @access private
+	 * @access protected
 	 * @param mixed &$configuration
 	 * @return void
 	 */
-	private function runSuccess( &$configuration ) {
+	protected function runSuccess( &$configuration ) {
 		$userInfoRes = $this->apiQuery(
 			array(
 				'action' => 'query',
@@ -477,6 +482,7 @@ class Wiki {
 		pecho( "Logging out of {$this->base_url}...\n\n", PECHO_NOTICE );
 		
 		$this->apiQuery( array( 'action' => 'logout' ), true );
+		
 	}
 	
 	/**
@@ -572,6 +578,12 @@ class Wiki {
 			if( isset( $data['error'] ) && $errorcheck ) {
 				
 				pecho( "API Error...\n\nCode: {$data['error']['code']}\nText: {$data['error']['info']}\n\n", PECHO_FATAL );
+				return false;
+			}
+			
+			if( $this->get_http()->get_HTTP_code() == 503 && $errorcheck ) {
+				
+				pecho( "API Error...\n\nCode: error503\nText: HTTP Error 503\n\n", PECHO_FATAL );
 				return false;
 			}
 			
@@ -888,8 +900,10 @@ class Wiki {
 			foreach( $result['purge'] as $page ) {
 				if( !isset( $page['purged'] ) ) {
 					pecho( "Purge error on {$page['title']}...\n\n" . print_r($page, true) . "\n\n", PECHO_FATAL );
+					return false;
 				}
 			}
+			return true;
 
 		}
 		else {
@@ -919,7 +933,7 @@ class Wiki {
 	 * @param int $limit A hard limit to impose on the number of results returned.
 	 * @return array Recent changes matching the description.
 	 */
-	public function recentchanges( $namespace = 0, $tag = false, $start = false, $end = false, $user = false, $excludeuser = false, $dir = 'older', $minor = null, $bot = null, $anon = null, $redirect = null, $patrolled = null, $prop = array( 'user', 'comment', 'flags', 'timestamp', 'title', 'ids', 'sizes', 'tags' ), $limit = null ) {
+	public function recentchanges( $namespace = 0, $tag = false, $start = false, $end = false, $user = false, $excludeuser = false, $dir = 'older', $minor = null, $bot = null, $anon = null, $redirect = null, $patrolled = null, $prop = array( 'user', 'comment', 'flags', 'timestamp', 'title', 'ids', 'sizes', 'tags' ), $limit = 50 ) {
 
 		if( is_array( $namespace ) ) {
 			$namespace = implode( '|', $namespace );
@@ -1010,7 +1024,7 @@ class Wiki {
 	 * @param bool $includeredirects Whether to include redirects or not (default: true).
 	 * @param int $limit A hard limit on the number of results to retrieve (default: null i.e. all).
 	 */
-	public function search($search, $fulltext = true, $namespaces = array(0), $prop = array('size', 'wordcount', 'timestamp', 'snippet'), $includeredirects = true, $limit = null) {
+	public function search($search, $fulltext = true, $namespaces = array(0), $prop = array('size', 'wordcount', 'timestamp', 'snippet'), $includeredirects = true, $limit = 50) {
 	
 		$srArray = array(
 			'_code' => 'sr',
@@ -1045,7 +1059,7 @@ class Wiki {
 	 * @param int limit How many results to retrieve (default: null i.e. all).
 	 * @return array Log entries
 	 */
-	public function logs( $type = false, $user = false, $title = false, $start = false, $end = false, $dir = 'older', $tag = false, $prop = array( 'ids', 'title', 'type', 'user', 'timestamp', 'comment', 'details' ), $limit = null ) {
+	public function logs( $type = false, $user = false, $title = false, $start = false, $end = false, $dir = 'older', $tag = false, $prop = array( 'ids', 'title', 'type', 'user', 'timestamp', 'comment', 'details' ), $limit = 50 ) {
 		
 		$leArray = array(
 			'list' => 'logevents',
@@ -1064,7 +1078,13 @@ class Wiki {
 		
 		Hooks::runHook( 'PreQueryLog', array( &$leArray ) );
 		
-		pecho( "Getting $type logs for {$title}{$user}...\n\n", PECHO_NORMAL );
+		if( $type ) {
+			if( $title || $user ) $title = ' for ' . $title;
+			pecho( "Getting $type logs{$title}{$user}...\n\n", PECHO_NORMAL );
+		}
+		else {
+			pecho( "Getting logs...\n\n", PECHO_NORMAL );
+		}
 		
 		return $this->listHandler( $leArray );
 	}
@@ -1085,7 +1105,7 @@ class Wiki {
 	 * @param int limit How many results to retrieve (default: null i.e. all).
 	 * @return array List of images
 	 */
-	public function allimages( $prefix = null, $sha1 = null, $base36 = null, $from = null, $minsize = null, $maxsize = null, $dir = 'ascending', $prop = array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' ), $limit = null ) {
+	public function allimages( $prefix = null, $sha1 = null, $base36 = null, $from = null, $minsize = null, $maxsize = null, $dir = 'ascending', $prop = array( 'timestamp', 'user', 'comment', 'url', 'size', 'dimensions', 'sha1', 'mime', 'metadata', 'archivename', 'bitdepth' ), $limit = 50 ) {
 		$leArray = array(
 			'list' => 'allimages',
 			'_code' => 'ai',
@@ -1127,7 +1147,7 @@ class Wiki {
 	 * @param int limit How many results to retrieve (default: null i.e. all)
 	 * @return array List of pages
 	 */
-	public function allpages( $namespace = array( 0 ), $prefix = null, $from = null, $redirects = 'all', $minsize = null, $maxsize = null, $protectiontypes = array(), $protectionlevels = array(), $dir = 'ascending', $interwiki = 'all', $limit = null ) {
+	public function allpages( $namespace = array( 0 ), $prefix = null, $from = null, $redirects = 'all', $minsize = null, $maxsize = null, $protectiontypes = array(), $protectionlevels = array(), $dir = 'ascending', $interwiki = 'all', $limit = 50 ) {
 		$leArray = array(
 			'list' => 'allpages',
 			'_code' => 'ap',
@@ -1175,7 +1195,7 @@ class Wiki {
 	 * @param int limit How many results to retrieve (default: null i.e. all).
 	 * @return array List of links
 	 */
-	public function alllinks( $namespace = array( 0 ), $prefix = null, $from = null, $continue = null, $unique = false, $prop = array( 'ids', 'title' ), $limit = null ) {
+	public function alllinks( $namespace = array( 0 ), $prefix = null, $from = null, $continue = null, $unique = false, $prop = array( 'ids', 'title' ), $limit = 50 ) {
 		$leArray = array(
 			'list' => 'alllinks',
 			'_code' => 'al',
@@ -1210,7 +1230,7 @@ class Wiki {
 	 * @param int limit How many results to retrieve (default: null i.e. all).
 	 * @return array List of users
 	 */
-	public function allusers( $prefix = null, $groups = array(), $from = null, $editsonly = false, $prop = array( 'blockinfo', 'groups', 'editcount', 'registration' ), $limit = null ) {
+	public function allusers( $prefix = null, $groups = array(), $from = null, $editsonly = false, $prop = array( 'blockinfo', 'groups', 'editcount', 'registration' ), $limit = 50 ) {
 		$leArray = array(
 			'list' => 'allusers',
 			'_code' => 'au',
@@ -1244,7 +1264,7 @@ class Wiki {
 	 * @param int limit How many results to retrieve (default: null i.e. all)
 	 * @return array Array of titles
 	 */
-	public function categorymembers( $category, $subcat = false, $namespace = null, $limit = null) {
+	public function categorymembers( $category, $subcat = false, $namespace = null, $limit = 50) {
 		$cmArray = array(
 			'list' => 'categorymembers',
 			'_code' => 'cm',
@@ -1305,8 +1325,8 @@ class Wiki {
 	 * @param int limit How many results to retrieve (default: null i.e. all).
 	 * @return array A list of pages the title is transcluded in.
 	 */
-	public function embeddedin( $title, $namespace = null, $limit = null ) {
-		pecho( "Warning: Wiki::embeddedin() is deprecated. Please use Page::embeddedin() instead.\n\n", PECHO_WARN );
+	public function embeddedin( $title, $namespace = null, $limit = 50 ) {
+		Peachy::deprecatedWarn( 'Wiki::embeddedin()', 'Page::embeddedin()' );
 		$page = $this->initPage( $title );
 		return $page->embeddedin( $namespace, $limit );
 	}
@@ -1319,7 +1339,7 @@ class Wiki {
 	 * @param int limit How many results to retrieve (default: null i.e. all).
 	 * @return array The tags retrieved.
 	 */
-	public function tags( $prop = array( 'name', 'displayname', 'description', 'hitcount' ), $limit = null ) {
+	public function tags( $prop = array( 'name', 'displayname', 'description', 'hitcount' ), $limit = 50 ) {
 		$tgArray = array(
 			'list' => 'tags',
 			'_code' => 'tg',
@@ -1334,7 +1354,7 @@ class Wiki {
 		return $this->listHandler( $tgArray );
 	}
 	
-	public function get_watchlist( $minor = null, $bot = null, $anon = null, $patrolled = null,$namespace = null, $user = null, $excludeuser = null, $start = null, $end = null, $prop = array( 'ids', 'title', 'flags', 'user', 'comment', 'parsedcomment', 'timestamp', 'patrol', 'sizes', 'notificationtimestamp' ), $limit = null) {
+	public function get_watchlist( $minor = null, $bot = null, $anon = null, $patrolled = null,$namespace = null, $user = null, $excludeuser = null, $start = null, $end = null, $prop = array( 'ids', 'title', 'flags', 'user', 'comment', 'parsedcomment', 'timestamp', 'patrol', 'sizes', 'notificationtimestamp' ), $limit = 50) {
 		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
 	}
 	
@@ -1353,7 +1373,7 @@ class Wiki {
 	 * @param int $limit A hard limit on the number of transclusions to fetch. Default null (all).
 	 * @return array Details about the usage of that external link on the wiki.
 	 */
-	public function exturlusage( $url, $protocol = 'http', $prop = array( 'title' ), $namespace = null, $limit = null ) {
+	public function exturlusage( $url, $protocol = 'http', $prop = array( 'title' ), $namespace = null, $limit = 50 ) {
 		$tArray = array(
 			'list' => 'exturlusage',
 			'_code' => 'eu',
@@ -1563,16 +1583,19 @@ class Wiki {
 		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
 	}
 	
+	
 	/**
-	 * Returns a unified or HTML diff between two revisions
+	 * Generate a diff between two or three revision IDs
 	 * 
 	 * @access public
-	 * @param int $rev1 The revision id of the old revision
-	 * @param int $rev2 The revision id of the new revision
-	 * @param string $method Format of diff. Either 'unified', 'inline' (HTML diff), or 'raw' (array( text1, text2))
-	 * @return string Returned diff
+	 * @param string $method Revision method. Options: unified, inline, context, threeway, raw (default: 'unified')
+	 * @param mixed $rev1
+	 * @param mixed $rev2
+	 * @param mixed $rev3
+	 * @return void
+	 * @see Diff::load
 	 */
-	public function diff( $rev1, $rev2, $method = 'unified' ) {
+	public function diff( $method = 'unified', $rev1, $rev2, $rev3 = null ) {
 		$r1array = array(
 			'action' => 'query',
 			'prop' => 'revisions',
@@ -1585,10 +1608,33 @@ class Wiki {
 			'revids' => $rev2,
 			'rvprop' => 'content'
 		);
+		$r3array = array(
+			'action' => 'query',
+			'prop' => 'revisions',
+			'revids' => $rev3,
+			'rvprop' => 'content'
+		);
 		
-		Hooks::runHook( 'PreDiff', array( &$r1array, &$r2array, &$method ) );
+		Hooks::runHook( 'PreDiff', array( &$r1array, &$r2array, &$r3array, &$method ) );
 		
-		pecho( "Getting $method diff of revisions $rev1 and $rev2...\n\n", PECHO_NORMAL );
+		if( !is_null( $rev3 ) ) {
+			pecho( "Getting $method diff of revisions $rev1, $rev2, and $rev3...\n\n", PECHO_NORMAL );
+			$r3 = $this->apiQuery( $r3array );
+			
+			
+			if( isset( $r3['query']['badrevids'] ) ) {
+				pecho( "A bad third revision ID was passed.\n\n", PECHO_FATAL );
+				return false;
+			}
+		
+			foreach( $r3['query']['pages'] as $r3pages ) {
+				$r3text = $r3pages['revisions'][0]['*'];
+			}
+		}
+		else {
+			pecho( "Getting $method diff of revisions $rev1 and $rev2...\n\n", PECHO_NORMAL );
+			$r3text = null;
+		}
 		
 		$r1 = $this->apiQuery( $r1array );
 		$r2 = $this->apiQuery( $r2array );
@@ -1610,8 +1656,8 @@ class Wiki {
 				$r2text = $r2pages['revisions'][0]['*'];
 			}
 			
-			if( $method == "raw" ) return array( $r1text, $r2text );
-			return getTextDiff($method, $r1text, $r2text);
+			if( $method == "raw" ) return array( $r1text, $r2text, $r3text );
+			return Diff::load($method, $r1text, $r2text, $r3text);
 		}
 		
 		
@@ -1750,7 +1796,7 @@ class Wiki {
 	 * @param int $limit A hard limit on the number of pages to fetch. Default null (all). 
 	 * @return array Titles of pages that transclude this page
 	 */
-	public function prefixindex( $prefix = null, $namespace = array( 0 ), $limit = null ) {
+	public function prefixindex( $prefix = null, $namespace = array( 0 ), $limit = 50 ) {
 		return $this->wiki->allpages( $namespace, $prefix, null, 'all', null, null, array(), array(), 'ascending', 'all', $limit );
 	}
 	

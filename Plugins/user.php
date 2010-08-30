@@ -137,6 +137,9 @@ class User {
 			$this->username = $username;
 			$this->exists = false;
 		}
+		else {
+			$this->exists = true;
+		}
 		
 		$this->username = $uiRes['query']['users'][0]['name'];
 		
@@ -151,6 +154,10 @@ class User {
 					'reason' => $uiRes['query']['logevents'][0]['comment'],
 				);
 			}
+			else {
+				$this->blocked = false;
+				$this->blockinfo = array();
+			}
 		}
 		elseif( isset( $uiRes['query']['users'][0]['missing'] ) || isset( $uiRes['query']['users'][0]['invalid'] ) ) {
 			$this->exists = false;
@@ -162,12 +169,18 @@ class User {
 			if( isset( $uiRes['query']['users'][0]['groups'] ) ) 
 				$this->groups = $uiRes['query']['users'][0]['groups'];
 			
-			if( isset( $uiRes['query']['users'][0]['blockedby'] ) ) 
+			if( isset( $uiRes['query']['users'][0]['blockedby'] ) ) {
 				$this->blocked = true;
 				$this->blockinfo = array(
 					'by' => $uiRes['query']['users'][0]['blockedby'],
 					'reason' => $uiRes['query']['users'][0]['blockreason'],
 				);
+			}
+			else {
+				$this->blocked = false;
+				$this->blockinfo = array();
+			}
+			
 			
 			if( isset( $uiRes['query']['users'][0]['emailable'] ) ) 
 				$this->hasemail = true;
@@ -512,7 +525,53 @@ class User {
 	}
 	
 	public function userrights( $add = array(), $remove = array(), $reason = '' ) {
-		pecho( "Error: " . __METHOD__ . " has not been programmed as of yet.\n\n", PECHO_ERROR );
+				
+		$token = $this->wiki->get_tokens();
+		
+		$token = $this->wiki->apiQuery( array(
+			'action' => 'query',
+			'list' => 'users',
+			'ususers' => $this->username,
+			'ustoken' => 'userrights'
+		));
+		
+        if( isset( $token['query']['users'][0]['userrightstoken'] ) ) {
+        	$token = $token['query']['users'][0]['userrightstoken'];
+        }
+        else {
+        	return false;
+        }
+		
+		$apiArr = array(
+			'action' => 'userrights',
+            'user' => $this->username,
+            'token' => $token,
+            'add' => implode( '|', $add ),
+            'remove' => implode( '|', $remove ),
+        );
+		if( !is_null( $reason ) ) $apiArr['reason'] = $reason;
+				
+		Hooks::runHook( 'StartUserrights', array( &$apiArr ) );
+		
+		pecho( "Assigning user rights to {$this->username}...\n\n", PECHO_NOTICE );
+		
+		$result = $this->wiki->apiQuery( $apiArr, true);
+		
+		if( isset( $result['userrights'] ) ) {
+			if( isset( $result['userrights']['user'] ) ) {
+				$this->__construct( $this->wiki, $this->username );
+				return true;
+			}
+			else {
+				pecho( "Userrights error...\n\n" . print_r($result['userrights'], true) . "\n\n", PECHO_FATAL );
+				return false;
+			}
+		}
+		else {
+			pecho( "Userrights error...\n\n" . print_r($result, true), PECHO_FATAL );
+			return false;
+		}
+
 	}
 	
 	/**

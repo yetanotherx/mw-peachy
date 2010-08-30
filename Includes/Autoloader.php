@@ -60,7 +60,7 @@ class AutoLoader {
 	static function autoload( $class_name ) {
 		global $pgIP, $pgAutoloader;
 
-		if( isset( $pgAutoloader[$class_name] ) ) {
+		if( isset( $pgAutoloader[$class_name] ) && is_file( $pgIP . $pgAutoloader[$class_name] ) ) {
 			require_once( $pgIP . $pgAutoloader[$class_name] );
 			return true;
 		}

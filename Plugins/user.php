@@ -367,7 +367,7 @@ class User {
 	public function get_editcount( $force = false, &$database = null, $liveonly = false ) {
 	
 		//First check if $database exists, because that returns a more accurate count
-		if( !is_null( $database ) && $database instanceOf DatabaseBase ) {
+		if( !is_null( $database ) && ( $database instanceOf Database || $database instanceOf DatabaseBase ) ) {
 			
 			pecho( "Getting edit count for {$this->username} using the Database class...\n\n", PECHO_NORMAL );
 			

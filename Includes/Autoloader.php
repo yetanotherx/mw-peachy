@@ -11,13 +11,13 @@ $pgAutoloader = array(
 	'DatabaseBase' => 'Plugins/database.php',
 	'ResultWrapper' => 'Plugins/database.php',
 	
-	'lime_test' => 'Plugins/lime.php',
-	'lime_output' => 'Plugins/lime.php',
-	'lime_output_color' => 'Plugins/lime.php',
-	'lime_colorizer' => 'Plugins/lime.php',
-	'lime_harness' => 'Plugins/lime.php',
-	'lime_coverage' => 'Plugins/lime.php',
-	'lime_registration' => 'Plugins/lime.php',
+	'lime_test' => 'Includes/lime.php',
+	'lime_output' => 'Includes/lime.php',
+	'lime_output_color' => 'Includes/lime.php',
+	'lime_colorizer' => 'Includes/lime.php',
+	'lime_harness' => 'Includes/lime.php',
+	'lime_coverage' => 'Includes/lime.php',
+	'lime_registration' => 'Includes/lime.php',
 	
 	
 	'Text_Diff' => 'Plugins/diff/textdiff/Diff.php',

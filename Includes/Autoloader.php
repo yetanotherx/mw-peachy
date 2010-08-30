@@ -90,6 +90,8 @@ class AutoLoader {
 				$trunk_url = 'http://mw-peachy.googlecode.com/svn/branches/REL' . strtoupper( str_replace( '.', '_', PEACHYVERSION ) );
 			}
 			
+			$trunk_url = str_replace( 'https://', 'http://', $trunk_url );
+			
 			if( isset( $pgAutoloader[$class_name] ) ) {
 				$file = $pgHTTP->get( $trunk_url . '/' . $pgAutoloader[$class_name] );
 			}

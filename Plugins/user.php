@@ -419,9 +419,11 @@ class User {
 	 * @access public
 	 * @param bool $mostrecentfirst Set to true to get the most recent edits first. Default true.
 	 * @param bool $limit Only get this many edits. Default null.
-	 * @return void
+	 * @return array Array, first level indexed, second level associative with keys user, pageid, revid, ns, title, timestamp, size and comment (edit summary).
 	 */
 	public function get_contribs( $mostrecentfirst = true, $limit = null ) {
+		if(!$this->exists) return array();
+		
 		$ucArray = array(
 			'_code' => 'uc',
 			'ucuser' => $this->username,
@@ -480,6 +482,7 @@ class User {
 	 * @param string $text Text to send
 	 * @param string $subject Subject of email. Default 'Wikipedia Email'
 	 * @param bool $ccme Whether or not to send a copy of the email to "myself". Default false.
+	 * $return void
 	 */
 	public function email( $text = null, $subject = "Wikipedia Email", $ccme = false ) {
 		if( !$this->has_email() ) {

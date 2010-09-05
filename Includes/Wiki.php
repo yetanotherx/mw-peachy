@@ -664,10 +664,7 @@ class Wiki {
 				if($limit < 0 || (floor($limit) != $limit)){
 					throw new BadEntryError( "listHandler", "limit should an integer greater than 0" );
 				}
-
-				if($limit < $tArray[$code . 'limit']){
-					$tArray[$code . 'limit'] = $limit;
-				}
+				$tArray[$code . 'limit'] = $limit;
 			}
 		} 
 		if( isset($tArray[$code . 'namespace']) && !is_null($tArray[$code . 'namespace']) ){
@@ -695,7 +692,8 @@ class Wiki {
 			if( !is_null( $start ) ) $tArray[$code . 'start'] = $start;
 			
 			$tRes = $this->apiQuery( $tArray );
-						
+			if(!isset($tRes['query'])) break;
+			
 			foreach( $tRes['query'] as $x ) {
 				foreach( $x as $y ) {
 					if( !is_null( $lhtitle ) ) {

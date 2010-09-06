@@ -235,7 +235,8 @@ function cecho( $text, $return = false ) {
  */
 function getTextDiff() {
 	Peachy::deprecatedWarn( 'getTextDiff()', 'Diff::load()' );
-	return call_user_func_array( array('Diff', 'load'), func_get_args());
+	$args = func_get_args();
+	return call_user_func_array( array('Diff', 'load'), $args );
 }
 
 /**

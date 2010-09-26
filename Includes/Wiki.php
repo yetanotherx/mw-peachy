@@ -627,7 +627,7 @@ class Wiki {
 	 * Simplifies the running of API queries, especially with continues and other parameters.
 	 * 
 	 * @access public
-	 * @link http://compwhizii.net/peachy/wiki/Manual/Wiki::listHandler
+	 * @link http://wiki.peachy.compwhizii.net/wiki/Manual/Wiki::listHandler
 	 * @param array $tArray Parameters given to query with (default: array()). In addition to those recognised by the API, ['_code'] should be set to the first two characters of all the parameters in a list=XXX API call - for example, with allpages, the parameters start with 'ap', with recentchanges, the parameters start with 'rc' -  and is required; ['_limit'] imposes a hard limit on the number of results returned (optional) and ['_lhtitle'] simplifies a multidimensional result into a unidimensional result - lhtitle is the key of the sub-array to return. (optional)
 	 * @return array Returns an array with the API result
 	 */

@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Hooks class
- * Stores and runs {@link http://compwhizii.net/peachy/wiki/Manual/Hooks hooks} 
+ * Stores and runs {@link http://wiki.peachy.compwhizii.net/wiki/Manual/Hooks hooks} 
  * 
  */
 class Hooks {

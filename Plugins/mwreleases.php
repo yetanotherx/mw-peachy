@@ -29,7 +29,7 @@ class MWReleases {
 		
 		global $pgHTTP;
 		
-		$ret = unserialize( $pgHTTP->get( 'http://compwhizii.net/peachy/wiki/api.php?action=mwreleases&format=php' ) );
+		$ret = unserialize( $pgHTTP->get( 'http://wiki.peachy.compwhizii.net/w/api.php?action=mwreleases&format=php' ) );
 		if( !isset( $ret['mwreleases'] ) ) return;
 		
 		foreach( $ret['mwreleases'] as $release ) {

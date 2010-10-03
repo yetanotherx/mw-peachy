@@ -1595,6 +1595,8 @@ class Page {
 		
 		$preeditinfo = $this->wiki->apiQuery( $preeditinfo );
 	
+		$messages = false;
+		$blocked = false;
 		if( isset( $preeditinfo['query']['pages'] ) ) {
 			//$oldtext = $preeditinfo['query']['pages'][$this->pageid]['revisions'][0]['*'];
 			foreach( $preeditinfo['query']['pages'] as $pageid => $page ) {
@@ -1620,8 +1622,6 @@ class Page {
 		else {
 			$oldtext = '';
 			$runtext = 'enable';
-			$messages = false;
-			$blocked = false;
 		}
 		
 		//Perform nobots checks, login checks, /Run checks

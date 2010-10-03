@@ -1795,7 +1795,7 @@ class Wiki {
 	 * @return array Titles of pages that transclude this page
 	 */
 	public function prefixindex( $prefix = null, $namespace = array( 0 ), $limit = 50 ) {
-		return $this->wiki->allpages( $namespace, $prefix, null, 'all', null, null, array(), array(), 'ascending', 'all', $limit );
+		return $this->allpages( $namespace, $prefix, null, 'all', null, null, array(), array(), 'ascending', 'all', $limit );
 	}
 	
 	/**

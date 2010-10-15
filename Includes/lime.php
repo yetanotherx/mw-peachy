@@ -861,6 +861,9 @@ lime_colorizer::style('RED_BAR', array('fg' => 'white', 'bg' => 'red', 'bold' =>
 lime_colorizer::style('YELLOW_BAR', array('fg' => 'black', 'bg' => 'yellow', 'bold' => true));
 lime_colorizer::style('INFO_BAR', array('fg' => 'cyan', 'bold' => true));
 
+lime_colorizer::style('DIFF_DELETED', array('fg' => 'red', 'bold' => true));
+lime_colorizer::style('DIFF_ADDED', array('fg' => 'green', 'bold' => true));
+
 /**
  * lime_harness class.
  * 

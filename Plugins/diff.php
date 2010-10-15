@@ -22,7 +22,7 @@ class Diff {
 	/**
 	 * Generates a diff between two strings
 	 * 
-	 * @param string $method Which style of diff to generate: unified, inline (HTML), context, threeway
+	 * @param string $method Which style of diff to generate: unified, inline (HTML), context, colorized, threeway
 	 * @param string $diff1 Old text
 	 * @param string $diff2 New text
 	 * @param string $diff3 New text #2 (if in three-way mode)
@@ -44,6 +44,13 @@ class Diff {
 				$diff = new Text_Diff('auto', array(explode("\n",$diff1), explode("\n",$diff2)));
 	
 				$renderer = new Text_Diff_Renderer_inline();
+				
+				$diff = $renderer->render($diff);
+				break;
+			case 'colorized':
+				$diff = new Text_Diff('auto', array(explode("\n",$diff1), explode("\n",$diff2)));
+	
+				$renderer = new Text_Diff_Renderer_colorized();
 				
 				$diff = $renderer->render($diff);
 				break;

@@ -71,7 +71,7 @@ class Hooks {
 			}
 			
 			if( isset( $data ) ) {
-				$args += array($data);
+				$args = array_merge( array($data), $args );
 			}			   
 			 
 			if( isset( $object ) ) {

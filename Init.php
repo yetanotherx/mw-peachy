@@ -176,6 +176,12 @@ class Peachy {
 				'siprop' => 'extensions|general',
 		)));
 		
+		if( isset( $siteinfo['error'] ) && $siteinfo['error']['code'] == 'readapidenied' ) {
+			global $pgHooks;
+			$pgHooks['PostLogin'][] = array( 'Peachy::wikiChecks', $base_url );
+			return array( MINMW, array() );
+		}
+		
 		$version = preg_replace( '/[^0-9\.]/', '', $siteinfo['query']['general']['generator'] );
 		
 		if( version_compare( $version, MINMW ) < 0 ) {

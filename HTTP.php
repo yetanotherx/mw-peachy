@@ -88,6 +88,8 @@ class HTTP {
 		$this->cookie_jar = sys_get_temp_dir() . 'peachy.cookies.'.$this->cookie_hash.'.dat';
 		$this->user_agent = 'Peachy MediaWiki Bot API Version ' . PEACHYVERSION;
 		
+		Hooks::runHook( 'HTTPNewCURLInstance', array( &$this, &$echo ) );
+		
 		$this->setCookieJar( $this->cookie_jar );
 		
 		curl_setopt($this->curl_instance,CURLOPT_MAXCONNECTS,100);
@@ -106,12 +108,16 @@ class HTTP {
 	function setCookieJar( $cookie_file ) {
 		$this->cookie_jar = $cookie_file;
 		
+		Hooks::runHook( 'HTTPSetCookieJar', array( &$cookie_file ) );
+		
 		curl_setopt($this->curl_instance,CURLOPT_COOKIEJAR, $cookie_file);
 		curl_setopt($this->curl_instance,CURLOPT_COOKIEFILE, $cookie_file);
 	}
 	
 	function setUserAgent( $user_agent = null ) {
 		$this->user_agent = $user_agent;
+		
+		Hooks::runHook( 'HTTPSetUserAgent', array( &$user_agent ) );
 		
 		curl_setopt($this->curl_instance,CURLOPT_USERAGENT, $user_agent);
 	}
@@ -156,6 +162,8 @@ class HTTP {
 		if( (!is_null( $argv ) && in_array( 'peachyecho', $argv )) || $this->echo ) {
 			pecho( "GET: $url\n", PECHO_NORMAL );
 		}
+		
+		Hooks::runHook( 'HTTPGet', array( &$this, &$url, &$data ) );
 
 		$data = curl_exec( $this->curl_instance );
 		
@@ -217,6 +225,8 @@ class HTTP {
 			pecho( "POST: $url\n", PECHO_NORMAL );
 		}
 		
+		Hooks::runHook( 'HTTPPost', array( &$this, &$url, &$data ) );
+		
 		$data = curl_exec( $this->curl_instance );
 		
 		if( curl_errno( $this->curl_instance ) != 0 ) {
@@ -262,6 +272,8 @@ class HTTP {
 			pecho( "DLOAD: $url\n", PECHO_NORMAL );
 		}
 		
+		Hooks::runHook( 'HTTPDownload', array( &$this, &$url, &$local ) );
+		
 		$ret = curl_exec( $this->curl_instance );
 		
 		if( curl_errno( $this->curl_instance ) != 0 ) {
@@ -283,7 +295,10 @@ class HTTP {
 	 * @return void
 	 */
 	function __destruct () {
+		Hooks::runHook( 'HTTPClose', array( &$this ) );
+		
 		curl_close($this->curl_instance);
+		
 		//@unlink($this->cookie_jar);
 	}
 

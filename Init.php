@@ -252,7 +252,7 @@ class Peachy {
 		$config_params = parse_ini_file( $config_name );
 		
 		if( isset( $config_params['useconfig'] ) ) {
-			$config_params = self::parse_config( $config_params['useconfig'] );
+			$config_params = $config_params + self::parse_config( $config_params['useconfig'] );
 		}
 		
 		return $config_params;

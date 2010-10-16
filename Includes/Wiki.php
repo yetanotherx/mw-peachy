@@ -860,12 +860,22 @@ class Wiki {
 	/**
 	 * Returns the configuration of the wiki
 	 * 
+	 * @param string $conf_name Name of configuration setting to get. Default null, will return all configuration.
 	 * @access public
 	 * @see Wiki::$configuration
 	 * @return array Configuration array
 	 */
-	public function get_configuration() {
-		return $this->configuration;
+	public function get_configuration( $conf_name = null ) {
+		if( is_null( $conf_name ) ) {
+			return $this->configuration;
+		}
+		else {
+			return $this->configuration[$conf_name];
+		}
+	}
+	
+	public function get_conf( $conf_name = null ) {
+		return $this->get_configuration( $conf_name );
 	}
 	
 	/**

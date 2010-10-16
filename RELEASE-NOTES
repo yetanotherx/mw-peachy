@@ -11,6 +11,8 @@ If you have it on, turn it *off* if you can.
 === New features in 1.1 ===
 * (bug 64) Hooks added to HTTP class
 * 'colorized' option added to Diff function
+* Wiki::get_configuration has a $conf_name option now
+* Wiki::get_conf aliases to get_configuration
 
 === Bug fixes in 1.1 ===
 * (bug 63) Check if it is a read only wiki before running wikiChecks

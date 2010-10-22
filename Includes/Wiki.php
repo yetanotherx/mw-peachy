@@ -353,7 +353,7 @@ class Wiki {
 		if( $use_cookie_login ) {
 			pecho( "Logging in to {$this->base_url} as {$this->username}, using a saved login cookie\n\n", PECHO_NORMAL );
 					
-			$this->runSuccess( &$configuration );
+			$this->runSuccess( $configuration );
 		}
 		elseif( !$this->nologin ) {
 			Hooks::runHook( 'PreLogin', array( &$lgarray ) );
@@ -422,7 +422,7 @@ class Wiki {
 				case 'Success':
 					pecho( "Successfully logged in to {$this->base_url} as {$this->username}\n\n", PECHO_NORMAL );
 					
-					$this->runSuccess( &$configuration );
+					$this->runSuccess( $configuration );
 					
 
 			}

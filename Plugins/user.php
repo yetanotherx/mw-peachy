@@ -221,6 +221,16 @@ class User {
 	}
 	
 	/**
+	 * is_ip function.
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function is_ip() {
+		return $this->ip;
+	}
+	
+	/**
 	 * Blocks the user
 	 * 
 	 * @access public

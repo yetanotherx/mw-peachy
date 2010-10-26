@@ -30,7 +30,7 @@ class MWReleases {
 		global $pgHTTP;
 		
 		$ret = unserialize( $pgHTTP->get( 'http://wiki.peachy.compwhizii.net/w/api.php?action=mwreleases&format=php' ) );
-		if( !isset( $ret['mwreleases'] ) ) return;
+		if( !isset( $ret['mwreleases'] ) || !$ret ) return;
 		
 		foreach( $ret['mwreleases'] as $release ) {
 			$this->versions['all'][] = $release['version'];
@@ -42,7 +42,7 @@ class MWReleases {
 	}
 	
 	public function isSupported( $version ) {
-		return in_array( $version, $this->versions['all'] );
+		return ( count( $this->versions['all'] ) ) ? in_array( $version, $this->versions['all'] ) : true;
 	}
 	
 	public function newerVersionExists( $version ) {

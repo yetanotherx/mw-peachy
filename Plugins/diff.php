@@ -61,6 +61,35 @@ class Diff {
 				
 				$diff = $renderer->render($diff);
 				break;
+			case 'dualview':
+				$diff = new Text_Diff('auto', array(explode("\n",$diff1), explode("\n",$diff2)));
+	
+				$renderer = new Text_Diff_Renderer_dualview();
+				
+				$diff = $renderer->render($diff);
+				
+				$old = str_replace(
+					array( 'WOIRUW*EOukcsfGQ', '*ROw2T){E@*jVWOw' ),
+					array( '<strong style="color:#F00;">', '</strong>' ),
+					preg_replace(
+						'/' . preg_quote( '@$(@IH@KW@Wwq2epw', '/' ) .
+						'(.*?)' . preg_quote( 'P(R#$J:W*F@ej72oiet', '/' ) . '/',
+						'',
+						$diff
+					)
+				);
+				$new = str_replace(
+					array( '@$(@IH@KW@Wwq2epw', 'P(R#$J:W*F@ej72oiet' ),
+					array( '<strong style="color:#0F0;">', '</strong>' ),
+					preg_replace(
+						'/' . preg_quote( 'WOIRUW*EOukcsfGQ', '/' ) .
+						'(.*?)' . preg_quote( '*ROw2T){E@*jVWOw', '/' ) . '/',
+						'',
+						$diff
+					)
+				);
+				return array($old, $new);
+				break;
 			case 'threeway':
 				$diff = new Text_Diff3( explode("\n",$diff1), explode("\n",$diff2), explode("\n",$diff3) );
 				$diff = implode( "\n", $diff->mergedOutput() );

@@ -45,11 +45,14 @@ $pgAutoloader = array(
 	'Text_Diff_Renderer_inline' => 'Plugins/diff/textdiff/Diff/Renderer/inline.php',
 	'Text_Diff_Renderer_context' => 'Plugins/diff/textdiff/Diff/Renderer/context.php',
 	'Text_Diff_Renderer_colorized' => 'Plugins/diff/textdiff/Diff/Renderer/colorized.php',
+	'Text_Diff_Renderer_dualview' => 'Plugins/diff/textdiff/Diff/Renderer/dualview.php',
 	'Text_Diff_Engine_xdiff' => 'Plugins/diff/textdiff/Diff/Engine/xdiff.php',
 	'Text_Diff_Engine_string' => 'Plugins/diff/textdiff/Diff/Engine/string.php',
 	'Text_Diff_Engine_shell' => 'Plugins/diff/textdiff/Diff/Engine/shell.php',
 	'Text_Diff_Engine_native' => 'Plugins/diff/textdiff/Diff/Engine/native.php',
-
+	
+	'PeachyAWBFunctions' => 'Includes/PeachyAWBFunctions.php',
+	
 	
 );
 
@@ -98,6 +101,7 @@ class AutoLoader {
 				$file = $pgHTTP->get( $trunk_url . '/' . $pgAutoloader[$class_name] );
 			}
 			else {
+				
 				$file = $pgHTTP->get( $trunk_url . '/Plugins/' . strtolower( $class_name ) . '.php' );
 				Hooks::runHook( 'LoadPlugin', array( &$class_name ) );
 			}

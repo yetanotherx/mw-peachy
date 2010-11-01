@@ -73,7 +73,7 @@ class Diff {
 					array( '<strong style="color:#F00;">', '</strong>' ),
 					preg_replace(
 						'/' . preg_quote( '@$(@IH@KW@Wwq2epw', '/' ) .
-						'(.*?)' . preg_quote( 'P(R#$J:W*F@ej72oiet', '/' ) . '/',
+						'(.*?)' . preg_quote( 'P(R#$J:W*F@ej72oiet', '/' ) . '/m',
 						'',
 						$diff
 					)
@@ -83,7 +83,7 @@ class Diff {
 					array( '<strong style="color:#0F0;">', '</strong>' ),
 					preg_replace(
 						'/' . preg_quote( 'WOIRUW*EOukcsfGQ', '/' ) .
-						'(.*?)' . preg_quote( '*ROw2T){E@*jVWOw', '/' ) . '/',
+						'(.*?)' . preg_quote( '*ROw2T){E@*jVWOw', '/' ) . '/m',
 						'',
 						$diff
 					)

@@ -239,7 +239,7 @@ abstract class DatabaseBase {
 		}
 		
 		
-		if( !is_null( $where ) ) {
+		if( $where ) {
 			if( is_array( $where ) ) {
 			
 				$where_tmp = array();

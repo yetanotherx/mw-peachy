@@ -75,28 +75,24 @@ require_once( $pgIP . 'Includes/Exceptions.php' );
 
 peachyCheckPHPVersion();
 
-require_once( $pgIP . 'Includes/Autoloader.php' );
-require_once( $pgIP . 'GenFunctions.php' );
+$pgHooks = array();
+$pgProxy = array();
+$pgUA = 'Peachy MediaWiki Bot API Version ' . PEACHYVERSION;
+
 require_once( $pgIP . 'Includes/Hooks.php' );
 require_once( $pgIP . 'HTTP.php' );
+$pgHTTP = new HTTP;
+
+
+require_once( $pgIP . 'Includes/Autoloader.php' );
+require_once( $pgIP . 'GenFunctions.php' );
 
 $pgVerbose = array(0,1,2,3,4);
-$pgUA = 'Peachy MediaWiki Bot API Version ' . PEACHYVERSION;
 $pgIRCTrigger = array( '!', '.' );
 
-$pgProxy = array();
-$pgHTTP = new HTTP;
 
 //Last version check
 $tmp = null;
-$PeachyInfo = MWReleases::load( $tmp, true );
-
-if( !$PeachyInfo->isSupported( PEACHYVERSION ) ) {
-	pecho( "Peachy version is below minimum version {$PeachyInfo->get_min_version()}\n\n", PECHO_ERROR );
-}
-elseif( $PeachyInfo->newerVersionExists( PEACHYVERSION ) ) {
-	pecho( "New version of Peachy available: {$PeachyInfo->get_current_version()}\n\n", PECHO_WARN );
-}
 
 if( function_exists( 'mb_internal_encoding' ) ) {
 	mb_internal_encoding( "UTF-8" );
